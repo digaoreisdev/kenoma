@@ -26,3 +26,4 @@ Este documento define regras obrigatórias para qualquer agente de IA que atue n
 ## 5. Performance e Versionamento
 * **Atenção ao Android:** Avisar imediatamente quando uma decisão, shader, textura ou processamento contínuo puder prejudicar o desempenho no Android.
 * **Commits:** Um passo concluído = um commit com mensagem curta e clara em inglês.
+
