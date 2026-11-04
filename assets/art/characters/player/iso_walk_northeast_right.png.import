@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://baygf5vu0llpa"
-path="res://.godot/imported/iso_walk_northeast_right.png-4a7fc9c8aa050eeec767286ad5630793.ctex"
+uid="uid://c0bfr07s3cm8h"
+path="res://.godot/imported/iso_walk_northeast_right.png-7838395345602cd643a0108696b2fbab.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/iso_walk_northeast_right.png"
-dest_files=["res://.godot/imported/iso_walk_northeast_right.png-4a7fc9c8aa050eeec767286ad5630793.ctex"]
+source_file="res://assets/art/characters/player/iso_walk_northeast_right.png"
+dest_files=["res://.godot/imported/iso_walk_northeast_right.png-7838395345602cd643a0108696b2fbab.ctex"]
 
 [params]
 

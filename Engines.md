@@ -42,4 +42,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.1 (2026-11-04):** Formalização do documento `Engines.md`, matriz de regressão e diretrizes de conformidade estática.
 * **v0.2 (2026-11-04):** Integração do addon AutoSprite (v1.0.0), ativação do plugin em project.godot e implementação da máquina de estados direcionais do Player com suporte a flip_h e fallback defensivo.
 * **v0.3 (2026-11-04):** Configuração dos spritesheets importados do AutoSprite (Lucas Reis) em player_frames.tres com animações idle e walk em 4 direções e vinculação com AnimatedSprite2D no Player.
+* **v0.4 (2026-11-04):** Evolução para movimentação e locomoção animada em 8 direções (cardinais e diagonais) com 18 animações em player_frames.tres, fatiamento angular por fposmod e fallback defensivo.
 

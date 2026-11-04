@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xrpr8sh00du2"
-path="res://.godot/imported/Lib__Walk_W_right.png-6381c82140f35c728b084ca358e64422.ctex"
+uid="uid://dxtahusdqhbu7"
+path="res://.godot/imported/Lib__Walk_W_right.png-07a404f3b32903775b02e26ca212a53e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Lib__Walk_W_right.png"
-dest_files=["res://.godot/imported/Lib__Walk_W_right.png-6381c82140f35c728b084ca358e64422.ctex"]
+source_file="res://assets/art/characters/player/Lib__Walk_W_right.png"
+dest_files=["res://.godot/imported/Lib__Walk_W_right.png-07a404f3b32903775b02e26ca212a53e.ctex"]
 
 [params]
 

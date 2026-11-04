@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" format=3 uid="uid://qc8fc7ial87k"]
+[gd_resource type="SpriteFrames" format=3 uid="uid://f2aqiqnkxcun"]
 
 [ext_resource type="Texture2D" uid="uid://ds86jyr4b5msb" path="res://autosprite_imported/Lucas_Reis/Walk_Left_right.png" id="1_1oifg"]
 [ext_resource type="Texture2D" uid="uid://dtqiu3mtcsb6c" path="res://autosprite_imported/Lucas_Reis/Walk_Northwest_right.png" id="1_2lnb2"]
