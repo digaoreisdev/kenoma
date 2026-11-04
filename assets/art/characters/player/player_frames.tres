@@ -1,4 +1,4 @@
-﻿[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3]
 
 [ext_resource type="Texture2D" path="res://assets/art/characters/player/iso_walk_down_right.png" id="ext_1"]
 [ext_resource type="Texture2D" path="res://assets/art/characters/player/iso_idle_down_right.png" id="ext_2"]
@@ -8715,6 +8715,28 @@ animations = [
 ],
 "loop": true,
 "name": &"push_up_left",
+"speed": 10.0
+}, {
+"frames": [
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_0") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_1") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_2") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_3") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_4") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_5") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_6") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_7") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_8") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_9") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_10") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_11") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_12") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_13") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_14") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_push_right_15") }
+],
+"loop": true,
+"name": &"push_side",
 "speed": 10.0
 }, {
 "frames": [

@@ -47,6 +47,7 @@
 * [x] **F1.6:** Implementação de limites dinâmicos da `Camera2D` vinculados ao mapa sandbox, inclusão da `AttackHitbox` direcional no Player, criação da cena de objeto interativo `PushCrate` (reação a dano de machado com flash e física de empurrão), e posicionamento de 2 caixas no `test_map.tscn`.
 * [x] **F1.7:** Remoção do ataque com machado na exploração, inclusão de `InteractionRay` no Player com detecção de proximidade, refatoração da física de empurrão (requer segurar `action_interact`), ajuste da colisão de base da caixa (`Vector2(24, 10)`) e prompt visual sutil com fade in/out.
 * [x] **F1.8 (Bugfix):** Correção de trepidação (jitter) no empurrão nas direções Cima e Laterais (REG-001) com extensão de 6px no InteractionRay, buffer de persistência de 0.15s e teste unitário automatizado em test_push_physics.gd.
+* [x] **F1.9 (Bugfix):** Resolução do ciclo incompleto de animação de empurrão (REG-002): sincronização de movimentação física única no PushCrate (_is_being_pushed), proteção contra reinício de frame em _play_push_animation, cadastro de push_side (16 frames, loop) e ampliação de testes em test_push_physics.gd.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

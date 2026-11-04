@@ -44,6 +44,7 @@ Para qualquer defeito identificado ou relatado:
 | :---: | :---: | :--- | :--- | :--- | :---: |
 | *REG-000* | *2026-11-04* | *Template inicial de exemplo* | *N/A* | *res://tests/test_example.gd* | *PASS* |
 | REG-001 | 2026-11-04 | Trepidação (jitter) ao empurrar caixa para Cima/Laterais por histerese de contato e micro-separação | Adicionado buffer de persistência (0.15s), extensão do InteractionRay (+6px) e acoplamento de alvo empurrável | res://tests/test_push_physics.gd | PASS |
+| REG-002 | 2026-11-04 | Ciclo incompleto de animação de empurrão (stutter/reset a frame 0) ao empurrar Cima/Laterais por dupla movimentação da caixa e chamadas repetidas de play() | Inclusão de trava _is_being_pushed no PushCrate, proteção em _play_push_animation (sem reinício de frame se mesma animação), registro de push_side e retenção de alvo por proximidade | res://tests/test_push_physics.gd | PASS |
 
 ---
 
@@ -57,4 +58,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.7 (2026-11-04):** Remoção de ataque da exploração, adição do RayCast2D de interação, refatoração da física de empurrão (requer segurar ação) e ajuste da colisão de base da caixa com prompt visual sutil.
 * **v0.8 (2026-11-04):** Atualização do contrato de governança para estrutura de saída bilíngue e concisa (Task Report em inglês + Resumo Rápido para o Diretor em português).
 * **v0.9 (2026-11-04):** Correção do bug REG-001 (eliminação de trepidação ao empurrar para Cima e Laterais via buffer de histerese de 0.15s e extensão de alcance do InteractionRay).
+* **v0.10 (2026-11-04):** Correção do bug REG-002 (proteção contra reinício da animação de empurrão a frame 0, sincronização estrita de física da caixa com _is_being_pushed e garantia de loop completo de 16 passos).
 

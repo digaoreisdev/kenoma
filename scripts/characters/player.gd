@@ -108,7 +108,7 @@ func _try_push(input_dir: Vector2) -> bool:
 	var target_crate: PushCrate = _find_pushable_target(input_dir)
 	if target_crate != null:
 		_pushed_crate = target_crate
-		_push_buffer = 0.15
+		_push_buffer = 0.2
 	elif _push_buffer > 0.0 and _pushed_crate != null and is_instance_valid(_pushed_crate):
 		target_crate = _pushed_crate
 	else:
@@ -119,7 +119,7 @@ func _try_push(input_dir: Vector2) -> bool:
 	velocity = input_dir * push_speed
 	target_crate.push_by(input_dir, push_speed)
 	move_and_slide()
-	_play_raw_animation("push_" + _direction_to_string(current_direction))
+	_play_push_animation(current_direction)
 	return true
 
 
@@ -127,15 +127,20 @@ func _find_pushable_target(input_dir: Vector2) -> PushCrate:
 	for i: int in get_slide_collision_count():
 		var col: KinematicCollision2D = get_slide_collision(i)
 		var collider: Object = col.get_collider()
-		if collider is PushCrate and (-col.get_normal()).dot(input_dir) > 0.4:
+		if collider is PushCrate and (-col.get_normal()).dot(input_dir) > 0.3:
 			return collider as PushCrate
 	
 	if interaction_ray != null and interaction_ray.is_colliding():
 		var ray_col: Object = interaction_ray.get_collider()
 		if ray_col is PushCrate:
 			var to_crate: Vector2 = (ray_col.global_position - global_position).normalized()
-			if to_crate.dot(input_dir) > 0.4:
+			if to_crate.dot(input_dir) > 0.3:
 				return ray_col as PushCrate
+	
+	if _pushed_crate != null and is_instance_valid(_pushed_crate):
+		var to_crate: Vector2 = _pushed_crate.global_position - global_position
+		if to_crate.length() <= 38.0 and to_crate.normalized().dot(input_dir) > 0.3:
+			return _pushed_crate
 	return null
 
 
@@ -226,17 +231,36 @@ func _update_locomotion_animation() -> void:
 	_play_raw_animation(anim_name)
 
 
+func _play_push_animation(dir: Direction) -> void:
+	if animated_sprite == null or animated_sprite.sprite_frames == null:
+		return
+	var target_anim: String = "push_" + _direction_to_string(dir)
+	if not animated_sprite.sprite_frames.has_animation(target_anim):
+		if animated_sprite.sprite_frames.has_animation("push_side") and (dir == Direction.LEFT or dir == Direction.RIGHT):
+			target_anim = "push_side"
+		else:
+			return
+	if animated_sprite.animation != target_anim:
+		animated_sprite.play(target_anim)
+	elif not animated_sprite.is_playing():
+		animated_sprite.play()
+
+
 func _play_raw_animation(anim_name: String) -> void:
 	if animated_sprite == null or animated_sprite.sprite_frames == null:
 		return
 	if not animated_sprite.sprite_frames.has_animation(anim_name):
 		return
-	if animated_sprite.animation != anim_name or not animated_sprite.is_playing():
+	if animated_sprite.animation != anim_name:
 		animated_sprite.play(anim_name)
+	elif not animated_sprite.is_playing():
+		animated_sprite.play()
 
 
 func _on_animation_finished() -> void:
 	if current_state == State.DEAD:
+		return
+	if current_state == State.INTERACTING and _pushed_crate != null:
 		return
 	if current_state in [State.HURT, State.RESTING, State.INTERACTING]:
 		var finished_action: String = current_action_name
