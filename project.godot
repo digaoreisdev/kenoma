@@ -19,16 +19,15 @@ config/icon="res://icon.svg"
 
 GameState="*res://scripts/autoload/game_state.gd"
 
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/autosprite/plugin.cfg")
-
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/autosprite/plugin.cfg")
 
 [input]
 

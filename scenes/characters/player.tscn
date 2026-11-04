@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://bvyg2x0k8h3pm"]
+[gd_scene load_steps=4 format=3 uid="uid://bvyg2x0k8h3pm"]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player_script"]
+[ext_resource type="SpriteFrames" path="res://assets/art/characters/player/player_frames.tres" id="2_player_frames"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_feet"]
 size = Vector2(14, 8)
@@ -11,9 +12,14 @@ collision_mask = 1
 script = ExtResource("1_player_script")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -16)
+position = Vector2(0, -32)
+scale = Vector2(0.25, 0.25)
+sprite_frames = ExtResource("2_player_frames")
+animation = &"idle_down"
+autoplay = "idle_down"
 
 [node name="PlaceholderVisual" type="ColorRect" parent="."]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

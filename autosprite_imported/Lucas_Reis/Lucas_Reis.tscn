@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://6xvfbgdt4tp2"]
+
+[ext_resource type="SpriteFrames" uid="uid://qc8fc7ial87k" path="res://autosprite_imported/Lucas_Reis/Lucas_Reis_frames.tres" id="1_of55m"]
+
+[node name="Lucas_Reis" type="AnimatedSprite2D" unique_id=1499712905]
+texture_filter = 1
+sprite_frames = ExtResource("1_of55m")
+animation = &"iso_walk_down_right"
+autoplay = "iso_walk_down_right"
