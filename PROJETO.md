@@ -17,6 +17,9 @@
 * **Modo de Stretch:** `canvas_items` com aspect `keep`.
 * **Filtro de Textura 2D:** `Nearest` (`textures/canvas_textures/default_texture_filter=0`) para preservar a nitidez da pixel art.
 * **Dimensões de Sprites de Personagem:** Quadro de 48x64 px (largura x altura). Origem de desenho no ponto dos pés (a confirmar).
+* **Velocidade Base do Jogador:** 120.0 px/s com normalização vetorial e `move_and_slide()`.
+* **Câmera de Exploração:** `Camera2D` centrada no jogador com zoom 3x e suavização ativa.
+* **Ciclo de Vida Global:** Gerenciado pelo singleton `GameState` com estados `EXPLORATION`, `DIALOGUE`, `BATTLE`, `PAUSE`.
 * **Ambiente de Desenvolvimento:** Windows (desenvolvimento focado no PC durante os passos iniciais).
 * **Plataformas-Alvo:** PC e Android.
 * **Estratégia Mobile:** Desenvolvimento inicial no PC, implementação e mapeamento dos controles touch na Fase F1, e realização do primeiro teste em celular Android físico no encerramento da F1.
@@ -27,16 +30,18 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F0 - Preparação e Infraestrutura Básica** (Passo 2 concluído).
+* **F1 - Fundação de Gameplay & Movimentação** (Passo 1 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
 * [x] **F0.2:** Criação da estrutura de pastas padronizada com `.gitkeep`, ajustes de viewport, stretch e filtro de textura no `project.godot`, definição de diretrizes em `AGENTS.md` e atualização do `PROJETO.md`.
+* [x] **F1.1:** Configuração do `Input Map` semântico no `project.godot` (teclado e gamepad), implementação do singleton `GameState`, desenvolvimento da cena e script `CharacterBody2D` do Player (com colisão nos pés, ColorRect temporário e Camera2D 3x), e construção do mapa de testes sandbox (`test_map.tscn`) definido como cena principal.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
-  * Implementação da vertical slice (movimentação, transição de mapa, combate por turnos).
+  * Implementação da vertical slice (transição de mapa, combate por turnos).
   * Reavaliar `window/stretch/aspect` (keep vs expand) para telas de celular com proporções ultra-wide (ex: 19.5:9, 20:9) durante a Fase F1.
+  * Criação dos controles virtuais na tela (D-pad virtual / touch) para mobile no fim da Fase F1.
 * **Talvez:**
   * Integração de elementos 3D com `Sprite3D` (HD-2D híbrido) — avaliar somente se o desempenho no celular Android físico permitir mantendo taxa de quadros estável.
 

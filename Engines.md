@@ -40,3 +40,4 @@ Para qualquer defeito identificado ou relatado:
 
 ## 5. Histórico de Versões de Engenharia
 * **v0.1 (2026-11-04):** Formalização do documento `Engines.md`, matriz de regressão e diretrizes de conformidade estática.
+
