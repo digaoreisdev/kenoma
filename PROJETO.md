@@ -22,6 +22,7 @@
 * **Ciclo de Vida Global:** Gerenciado pelo singleton `GameState` com estados `EXPLORATION`, `DIALOGUE`, `BATTLE`, `PAUSE`.
 * **Addon AutoSprite:** Plugin instalado em `res://addons/autosprite/` e ativado em `project.godot` para importação e geração de `SpriteFrames`.
 * **Animações e Direções do Personagem:** Locomoção e posturas completas em 8 direções (`DOWN`, `UP`, `LEFT`, `RIGHT`, `DOWN_RIGHT`, `DOWN_LEFT`, `UP_RIGHT`, `UP_LEFT`) e 2 modos (`IDLE`, `WALK`), mapeadas para 18 animações dedicadas no `SpriteFrames` (`idle_*`, `walk_*`) com cálculo angular normalizado e fallback defensivo para direções cardinais.
+* **Suíte Completa de Ações do Personagem:** 88 animações em 8 direções cadastradas em `player_frames.tres` cobrindo `walk`, `idle`, `attack_axe`, `crouch`, `die`, `dodge`, `hurt`, `pull`, `push`, `sit` e `sleep`. A máquina de estados do jogador gerencia `IDLE`, `WALK`, `INTERACTING`, `ATTACKING`, `HURT`, `DEAD` e `RESTING`, com bloqueio automático da física de caminhada durante execuções de ação.
 * **Ambiente de Desenvolvimento:** Windows (desenvolvimento focado no PC durante os passos iniciais).
 * **Plataformas-Alvo:** PC e Android.
 * **Estratégia Mobile:** Desenvolvimento inicial no PC, implementação e mapeamento dos controles touch na Fase F1, e realização do primeiro teste em celular Android físico no encerramento da F1.
@@ -32,7 +33,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F1 - Fundação de Gameplay & Movimentação** (Passo 4 concluído).
+* **F1 - Fundação de Gameplay & Movimentação** (Passo 5 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -41,6 +42,7 @@
 * [x] **F1.2:** Integração do addon oficial AutoSprite em `addons/autosprite/` e ativação no `project.godot`, criação da pasta de assets para sprites do jogador (`res://assets/art/characters/player/`), implementação da máquina de direções e animações no `player.gd` com `AnimatedSprite2D` e fallback defensivo visual.
 * [x] **F1.3:** Organização dos assets gerados pelo AutoSprite em `res://assets/art/characters/player/`, criação do recurso `SpriteFrames` (`player_frames.tres`) com `walk_down`, `walk_up`, `walk_side` e seus respectivos idles, e vinculação com `AnimatedSprite2D` no `player.tscn` com ocultamento do placeholder visual.
 * [x] **F1.4:** Evolução para locomoção e animações completas em 8 direções no `player.gd` (cálculo de 8 ângulos via `fposmod`/`round`), geração de 18 animações dedicadas em `player_frames.tres` utilizando spritesheets diagonais e cardinais reais do AutoSprite, com fallback defensivo para direções cardinais.
+* [x] **F1.5:** Mapeamento completo de 88 animações nas 8 direções no `player_frames.tres` (11 ações x 8 orientações: walk, idle, attack_axe, crouch, die, dodge, hurt, pull, push, sit, sleep), expansão da máquina de estados do Player (IDLE, WALK, INTERACTING, ATTACKING, HURT, DEAD, RESTING), vinculação do ataque com machado ao botão de interação (Espaço/Enter/Gamepad A), bloqueio de locomoção em ações e emissão de sinais de vida e estado.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
