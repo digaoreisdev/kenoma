@@ -52,3 +52,4 @@ shape = SubResource("RectangleShape2D_wall_right")
 
 [node name="Player" parent="." instance=ExtResource("1_player_scene")]
 position = Vector2(0, 0)
+

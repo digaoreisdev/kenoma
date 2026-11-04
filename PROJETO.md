@@ -20,6 +20,8 @@
 * **Velocidade Base do Jogador:** 120.0 px/s com normalização vetorial e `move_and_slide()`.
 * **Câmera de Exploração:** `Camera2D` centrada no jogador com zoom 3x e suavização ativa.
 * **Ciclo de Vida Global:** Gerenciado pelo singleton `GameState` com estados `EXPLORATION`, `DIALOGUE`, `BATTLE`, `PAUSE`.
+* **Addon AutoSprite:** Plugin instalado em `res://addons/autosprite/` e ativado em `project.godot` para importação e geração de `SpriteFrames`.
+* **Animações e Direções do Personagem:** 4 direções (`DOWN`, `UP`, `LEFT`, `RIGHT`) e 2 modos (`IDLE`, `WALK`), mapeados para `idle_down`, `idle_up`, `idle_side` (com `flip_h` para a esquerda), `walk_down`, `walk_up`, `walk_side` (com `flip_h` para a esquerda).
 * **Ambiente de Desenvolvimento:** Windows (desenvolvimento focado no PC durante os passos iniciais).
 * **Plataformas-Alvo:** PC e Android.
 * **Estratégia Mobile:** Desenvolvimento inicial no PC, implementação e mapeamento dos controles touch na Fase F1, e realização do primeiro teste em celular Android físico no encerramento da F1.
@@ -30,12 +32,13 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F1 - Fundação de Gameplay & Movimentação** (Passo 1 concluído).
+* **F1 - Fundação de Gameplay & Movimentação** (Passo 2 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
 * [x] **F0.2:** Criação da estrutura de pastas padronizada com `.gitkeep`, ajustes de viewport, stretch e filtro de textura no `project.godot`, definição de diretrizes em `AGENTS.md` e atualização do `PROJETO.md`.
 * [x] **F1.1:** Configuração do `Input Map` semântico no `project.godot` (teclado e gamepad), implementação do singleton `GameState`, desenvolvimento da cena e script `CharacterBody2D` do Player (com colisão nos pés, ColorRect temporário e Camera2D 3x), e construção do mapa de testes sandbox (`test_map.tscn`) definido como cena principal.
+* [x] **F1.2:** Integração do addon oficial AutoSprite em `addons/autosprite/` e ativação no `project.godot`, criação da pasta de assets para sprites do jogador (`res://assets/art/characters/player/`), implementação da máquina de direções e animações no `player.gd` com `AnimatedSprite2D` e fallback defensivo visual.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

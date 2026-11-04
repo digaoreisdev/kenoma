@@ -32,3 +32,4 @@ func is_state(state: State) -> bool:
 
 func is_exploration() -> bool:
 	return current_state == State.EXPLORATION
+
