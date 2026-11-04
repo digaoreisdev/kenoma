@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://w6x8e5rdwwx6"
-path="res://.godot/imported/Sit_Northeast_right.png-5bf72f4fd5c3c3093e8805a6cc2bc76f.ctex"
+uid="uid://bjrgc52sak4v4"
+path="res://.godot/imported/Sit_Northeast_right.png-c4dc923bf3e377b713647ebba0c7323f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Sit_Northeast_right.png"
-dest_files=["res://.godot/imported/Sit_Northeast_right.png-5bf72f4fd5c3c3093e8805a6cc2bc76f.ctex"]
+source_file="res://assets/art/characters/player/Sit_Northeast_right.png"
+dest_files=["res://.godot/imported/Sit_Northeast_right.png-c4dc923bf3e377b713647ebba0c7323f.ctex"]
 
 [params]
 

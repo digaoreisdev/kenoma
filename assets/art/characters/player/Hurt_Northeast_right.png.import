@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmq056gb2g2ra"
-path="res://.godot/imported/Hurt_Northeast_right.png-319c7c99aeddebe2351b68d72aaa6c88.ctex"
+uid="uid://cv7q4beq4j36b"
+path="res://.godot/imported/Hurt_Northeast_right.png-86f2a6cab7ede7caff5f7b46e894bf98.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Hurt_Northeast_right.png"
-dest_files=["res://.godot/imported/Hurt_Northeast_right.png-319c7c99aeddebe2351b68d72aaa6c88.ctex"]
+source_file="res://assets/art/characters/player/Hurt_Northeast_right.png"
+dest_files=["res://.godot/imported/Hurt_Northeast_right.png-86f2a6cab7ede7caff5f7b46e894bf98.ctex"]
 
 [params]
 

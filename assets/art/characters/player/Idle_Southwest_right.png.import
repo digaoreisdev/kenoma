@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1uxak4ur0va0"
-path="res://.godot/imported/Idle_Southwest_right.png-a104be7e76b764ee97463fb41c0f0bb8.ctex"
+uid="uid://dctu4o2lkw5cu"
+path="res://.godot/imported/Idle_Southwest_right.png-57691d73ee0a9feea1fb6dd5383d6cf0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Idle_Southwest_right.png"
-dest_files=["res://.godot/imported/Idle_Southwest_right.png-a104be7e76b764ee97463fb41c0f0bb8.ctex"]
+source_file="res://assets/art/characters/player/Idle_Southwest_right.png"
+dest_files=["res://.godot/imported/Idle_Southwest_right.png-57691d73ee0a9feea1fb6dd5383d6cf0.ctex"]
 
 [params]
 

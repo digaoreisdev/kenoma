@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://84wgev5u8j21"
-path="res://.godot/imported/Sleep_Right_right.png-8994329672a7f7fdac4f86837e2dd88c.ctex"
+uid="uid://ct7jkx66ithwl"
+path="res://.godot/imported/Sleep_Right_right.png-a7bac5b26dd96db718daa81a41ed015d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Sleep_Right_right.png"
-dest_files=["res://.godot/imported/Sleep_Right_right.png-8994329672a7f7fdac4f86837e2dd88c.ctex"]
+source_file="res://assets/art/characters/player/Sleep_Right_right.png"
+dest_files=["res://.godot/imported/Sleep_Right_right.png-a7bac5b26dd96db718daa81a41ed015d.ctex"]
 
 [params]
 

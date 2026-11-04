@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btbu2mvqdjkon"
-path="res://.godot/imported/Attack_Left_right.png-f957a19846f5a561f61ffd12e2673fef.ctex"
+uid="uid://xvad3or6n00o"
+path="res://.godot/imported/Attack_Left_right.png-771a8fc3bf9077622ff7aea835099fe5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Attack_Left_right.png"
-dest_files=["res://.godot/imported/Attack_Left_right.png-f957a19846f5a561f61ffd12e2673fef.ctex"]
+source_file="res://assets/art/characters/player/Attack_Left_right.png"
+dest_files=["res://.godot/imported/Attack_Left_right.png-771a8fc3bf9077622ff7aea835099fe5.ctex"]
 
 [params]
 

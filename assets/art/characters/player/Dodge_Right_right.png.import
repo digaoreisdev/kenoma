@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dmfljq6ebpaoo"
-path="res://.godot/imported/Dodge_Right_right.png-b512483a9b5d74d5c63eca674084ca56.ctex"
+uid="uid://c4lpdec0s7l5x"
+path="res://.godot/imported/Dodge_Right_right.png-bf67f0a4a6587f7d3deb5c02445971ee.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Dodge_Right_right.png"
-dest_files=["res://.godot/imported/Dodge_Right_right.png-b512483a9b5d74d5c63eca674084ca56.ctex"]
+source_file="res://assets/art/characters/player/Dodge_Right_right.png"
+dest_files=["res://.godot/imported/Dodge_Right_right.png-bf67f0a4a6587f7d3deb5c02445971ee.ctex"]
 
 [params]
 

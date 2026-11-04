@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jgw3mwhd4dpc"
-path="res://.godot/imported/Hurt_Southwest_right.png-6c58b4f208cd8ee4ce39ca3bdb9b9cef.ctex"
+uid="uid://0ntfhjwfpla0"
+path="res://.godot/imported/Hurt_Southwest_right.png-afd7182efb26a4ee4ee2ee24890c6fe3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Hurt_Southwest_right.png"
-dest_files=["res://.godot/imported/Hurt_Southwest_right.png-6c58b4f208cd8ee4ce39ca3bdb9b9cef.ctex"]
+source_file="res://assets/art/characters/player/Hurt_Southwest_right.png"
+dest_files=["res://.godot/imported/Hurt_Southwest_right.png-afd7182efb26a4ee4ee2ee24890c6fe3.ctex"]
 
 [params]
 

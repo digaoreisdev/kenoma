@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://mcmqtva6haol"
-path="res://.godot/imported/Pull_Left_right.png-cab09f1e90ed34ef6ea6809e735efde5.ctex"
+uid="uid://c7m4dl8ci0m3l"
+path="res://.godot/imported/Pull_Left_right.png-d047d126c0c486989c0a1b8864df0959.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Pull_Left_right.png"
-dest_files=["res://.godot/imported/Pull_Left_right.png-cab09f1e90ed34ef6ea6809e735efde5.ctex"]
+source_file="res://assets/art/characters/player/Pull_Left_right.png"
+dest_files=["res://.godot/imported/Pull_Left_right.png-d047d126c0c486989c0a1b8864df0959.ctex"]
 
 [params]
 

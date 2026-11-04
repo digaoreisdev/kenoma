@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqftrigwkvm0j"
-path="res://.godot/imported/Idle_Northwest_right.png-4c118f8274b252ac41b9099e8d2c45ef.ctex"
+uid="uid://byc22pefj74xv"
+path="res://.godot/imported/Idle_Northwest_right.png-f59e6a09ee5918e90d09b12b23b65958.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Idle_Northwest_right.png"
-dest_files=["res://.godot/imported/Idle_Northwest_right.png-4c118f8274b252ac41b9099e8d2c45ef.ctex"]
+source_file="res://assets/art/characters/player/Idle_Northwest_right.png"
+dest_files=["res://.godot/imported/Idle_Northwest_right.png-f59e6a09ee5918e90d09b12b23b65958.ctex"]
 
 [params]
 

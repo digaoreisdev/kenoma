@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ol6h5btoq0ob"
-path="res://.godot/imported/Attack_Southeast_right.png-9a60294250f9942e6b98189b64b63a9a.ctex"
+uid="uid://byp5l6om3yonl"
+path="res://.godot/imported/Attack_Southeast_right.png-48968deb100b4fc77888b3fa3cd8353a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Attack_Southeast_right.png"
-dest_files=["res://.godot/imported/Attack_Southeast_right.png-9a60294250f9942e6b98189b64b63a9a.ctex"]
+source_file="res://assets/art/characters/player/Attack_Southeast_right.png"
+dest_files=["res://.godot/imported/Attack_Southeast_right.png-48968deb100b4fc77888b3fa3cd8353a.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxom0t3p3fkqu"
-path="res://.godot/imported/Sit_Down_right.png-928300fd5382d9f1a516aa03010933fd.ctex"
+uid="uid://qm35ojwuf4vw"
+path="res://.godot/imported/Sit_Down_right.png-935f943f5a16f43fbee5ea43a1dd9362.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Sit_Down_right.png"
-dest_files=["res://.godot/imported/Sit_Down_right.png-928300fd5382d9f1a516aa03010933fd.ctex"]
+source_file="res://assets/art/characters/player/Sit_Down_right.png"
+dest_files=["res://.godot/imported/Sit_Down_right.png-935f943f5a16f43fbee5ea43a1dd9362.ctex"]
 
 [params]
 

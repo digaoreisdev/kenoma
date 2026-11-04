@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cyh3bnhup4cn6"
-path="res://.godot/imported/Kneel_Up_right.png-a03ad6d758763181aa6832f3ab9885a0.ctex"
+uid="uid://iomvyr2wwjju"
+path="res://.godot/imported/Kneel_Up_right.png-08388bb6b4d0f5dd306167f4b15b8e9f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Kneel_Up_right.png"
-dest_files=["res://.godot/imported/Kneel_Up_right.png-a03ad6d758763181aa6832f3ab9885a0.ctex"]
+source_file="res://assets/art/characters/player/Kneel_Up_right.png"
+dest_files=["res://.godot/imported/Kneel_Up_right.png-08388bb6b4d0f5dd306167f4b15b8e9f.ctex"]
 
 [params]
 

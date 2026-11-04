@@ -44,4 +44,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.3 (2026-11-04):** Configuração dos spritesheets importados do AutoSprite (Lucas Reis) em player_frames.tres com animações idle e walk em 4 direções e vinculação com AnimatedSprite2D no Player.
 * **v0.4 (2026-11-04):** Evolução para movimentação e locomoção animada em 8 direções (cardinais e diagonais) com 18 animações em player_frames.tres, fatiamento angular por fposmod e fallback defensivo.
 * **v0.5 (2026-11-04):** Mapeamento do conjunto completo de 88 animações em 8 direções (walk, idle, attack_axe, crouch, die, dodge, hurt, pull, push, sit, sleep), estruturação dos estados do jogador (IDLE, WALK, INTERACTING, ATTACKING, HURT, DEAD, RESTING), controle de dano/morte e bloqueio de locomoção em ações.
+* **v0.6 (2026-11-04):** Implementação de limites dinâmicos de Camera2D (set_camera_limits), criação da AttackHitbox no Player e objeto interativo PushCrate com reação a dano de machado e empurrão físico.
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://di723sdtyg1ee"
-path="res://.godot/imported/Crouch_Southwest_right.png-9f11cd62cf8609b7e18cfb92e03d448c.ctex"
+uid="uid://fjdoefaoo4fj"
+path="res://.godot/imported/Crouch_Southwest_right.png-94df500a24c874d4a5c6c953fb3f25e9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Crouch_Southwest_right.png"
-dest_files=["res://.godot/imported/Crouch_Southwest_right.png-9f11cd62cf8609b7e18cfb92e03d448c.ctex"]
+source_file="res://assets/art/characters/player/Crouch_Southwest_right.png"
+dest_files=["res://.godot/imported/Crouch_Southwest_right.png-94df500a24c874d4a5c6c953fb3f25e9.ctex"]
 
 [params]
 

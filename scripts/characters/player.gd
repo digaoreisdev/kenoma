@@ -1,7 +1,7 @@
 class_name Player
 extends CharacterBody2D
 
-## Controlador de locomoção em 8 direções e suíte de ações do jogador.
+## Controlador de locomoção em 8 direções, ações e câmera do jogador.
 
 enum Direction {
 	DOWN,
@@ -39,6 +39,9 @@ var current_action_name: String = ""
 
 @onready var animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D")
 @onready var placeholder_visual: ColorRect = get_node_or_null("PlaceholderVisual")
+@onready var camera_2d: Camera2D = get_node_or_null("Camera2D")
+@onready var attack_hitbox: Area2D = get_node_or_null("AttackHitbox")
+@onready var hitbox_collision: CollisionShape2D = get_node_or_null("AttackHitbox/HitboxCollision")
 
 
 func _ready() -> void:
@@ -47,6 +50,8 @@ func _ready() -> void:
 		placeholder_visual.visible = false
 	if animated_sprite != null:
 		animated_sprite.animation_finished.connect(_on_animation_finished)
+	if hitbox_collision != null:
+		hitbox_collision.disabled = true
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -64,8 +69,17 @@ func _physics_process(_delta: float) -> void:
 	_update_locomotion_animation()
 
 
+func set_camera_limits(left: int, top: int, right: int, bottom: int) -> void:
+	if camera_2d == null:
+		return
+	camera_2d.limit_left = left
+	camera_2d.limit_top = top
+	camera_2d.limit_right = right
+	camera_2d.limit_bottom = bottom
+
+
 func _can_walk() -> bool:
-	if current_state != State.IDLE and current_state != State.WALK:
+	if current_state != State.IDLE and current_state != State.WALK and current_state != State.INTERACTING:
 		return false
 	if has_node("/root/GameState"):
 		var state_mgr: Node = get_node("/root/GameState")
@@ -94,6 +108,19 @@ func _handle_movement() -> void:
 	
 	velocity = input_direction * move_speed
 	move_and_slide()
+	_check_pushable_collisions(input_direction)
+
+
+func _check_pushable_collisions(input_dir: Vector2) -> void:
+	for i: int in get_slide_collision_count():
+		var col: KinematicCollision2D = get_slide_collision(i)
+		var collider: Object = col.get_collider()
+		if collider != null and collider.has_method("push_by"):
+			var push_dir: Vector2 = -col.get_normal()
+			if push_dir.dot(input_dir) > 0.5:
+				current_state = State.INTERACTING
+				collider.call("push_by", push_dir, move_speed * 0.4)
+				_play_raw_animation("push_" + _direction_to_string(current_direction))
 
 
 func _resolve_8way_direction(dir: Vector2) -> void:
@@ -113,13 +140,39 @@ func _resolve_8way_direction(dir: Vector2) -> void:
 
 
 func trigger_attack() -> void:
+	_position_hitbox()
+	_activate_hitbox()
 	play_action("attack_axe", current_direction)
+
+
+func _position_hitbox() -> void:
+	if hitbox_collision == null:
+		return
+	match current_direction:
+		Direction.DOWN: hitbox_collision.position = Vector2(0, 10)
+		Direction.UP: hitbox_collision.position = Vector2(0, -26)
+		Direction.LEFT: hitbox_collision.position = Vector2(-18, -12)
+		Direction.RIGHT: hitbox_collision.position = Vector2(18, -12)
+		Direction.DOWN_RIGHT: hitbox_collision.position = Vector2(14, 2)
+		Direction.DOWN_LEFT: hitbox_collision.position = Vector2(-14, 2)
+		Direction.UP_RIGHT: hitbox_collision.position = Vector2(14, -20)
+		Direction.UP_LEFT: hitbox_collision.position = Vector2(-14, -20)
+
+
+func _activate_hitbox() -> void:
+	if hitbox_collision == null:
+		return
+	hitbox_collision.disabled = false
+	var timer: SceneTreeTimer = get_tree().create_timer(0.3)
+	timer.timeout.connect(func() -> void:
+		if is_instance_valid(hitbox_collision):
+			hitbox_collision.disabled = true
+	)
 
 
 func take_damage(amount: int) -> void:
 	if current_state == State.DEAD:
 		return
-	
 	current_health = clampi(current_health - amount, 0, max_health)
 	health_changed.emit(current_health, max_health)
 	
@@ -163,7 +216,6 @@ func _play_raw_animation(anim_name: String) -> void:
 		return
 	if not animated_sprite.sprite_frames.has_animation(anim_name):
 		return
-	
 	if animated_sprite.animation != anim_name or not animated_sprite.is_playing():
 		animated_sprite.play(anim_name)
 
@@ -171,6 +223,8 @@ func _play_raw_animation(anim_name: String) -> void:
 func _on_animation_finished() -> void:
 	if current_state == State.DEAD:
 		return
+	if hitbox_collision != null:
+		hitbox_collision.disabled = true
 	
 	if current_state in [State.ATTACKING, State.HURT, State.RESTING, State.INTERACTING]:
 		var finished_action: String = current_action_name

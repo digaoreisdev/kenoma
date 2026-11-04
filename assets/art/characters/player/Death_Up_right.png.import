@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b2j2aftr1f8gd"
-path="res://.godot/imported/Death_Up_right.png-f7d394d6972b9fe635ec4efb7bc27432.ctex"
+uid="uid://dutpamgj7n45g"
+path="res://.godot/imported/Death_Up_right.png-0be0848d72bc5573341debe41bb30f74.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Death_Up_right.png"
-dest_files=["res://.godot/imported/Death_Up_right.png-f7d394d6972b9fe635ec4efb7bc27432.ctex"]
+source_file="res://assets/art/characters/player/Death_Up_right.png"
+dest_files=["res://.godot/imported/Death_Up_right.png-0be0848d72bc5573341debe41bb30f74.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bpulp10wp4he1"
-path="res://.godot/imported/Sleep_Southwest_right.png-0a9941c1871cedcda920a3da5d38f157.ctex"
+uid="uid://bqr5h3hay6ae5"
+path="res://.godot/imported/Sleep_Southwest_right.png-8b2ab0cc088ad9d2d9ba04911be97267.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Sleep_Southwest_right.png"
-dest_files=["res://.godot/imported/Sleep_Southwest_right.png-0a9941c1871cedcda920a3da5d38f157.ctex"]
+source_file="res://assets/art/characters/player/Sleep_Southwest_right.png"
+dest_files=["res://.godot/imported/Sleep_Southwest_right.png-8b2ab0cc088ad9d2d9ba04911be97267.ctex"]
 
 [params]
 

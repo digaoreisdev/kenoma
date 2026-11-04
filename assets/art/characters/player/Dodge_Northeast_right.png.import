@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cf082he6rb5x6"
-path="res://.godot/imported/Dodge_Northeast_right.png-f476731b7dd646c7c1a4a856231c6033.ctex"
+uid="uid://bnei281kd2eng"
+path="res://.godot/imported/Dodge_Northeast_right.png-ef5137777ff2eb418b135d31dd0546f2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Dodge_Northeast_right.png"
-dest_files=["res://.godot/imported/Dodge_Northeast_right.png-f476731b7dd646c7c1a4a856231c6033.ctex"]
+source_file="res://assets/art/characters/player/Dodge_Northeast_right.png"
+dest_files=["res://.godot/imported/Dodge_Northeast_right.png-ef5137777ff2eb418b135d31dd0546f2.ctex"]
 
 [params]
 

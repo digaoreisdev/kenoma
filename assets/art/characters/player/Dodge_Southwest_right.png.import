@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://qmqrhrnysmqr"
-path="res://.godot/imported/Dodge_Southwest_right.png-c606b045493db0cc45d8d56b124b6011.ctex"
+uid="uid://v00xkp8s1b5l"
+path="res://.godot/imported/Dodge_Southwest_right.png-09e7e6da6bd03371de3b59ca3f4b514f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Dodge_Southwest_right.png"
-dest_files=["res://.godot/imported/Dodge_Southwest_right.png-c606b045493db0cc45d8d56b124b6011.ctex"]
+source_file="res://assets/art/characters/player/Dodge_Southwest_right.png"
+dest_files=["res://.godot/imported/Dodge_Southwest_right.png-09e7e6da6bd03371de3b59ca3f4b514f.ctex"]
 
 [params]
 

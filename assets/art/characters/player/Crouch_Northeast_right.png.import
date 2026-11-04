@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgywnr6evdc2m"
-path="res://.godot/imported/Crouch_Northeast_right.png-1715e3b9c48d6d20ab694438339979bf.ctex"
+uid="uid://8ywx3lqju336"
+path="res://.godot/imported/Crouch_Northeast_right.png-11584fcf624adaabdd5eb92b03b60ea6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Crouch_Northeast_right.png"
-dest_files=["res://.godot/imported/Crouch_Northeast_right.png-1715e3b9c48d6d20ab694438339979bf.ctex"]
+source_file="res://assets/art/characters/player/Crouch_Northeast_right.png"
+dest_files=["res://.godot/imported/Crouch_Northeast_right.png-11584fcf624adaabdd5eb92b03b60ea6.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8nf7trqv85xl"
-path="res://.godot/imported/Victory_Down_right.png-cc96defd16f077de513f596aa2c0792b.ctex"
+uid="uid://ddo557vq1nfpf"
+path="res://.godot/imported/Victory_Down_right.png-233c7558530164609aa51402600cd96e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Victory_Down_right.png"
-dest_files=["res://.godot/imported/Victory_Down_right.png-cc96defd16f077de513f596aa2c0792b.ctex"]
+source_file="res://assets/art/characters/player/Victory_Down_right.png"
+dest_files=["res://.godot/imported/Victory_Down_right.png-233c7558530164609aa51402600cd96e.ctex"]
 
 [params]
 

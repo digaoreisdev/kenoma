@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djk43ykqtqe6y"
-path="res://.godot/imported/Victory_Northeast_right.png-b39bcea6c69d132a344916a13b4d302c.ctex"
+uid="uid://bgcv4i4bor2nq"
+path="res://.godot/imported/Victory_Northeast_right.png-21ae16201f75ee6bdded56b204ca85f4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Victory_Northeast_right.png"
-dest_files=["res://.godot/imported/Victory_Northeast_right.png-b39bcea6c69d132a344916a13b4d302c.ctex"]
+source_file="res://assets/art/characters/player/Victory_Northeast_right.png"
+dest_files=["res://.godot/imported/Victory_Northeast_right.png-21ae16201f75ee6bdded56b204ca85f4.ctex"]
 
 [params]
 

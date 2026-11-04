@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dl2og4dvfi20k"
-path="res://.godot/imported/iso_idle_right_right.png-747ba5a713f75e7a2ad92f87828d9511.ctex"
+uid="uid://jgf0465tafd2"
+path="res://.godot/imported/iso_idle_right_right.png-bbde65e6bfa9d947a92a9ac09915ebe2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/iso_idle_right_right.png"
-dest_files=["res://.godot/imported/iso_idle_right_right.png-747ba5a713f75e7a2ad92f87828d9511.ctex"]
+source_file="res://assets/art/characters/player/iso_idle_right_right.png"
+dest_files=["res://.godot/imported/iso_idle_right_right.png-bbde65e6bfa9d947a92a9ac09915ebe2.ctex"]
 
 [params]
 

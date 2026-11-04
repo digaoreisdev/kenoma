@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://0mids1eb14xw"
-path="res://.godot/imported/Sleep_Northeast_right.png-5c2ccb249bdb6fb7c39a7e85214a4e89.ctex"
+uid="uid://cscufxw6aqwyd"
+path="res://.godot/imported/Sleep_Northeast_right.png-b542f325cc36a2cf9d8a2b55bc59650e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Sleep_Northeast_right.png"
-dest_files=["res://.godot/imported/Sleep_Northeast_right.png-5c2ccb249bdb6fb7c39a7e85214a4e89.ctex"]
+source_file="res://assets/art/characters/player/Sleep_Northeast_right.png"
+dest_files=["res://.godot/imported/Sleep_Northeast_right.png-b542f325cc36a2cf9d8a2b55bc59650e.ctex"]
 
 [params]
 

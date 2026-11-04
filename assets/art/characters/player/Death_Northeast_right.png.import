@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bbwlj3pm8sp30"
-path="res://.godot/imported/Death_Northeast_right.png-1b9c624f5d7a46371fed5188989d3812.ctex"
+uid="uid://5nnw57svs2du"
+path="res://.godot/imported/Death_Northeast_right.png-a84a8e74c01158ad034ba8637e0777f1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Death_Northeast_right.png"
-dest_files=["res://.godot/imported/Death_Northeast_right.png-1b9c624f5d7a46371fed5188989d3812.ctex"]
+source_file="res://assets/art/characters/player/Death_Northeast_right.png"
+dest_files=["res://.godot/imported/Death_Northeast_right.png-a84a8e74c01158ad034ba8637e0777f1.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bcvhtlwqwt412"
-path="res://.godot/imported/Kneel_Southwest_right.png-e77e860ae4724fdfec973216313fab36.ctex"
+uid="uid://dyaarwj8gbljt"
+path="res://.godot/imported/Kneel_Southwest_right.png-4c88084bb11cce8ef824ecefe88f0fc7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Kneel_Southwest_right.png"
-dest_files=["res://.godot/imported/Kneel_Southwest_right.png-e77e860ae4724fdfec973216313fab36.ctex"]
+source_file="res://assets/art/characters/player/Kneel_Southwest_right.png"
+dest_files=["res://.godot/imported/Kneel_Southwest_right.png-4c88084bb11cce8ef824ecefe88f0fc7.ctex"]
 
 [params]
 

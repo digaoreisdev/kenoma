@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bc5rbwrnw0v2u"
-path="res://.godot/imported/Attack_Northwest_right.png-1551f83fec868ee1de4d56a1e1a54d49.ctex"
+uid="uid://d0guid3j7ih8u"
+path="res://.godot/imported/Attack_Northwest_right.png-c145bacd02b206f6dfa5503a3b66a8fc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Attack_Northwest_right.png"
-dest_files=["res://.godot/imported/Attack_Northwest_right.png-1551f83fec868ee1de4d56a1e1a54d49.ctex"]
+source_file="res://assets/art/characters/player/Attack_Northwest_right.png"
+dest_files=["res://.godot/imported/Attack_Northwest_right.png-c145bacd02b206f6dfa5503a3b66a8fc.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dj23t8xc8qxww"
-path="res://.godot/imported/Death_Southwest_right.png-d69436a549ed516579b28f6430bd22dd.ctex"
+uid="uid://yhs6tcyjvx8b"
+path="res://.godot/imported/Death_Southwest_right.png-627103ac8340011691ba2174df475b00.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Death_Southwest_right.png"
-dest_files=["res://.godot/imported/Death_Southwest_right.png-d69436a549ed516579b28f6430bd22dd.ctex"]
+source_file="res://assets/art/characters/player/Death_Southwest_right.png"
+dest_files=["res://.godot/imported/Death_Southwest_right.png-627103ac8340011691ba2174df475b00.ctex"]
 
 [params]
 

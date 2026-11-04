@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c411y800cqjv"
-path="res://.godot/imported/Hurt_Up_right.png-81de3ff70bcbad8be4c72615cdc5a79e.ctex"
+uid="uid://cfnhynxr84m4p"
+path="res://.godot/imported/Hurt_Up_right.png-b667f48fc3b24891b834cdd1c600da10.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Hurt_Up_right.png"
-dest_files=["res://.godot/imported/Hurt_Up_right.png-81de3ff70bcbad8be4c72615cdc5a79e.ctex"]
+source_file="res://assets/art/characters/player/Hurt_Up_right.png"
+dest_files=["res://.godot/imported/Hurt_Up_right.png-b667f48fc3b24891b834cdd1c600da10.ctex"]
 
 [params]
 

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bpium6u6h3ymj"
-path="res://.godot/imported/Lib__Walk_E_right.png-2f51fd5b4578f136a0754eb2eb726d08.ctex"
+path="res://.godot/imported/Lib__Walk_E_right.png-b724d65c6bdfa2c3a36b57980d63f887.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Lib__Walk_E_right.png"
-dest_files=["res://.godot/imported/Lib__Walk_E_right.png-2f51fd5b4578f136a0754eb2eb726d08.ctex"]
+source_file="res://assets/art/characters/player/Lib__Walk_E_right.png"
+dest_files=["res://.godot/imported/Lib__Walk_E_right.png-b724d65c6bdfa2c3a36b57980d63f887.ctex"]
 
 [params]
 

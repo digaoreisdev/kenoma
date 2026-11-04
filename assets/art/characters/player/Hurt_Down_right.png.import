@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://lmvbrfkown7x"
-path="res://.godot/imported/Hurt_Down_right.png-d01149a059a411004d2e7b8840f5d09b.ctex"
+uid="uid://cxilpf7dxnsu"
+path="res://.godot/imported/Hurt_Down_right.png-d08782a0a339dd853b4e1841930af895.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Hurt_Down_right.png"
-dest_files=["res://.godot/imported/Hurt_Down_right.png-d01149a059a411004d2e7b8840f5d09b.ctex"]
+source_file="res://assets/art/characters/player/Hurt_Down_right.png"
+dest_files=["res://.godot/imported/Hurt_Down_right.png-d08782a0a339dd853b4e1841930af895.ctex"]
 
 [params]
 

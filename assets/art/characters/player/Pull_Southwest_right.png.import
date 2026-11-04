@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c7i07ss0x6sv3"
-path="res://.godot/imported/Pull_Southwest_right.png-13a702d81161f55026a605d7205da521.ctex"
+uid="uid://bmhor1titvfxd"
+path="res://.godot/imported/Pull_Southwest_right.png-f4bf22d38c15c00088b5ea0cf2e459d6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://autosprite_imported/Lucas_Reis/Pull_Southwest_right.png"
-dest_files=["res://.godot/imported/Pull_Southwest_right.png-13a702d81161f55026a605d7205da521.ctex"]
+source_file="res://assets/art/characters/player/Pull_Southwest_right.png"
+dest_files=["res://.godot/imported/Pull_Southwest_right.png-f4bf22d38c15c00088b5ea0cf2e459d6.ctex"]
 
 [params]
 
