@@ -23,3 +23,4 @@ func _setup_camera_limits() -> void:
 		)
 	else:
 		player.set_camera_limits(-400, -300, 400, 300)
+

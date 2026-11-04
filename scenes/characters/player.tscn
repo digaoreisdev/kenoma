@@ -1,13 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bvyg2x0k8h3pm"]
+[gd_scene load_steps=4 format=3 uid="uid://bvyg2x0k8h3pm"]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player_script"]
 [ext_resource type="SpriteFrames" path="res://assets/art/characters/player/player_frames.tres" id="2_player_frames"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_feet"]
 size = Vector2(14, 8)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 16.0
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 1
@@ -44,12 +41,8 @@ shape = SubResource("RectangleShape2D_feet")
 zoom = Vector2(3, 3)
 position_smoothing_enabled = true
 
-[node name="AttackHitbox" type="Area2D" parent="." groups=["player_hitbox"]]
-collision_layer = 2
-collision_mask = 0
-monitoring = false
-
-[node name="HitboxCollision" type="CollisionShape2D" parent="AttackHitbox"]
-position = Vector2(0, 8)
-shape = SubResource("CircleShape2D_hitbox")
-disabled = true
+[node name="InteractionRay" type="RayCast2D" parent="."]
+target_position = Vector2(0, 16)
+collision_mask = 1
+collide_with_areas = false
+collide_with_bodies = true

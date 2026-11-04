@@ -1,30 +1,24 @@
 class_name PushCrate
 extends CharacterBody2D
 
-## Objeto interativo de teste que reage a golpes de machado e suporta empurrão.
+## Objeto de teste empurrável com indicador de interação e colisão na base.
 
-signal destroyed
+@export var friction: float = 600.0
 
-@export var max_health: int = 3
-@export var friction: float = 800.0
+var _is_highlighted: bool = false
 
-var current_health: int = 3
-var is_invulnerable: bool = false
-
-@onready var visual_rect: ColorRect = get_node_or_null("VisualRect")
-@onready var hurtbox: Area2D = get_node_or_null("Hurtbox")
-
-
-func _ready() -> void:
-	current_health = max_health
-	if hurtbox != null:
-		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+@onready var prompt_icon: CanvasItem = get_node_or_null("InteractionPrompt")
 
 
 func _physics_process(delta: float) -> void:
 	if velocity != Vector2.ZERO:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 		move_and_slide()
+	_update_prompt(delta)
+
+
+func set_highlighted(highlight: bool) -> void:
+	_is_highlighted = highlight
 
 
 func push_by(dir: Vector2, speed: float) -> void:
@@ -32,36 +26,8 @@ func push_by(dir: Vector2, speed: float) -> void:
 	move_and_slide()
 
 
-func take_hit(damage: int = 1) -> void:
-	if is_invulnerable or current_health <= 0:
+func _update_prompt(delta: float) -> void:
+	if prompt_icon == null:
 		return
-	
-	current_health -= damage
-	_flash_effect()
-	
-	if current_health <= 0:
-		_destroy()
-
-
-func _on_hurtbox_area_entered(area: Area2D) -> void:
-	if area.name == "AttackHitbox" or area.is_in_group("player_hitbox"):
-		take_hit(1)
-
-
-func _flash_effect() -> void:
-	if visual_rect == null:
-		return
-	is_invulnerable = true
-	var orig_color: Color = visual_rect.color
-	visual_rect.color = Color(1.0, 0.9, 0.4, 1.0)
-	var timer: SceneTreeTimer = get_tree().create_timer(0.12)
-	timer.timeout.connect(func() -> void:
-		if is_instance_valid(visual_rect):
-			visual_rect.color = orig_color
-		is_invulnerable = false
-	)
-
-
-func _destroy() -> void:
-	destroyed.emit()
-	queue_free()
+	var target_alpha: float = 1.0 if _is_highlighted else 0.0
+	prompt_icon.modulate.a = move_toward(prompt_icon.modulate.a, target_alpha, 8.0 * delta)

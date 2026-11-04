@@ -25,8 +25,8 @@
 * **Suíte Completa de Ações do Personagem:** 88 animações em 8 direções cadastradas em `player_frames.tres` cobrindo `walk`, `idle`, `attack_axe`, `crouch`, `die`, `dodge`, `hurt`, `pull`, `push`, `sit` e `sleep`. A máquina de estados do jogador gerencia `IDLE`, `WALK`, `INTERACTING`, `ATTACKING`, `HURT`, `DEAD` e `RESTING`, com bloqueio automático da física de caminhada durante execuções de ação.
 * **Ambiente de Desenvolvimento:** Windows (desenvolvimento focado no PC durante os passos iniciais).
 * **Plataformas-Alvo:** Foco estrito em PC (Steam / Desktop) com suporte total a Teclado e Gamepad.
+* **Interação e Exploração JRPG:** Exploração sem ataque direto com machado. O jogador utiliza um `RayCast2D` de interação direcional e aciona empurrão físico exclusivamente ao segurar a tecla de ação (`action_interact`).
 * **Limites de Câmera 2D:** Método `set_camera_limits()` no jogador vincula os limites da `Camera2D` às dimensões reais do mapa atual, eliminando a visão do vazio além das bordas.
-* **Hitbox e Objetos Interativos:** `AttackHitbox` (`Area2D` na camada de colisão 2) ativada exclusivamente na janela de impacto do machado. Cena interativa `PushCrate` reage a dano e empurrão físico.
 
 ## Respostas do Criador
 * Estrutura de produção solo orientada a vertical slice antes da expansão de conteúdo.
@@ -34,7 +34,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F1 - Fundação de Gameplay & Movimentação** (Passo 6 concluído).
+* **F1 - Fundação de Gameplay & Movimentação** (Passo 7 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -45,6 +45,7 @@
 * [x] **F1.4:** Evolução para locomoção e animações completas em 8 direções no `player.gd` (cálculo de 8 ângulos via `fposmod`/`round`), geração de 18 animações dedicadas em `player_frames.tres` utilizando spritesheets diagonais e cardinais reais do AutoSprite, com fallback defensivo para direções cardinais.
 * [x] **F1.5:** Mapeamento completo de 88 animações nas 8 direções no `player_frames.tres` (11 ações x 8 orientações: walk, idle, attack_axe, crouch, die, dodge, hurt, pull, push, sit, sleep), expansão da máquina de estados do Player (IDLE, WALK, INTERACTING, ATTACKING, HURT, DEAD, RESTING), vinculação do ataque com machado ao botão de interação (Espaço/Enter/Gamepad A), bloqueio de locomoção em ações e emissão de sinais de vida e estado.
 * [x] **F1.6:** Implementação de limites dinâmicos da `Camera2D` vinculados ao mapa sandbox, inclusão da `AttackHitbox` direcional no Player, criação da cena de objeto interativo `PushCrate` (reação a dano de machado com flash e física de empurrão), e posicionamento de 2 caixas no `test_map.tscn`.
+* [x] **F1.7:** Remoção do ataque com machado na exploração, inclusão de `InteractionRay` no Player com detecção de proximidade, refatoração da física de empurrão (requer segurar `action_interact`), ajuste da colisão de base da caixa (`Vector2(24, 10)`) e prompt visual sutil com fade in/out.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
