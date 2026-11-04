@@ -1,7 +1,7 @@
 class_name Player
 extends CharacterBody2D
 
-## Controlador de locomoção em 8 direções e interação com mapa do jogador.
+## Controlador de locomoção em 8 direções e interação de empurrão sem trepidação.
 
 enum Direction {
 	DOWN,
@@ -37,6 +37,8 @@ var current_direction: Direction = Direction.DOWN
 var current_state: State = State.IDLE
 var current_action_name: String = ""
 var _last_interactable: Object = null
+var _push_buffer: float = 0.0
+var _pushed_crate: PushCrate = null
 
 @onready var animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D")
 @onready var placeholder_visual: ColorRect = get_node_or_null("PlaceholderVisual")
@@ -53,7 +55,10 @@ func _ready() -> void:
 	_update_interaction_ray()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if _push_buffer > 0.0:
+		_push_buffer = maxf(0.0, _push_buffer - delta)
+	
 	_update_ray_sensing()
 	if not _can_walk():
 		velocity = Vector2.ZERO
@@ -91,26 +96,52 @@ func _handle_movement() -> void:
 			return
 		current_state = State.WALK
 		velocity = input_dir * move_speed
+		_reset_push_state()
 	else:
 		current_state = State.IDLE
 		velocity = Vector2.ZERO
+		_reset_push_state()
 	move_and_slide()
 
 
 func _try_push(input_dir: Vector2) -> bool:
+	var target_crate: PushCrate = _find_pushable_target(input_dir)
+	if target_crate != null:
+		_pushed_crate = target_crate
+		_push_buffer = 0.15
+	elif _push_buffer > 0.0 and _pushed_crate != null and is_instance_valid(_pushed_crate):
+		target_crate = _pushed_crate
+	else:
+		_reset_push_state()
+		return false
+	
+	current_state = State.INTERACTING
+	velocity = input_dir * push_speed
+	target_crate.push_by(input_dir, push_speed)
+	move_and_slide()
+	_play_raw_animation("push_" + _direction_to_string(current_direction))
+	return true
+
+
+func _find_pushable_target(input_dir: Vector2) -> PushCrate:
 	for i: int in get_slide_collision_count():
 		var col: KinematicCollision2D = get_slide_collision(i)
 		var collider: Object = col.get_collider()
-		if collider != null and collider.has_method("push_by"):
-			var push_dir: Vector2 = -col.get_normal()
-			if push_dir.dot(input_dir) > 0.5:
-				current_state = State.INTERACTING
-				collider.call("push_by", push_dir, push_speed)
-				velocity = input_dir * push_speed
-				move_and_slide()
-				_play_raw_animation("push_" + _direction_to_string(current_direction))
-				return true
-	return false
+		if collider is PushCrate and (-col.get_normal()).dot(input_dir) > 0.4:
+			return collider as PushCrate
+	
+	if interaction_ray != null and interaction_ray.is_colliding():
+		var ray_col: Object = interaction_ray.get_collider()
+		if ray_col is PushCrate:
+			var to_crate: Vector2 = (ray_col.global_position - global_position).normalized()
+			if to_crate.dot(input_dir) > 0.4:
+				return ray_col as PushCrate
+	return null
+
+
+func _reset_push_state() -> void:
+	_push_buffer = 0.0
+	_pushed_crate = null
 
 
 func _resolve_8way_direction(dir: Vector2) -> void:
@@ -133,14 +164,14 @@ func _update_interaction_ray() -> void:
 	if interaction_ray == null:
 		return
 	match current_direction:
-		Direction.DOWN: interaction_ray.target_position = Vector2(0, 18)
-		Direction.UP: interaction_ray.target_position = Vector2(0, -18)
-		Direction.LEFT: interaction_ray.target_position = Vector2(-18, 0)
-		Direction.RIGHT: interaction_ray.target_position = Vector2(18, 0)
-		Direction.DOWN_RIGHT: interaction_ray.target_position = Vector2(14, 14)
-		Direction.DOWN_LEFT: interaction_ray.target_position = Vector2(-14, 14)
-		Direction.UP_RIGHT: interaction_ray.target_position = Vector2(14, -14)
-		Direction.UP_LEFT: interaction_ray.target_position = Vector2(-14, -14)
+		Direction.DOWN: interaction_ray.target_position = Vector2(0, 24)
+		Direction.UP: interaction_ray.target_position = Vector2(0, -24)
+		Direction.LEFT: interaction_ray.target_position = Vector2(-24, 0)
+		Direction.RIGHT: interaction_ray.target_position = Vector2(24, 0)
+		Direction.DOWN_RIGHT: interaction_ray.target_position = Vector2(18, 18)
+		Direction.DOWN_LEFT: interaction_ray.target_position = Vector2(-18, 18)
+		Direction.UP_RIGHT: interaction_ray.target_position = Vector2(18, -18)
+		Direction.UP_LEFT: interaction_ray.target_position = Vector2(-18, -18)
 
 
 func _update_ray_sensing() -> void:

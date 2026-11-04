@@ -46,6 +46,7 @@
 * [x] **F1.5:** Mapeamento completo de 88 animações nas 8 direções no `player_frames.tres` (11 ações x 8 orientações: walk, idle, attack_axe, crouch, die, dodge, hurt, pull, push, sit, sleep), expansão da máquina de estados do Player (IDLE, WALK, INTERACTING, ATTACKING, HURT, DEAD, RESTING), vinculação do ataque com machado ao botão de interação (Espaço/Enter/Gamepad A), bloqueio de locomoção em ações e emissão de sinais de vida e estado.
 * [x] **F1.6:** Implementação de limites dinâmicos da `Camera2D` vinculados ao mapa sandbox, inclusão da `AttackHitbox` direcional no Player, criação da cena de objeto interativo `PushCrate` (reação a dano de machado com flash e física de empurrão), e posicionamento de 2 caixas no `test_map.tscn`.
 * [x] **F1.7:** Remoção do ataque com machado na exploração, inclusão de `InteractionRay` no Player com detecção de proximidade, refatoração da física de empurrão (requer segurar `action_interact`), ajuste da colisão de base da caixa (`Vector2(24, 10)`) e prompt visual sutil com fade in/out.
+* [x] **F1.8 (Bugfix):** Correção de trepidação (jitter) no empurrão nas direções Cima e Laterais (REG-001) com extensão de 6px no InteractionRay, buffer de persistência de 0.15s e teste unitário automatizado em test_push_physics.gd.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

@@ -43,6 +43,7 @@ Para qualquer defeito identificado ou relatado:
 | ID | Data | Defeito / Causa Raiz | Solução Aplicada | Arquivo de Teste (GUT) | Status |
 | :---: | :---: | :--- | :--- | :--- | :---: |
 | *REG-000* | *2026-11-04* | *Template inicial de exemplo* | *N/A* | *res://tests/test_example.gd* | *PASS* |
+| REG-001 | 2026-11-04 | Trepidação (jitter) ao empurrar caixa para Cima/Laterais por histerese de contato e micro-separação | Adicionado buffer de persistência (0.15s), extensão do InteractionRay (+6px) e acoplamento de alvo empurrável | res://tests/test_push_physics.gd | PASS |
 
 ---
 
@@ -55,4 +56,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.6 (2026-11-04):** Implementação de limites dinâmicos de Camera2D (set_camera_limits), criação da AttackHitbox no Player e objeto interativo PushCrate com reação a dano de machado e empurrão físico.
 * **v0.7 (2026-11-04):** Remoção de ataque da exploração, adição do RayCast2D de interação, refatoração da física de empurrão (requer segurar ação) e ajuste da colisão de base da caixa com prompt visual sutil.
 * **v0.8 (2026-11-04):** Atualização do contrato de governança para estrutura de saída bilíngue e concisa (Task Report em inglês + Resumo Rápido para o Diretor em português).
+* **v0.9 (2026-11-04):** Correção do bug REG-001 (eliminação de trepidação ao empurrar para Cima e Laterais via buffer de histerese de 0.15s e extensão de alcance do InteractionRay).
 
