@@ -53,6 +53,10 @@ func _ready() -> void:
 		placeholder_visual.visible = false
 	if animated_sprite != null:
 		animated_sprite.animation_finished.connect(_on_animation_finished)
+	if has_node("/root/DialogueManager"):
+		var dm: Node = get_node("/root/DialogueManager")
+		if dm.has_signal("dialogue_started"):
+			dm.connect("dialogue_started", _on_dialogue_started)
 	_update_interaction_ray()
 
 
@@ -62,7 +66,10 @@ func _physics_process(delta: float) -> void:
 	
 	_update_ray_sensing()
 	if not _can_walk():
-		velocity = Vector2.ZERO
+		if current_state in [State.WALK, State.INTERACTING]:
+			force_idle()
+		else:
+			velocity = Vector2.ZERO
 		move_and_slide()
 		return
 	
@@ -110,9 +117,21 @@ func _try_interact() -> bool:
 		return false
 	var collider: Object = interaction_ray.get_collider()
 	if collider != null and collider.has_method("interact"):
+		force_idle()
 		collider.call("interact", self)
 		return true
 	return false
+
+
+func _on_dialogue_started(_id: String) -> void:
+	force_idle()
+
+
+func force_idle() -> void:
+	velocity = Vector2.ZERO
+	current_state = State.IDLE
+	_reset_push_state()
+	_update_locomotion_animation()
 
 
 func set_facing_direction(dir: Direction) -> void:

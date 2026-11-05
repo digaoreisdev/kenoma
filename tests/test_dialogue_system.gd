@@ -12,6 +12,7 @@ static func run_tests() -> bool:
 	all_passed = all_passed and test_npc_facing_and_interact()
 	all_passed = all_passed and test_npc_collision_bounds()
 	all_passed = all_passed and test_player_interaction_reach()
+	all_passed = all_passed and test_player_walk_lock_on_dialogue()
 	return all_passed
 
 
@@ -127,6 +128,24 @@ static func test_player_interaction_reach() -> bool:
 	assert(ray.target_position.x >= 30.0, "InteractionRay right reach must be >= 30px")
 	player._resolve_8way_direction(Vector2(-1, 0))
 	assert(ray.target_position.x <= -30.0, "InteractionRay left reach must be <= -30px")
+	
+	player.free()
+	return true
+
+
+static func test_player_walk_lock_on_dialogue() -> bool:
+	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
+	assert(player_scene != null, "Player scene must be loadable")
+	var player: Player = player_scene.instantiate() as Player
+	assert(player != null, "Player must instantiate")
+	
+	player.current_state = Player.State.WALK
+	player.velocity = Vector2(0, 120)
+	player.force_idle()
+	assert(player.current_state == Player.State.IDLE, "Player must transition to IDLE on force_idle")
+	assert(player.velocity == Vector2.ZERO, "Player velocity must be zeroed")
+	if player.animated_sprite != null:
+		assert(player.animated_sprite.animation.begins_with("idle_"), "Animation must switch to idle")
 	
 	player.free()
 	return true
