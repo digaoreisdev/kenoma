@@ -18,18 +18,21 @@
 4. **Código Defensivo:** Uso ativo de asserções (`assert`) em tempo de desenvolvimento e checagens explícitas de nulidade antes de chamadas de métodos.
 5. **Arquitetura Orientada a Dados (*Data-Driven*):** Itens, inimigos, diálogos, tabelas de experiência e atributos residem em arquivos de dados (`Resource` `.tres` ou `.json`), nunca fixos no código.
 6. **Mapeamento Unificado de Entrada:** Leitura de ações exclusivamente via `Input Map` da engine (ações semânticas compatíveis com teclado, controle e touch).
-7. **Mandatory Bilingual Output Contract:** Every task response MUST strictly follow this bilingual, low-token structure:
-   - `### Task Report`
-     - `- **1) Core Actions Taken (English):** [Concise bullet points]`
-     - `- **2) Modified/Created Files:** [List of paths]`
-     - `- **3) Status:** [PASS / FAIL]`
-   - `### Resumo Rápido para o Diretor (Português)`
-     - `- **O que foi feito:** [Resumo direto em 2 a 3 linhas]`
-     - `- **Como testar:** [Instrução simples passo a passo para testar no Godot]`
 
 ---
 
-## 3. Protocolo da Lei do Bug Registrado
+## 3. OUTPUT PROTOCOL & TOKEN EFFICIENCY (MANDATORY)
+Verbose chatter, repeated code blocks, long terminal narratives, conversational filler, and redundant explanations are strictly forbidden in final task reports.
+All future completion reports MUST strictly adhere to the following ultra-compact 4-line standardized format:
+
+STATUS: PASS / FAIL
+FILES: [comma-separated list of modified/created files]
+ACTIONS: [1 to 2 technical sentences in English summarizing the code changes]
+COMO TESTAR: [1 to 2 direct sentences in PT-BR explaining the exact key to press or scene to run]
+
+---
+
+## 4. Protocolo da Lei do Bug Registrado
 Para qualquer defeito identificado ou relatado:
 1. **Reprodução Automatizada:** Escrever previamente um teste automatizado no GUT que reproduza a falha.
 2. **Correção Controlada:** Implementar a alteração no código até que o teste passe com 100% de sucesso.
@@ -39,7 +42,7 @@ Para qualquer defeito identificado ou relatado:
 
 ---
 
-## 4. Matriz de Regressão Contínua
+## 5. Matriz de Regressão Contínua
 
 | ID | Data | Defeito / Causa Raiz | Solução Aplicada | Arquivo de Teste (GUT) | Status |
 | :---: | :---: | :--- | :--- | :--- | :---: |
@@ -52,7 +55,7 @@ Para qualquer defeito identificado ou relatado:
 
 ---
 
-## 5. Histórico de Versões de Engenharia
+## 6. Histórico de Versões de Engenharia
 * **v0.1 (2026-11-04):** Formalização do documento `Engines.md`, matriz de regressão e diretrizes de conformidade estática.
 * **v0.2 (2026-11-04):** Integração do addon AutoSprite (v1.0.0), ativação do plugin em project.godot e implementação da máquina de estados direcionais do Player com suporte a flip_h e fallback defensivo.
 * **v0.3 (2026-11-04):** Configuração dos spritesheets importados do AutoSprite (Lucas Reis) em player_frames.tres com animações idle e walk em 4 direções e vinculação com AnimatedSprite2D no Player.
@@ -75,4 +78,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.22 (2026-11-05):** Implementação do Menu de Pausa HD-2D para 4 heróis, Habilidades e Primordiais (F2.6 - Step 2.1): arquitetura de dados com `CharacterData` e singleton `PartyManager` (Lucas Reis nível 1 em slot 0 e slots 1..3 vazios reservados), interface de pausa expandida em `res://scenes/ui/pause_menu.tscn` com barras de PV/PM, comandos 100% em PT-BR (Itens, Habilidades, Primordiais, Equipamento, Status, Formação, Configurações, Salvar), seleção de personagens com banners informativos, rodapé com mapa, tempo e moedas, e suíte de testes em `res://tests/test_pause_menu.gd`.
 * **v0.23 (2026-11-05):** Correção de sombreamento de classes em Autoloads (REG-005): remoção de `class_name PartyManager` em `party_manager.gd` e `class_name PauseMenu` em `pause_menu.gd`, mantendo declaração estrita de herança (`extends Node` / `extends CanvasLayer`) e atualizando a suíte `test_pause_menu.gd` com preload isolado para evitar colisões no analisador sintático do Godot.
 * **v0.24 (2026-11-05):** Blindagem do pipeline headless e runner automatizado (REG-005): criação de `res://tests/test_runner.gd` executável via Godot CLI `--headless`, adaptação do ciclo de vida dos testes para SceneTree e carregamento de Autoloads, e resolução integral dos erros de sombreamento e testes de regressão com 100% de aprovação (ALL PASS).
+* **v0.25 (2026-11-05):** Instituição do protocolo de saída ultra-compacto de 4 linhas (STATUS, FILES, ACTIONS, COMO TESTAR) na Seção 3 para eficiência de tokens e eliminação de narrativas extensas.
 

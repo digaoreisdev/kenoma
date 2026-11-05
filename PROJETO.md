@@ -59,6 +59,7 @@
 * [x] **F2.5 (Passo 1.4 / Governança):** Criação da Art Bible em `res://docs/art_bible.md`: especificações técnicas para portraits HD-2D (256x256 px, PNG transparente, busto 3/4), ficha canônica e paleta do protagonista Lucas Reis, template de DNA visual para novos personagens/NPCs e fórmula padronizada de prompt para geração de arte consistente via IA.
 * [x] **F2.6 (Passo 2.1):** Menu de Pausa para 4 heróis, Habilidades e Primordiais: arquitetura de grupo via `CharacterData` e singleton `PartyManager`, painel de equipe com barras de PV/PM e slots reservados (1 ativo + 3 vazios), comandos em PT-BR (Itens, Habilidades, Primordiais, Equipamento, Status, Formação, Configurações, Salvar), navegação com seleção de personagens, troca de posições na formação, rodapé informativo e suíte de testes em `test_pause_menu.gd`.
 * [x] **F2.7 (Bugfix Autoload & Runner Headless):** Eliminação de conflito de sombreamento no compilador GDScript (REG-005): remoção de `class_name` em `PartyManager` e `PauseMenu`, criação do runner headless `res://tests/test_runner.gd` e execução 100% verde das 4 suítes de testes automatizados via Godot CLI.
+* [x] **F2.8 (Governança):** Atualização do `Engines.md` (v0.25) instituindo o protocolo mandatório de saída ultra-compacto em 4 linhas (STATUS, FILES, ACTIONS, COMO TESTAR) para eficiência de tokens e eliminação de narrativas extensas.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
