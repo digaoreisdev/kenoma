@@ -53,6 +53,7 @@
 * [x] **F1.12 (Passo 8.1 - Sincronização Rítmica):** Preservação do conjunto original de animações pull_* com sincronização física rítmica por frame (_get_pull_impulse_multiplier): alta tração no golpe de puxar e desaceleração na extensão dos braços, eliminando o deslizamento constante com esforço pesado convincente.
 * [x] **F1.13 (Passo 9):** Implementação do singleton global SceneManager com transições suaves em fade out/in (Tween preto 0.35s), bloqueio de inputs durante a transição, criação dos componentes Doorway (Area2D) e SpawnPoint (Marker2D), ambiente de testes dual com test_map e test_room_b, e testes em test_scene_manager.gd.
 * [x] **F2.1 (Passo 1):** Implementação do sistema de diálogos clássico JRPG: singleton global DialogueManager, caixa de diálogos DialogueBox com máquina de escrever e suporte a retratos, estrutura de dados DialogueLine, NPC interativo com orientação de olhar voltada para o jogador e suíte de testes automatizados em test_dialogue_system.gd.
+* [x] **F2.2 (Passo 1.1):** Correção de colisão e distância de conversa do NPC (REG-003): ampliação da caixa de colisão dos pés do NPC para 24x16 px em (0, -4), ativação de renderização em profundidade vertical (y_sort_enabled) nas entidades e cenários de teste, extensão do alcance do InteractionRay para 32 px (cardinais) e 24 px (diagonais) viabilizando interação sem contato físico excessivo e novos testes em test_dialogue_system.gd.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

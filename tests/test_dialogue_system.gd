@@ -10,6 +10,8 @@ static func run_tests() -> bool:
 	all_passed = all_passed and test_dialogue_box_lifecycle()
 	all_passed = all_passed and test_dialogue_manager_state_lock()
 	all_passed = all_passed and test_npc_facing_and_interact()
+	all_passed = all_passed and test_npc_collision_bounds()
+	all_passed = all_passed and test_player_interaction_reach()
 	return all_passed
 
 
@@ -87,3 +89,45 @@ static func test_npc_facing_and_interact() -> bool:
 	
 	npc.free()
 	return true
+
+
+static func test_npc_collision_bounds() -> bool:
+	var npc_scene: PackedScene = load("res://scenes/characters/npc.tscn")
+	assert(npc_scene != null, "NPC scene must be loadable")
+	var npc: NPC = npc_scene.instantiate() as NPC
+	assert(npc != null, "NPC must instantiate")
+	assert(npc.y_sort_enabled == true, "NPC must have y_sort_enabled = true")
+	
+	var col: CollisionShape2D = npc.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	assert(col != null, "NPC must have CollisionShape2D")
+	assert(col.shape is RectangleShape2D, "Shape must be RectangleShape2D")
+	var rect_shape: RectangleShape2D = col.shape as RectangleShape2D
+	assert(rect_shape.size.x >= 24.0, "Foot collision width must be at least 24px")
+	assert(rect_shape.size.y >= 14.0, "Foot collision height must be at least 14px")
+	assert(col.position.y <= 0.0, "Foot collision must be at base or slightly offset upwards")
+	
+	npc.free()
+	return true
+
+
+static func test_player_interaction_reach() -> bool:
+	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
+	assert(player_scene != null, "Player scene must be loadable")
+	var player: Player = player_scene.instantiate() as Player
+	assert(player != null, "Player must instantiate")
+	assert(player.y_sort_enabled == true, "Player must have y_sort_enabled = true")
+	
+	var ray: RayCast2D = player.get_node_or_null("InteractionRay") as RayCast2D
+	assert(ray != null, "Player must have InteractionRay")
+	player._resolve_8way_direction(Vector2(0, 1))
+	assert(ray.target_position.y >= 30.0, "InteractionRay down reach must be >= 30px")
+	player._resolve_8way_direction(Vector2(0, -1))
+	assert(ray.target_position.y <= -30.0, "InteractionRay up reach must be <= -30px")
+	player._resolve_8way_direction(Vector2(1, 0))
+	assert(ray.target_position.x >= 30.0, "InteractionRay right reach must be >= 30px")
+	player._resolve_8way_direction(Vector2(-1, 0))
+	assert(ray.target_position.x <= -30.0, "InteractionRay left reach must be <= -30px")
+	
+	player.free()
+	return true
+

@@ -51,3 +51,4 @@ func is_active() -> bool:
 func advance_current_dialogue() -> void:
 	if _dialogue_box != null and is_dialogue_active:
 		_dialogue_box.advance()
+

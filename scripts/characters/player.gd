@@ -273,14 +273,14 @@ func _update_interaction_ray() -> void:
 	if interaction_ray == null:
 		return
 	match current_direction:
-		Direction.DOWN: interaction_ray.target_position = Vector2(0, 24)
-		Direction.UP: interaction_ray.target_position = Vector2(0, -24)
-		Direction.LEFT: interaction_ray.target_position = Vector2(-24, 0)
-		Direction.RIGHT: interaction_ray.target_position = Vector2(24, 0)
-		Direction.DOWN_RIGHT: interaction_ray.target_position = Vector2(18, 18)
-		Direction.DOWN_LEFT: interaction_ray.target_position = Vector2(-18, 18)
-		Direction.UP_RIGHT: interaction_ray.target_position = Vector2(18, -18)
-		Direction.UP_LEFT: interaction_ray.target_position = Vector2(-18, -18)
+		Direction.DOWN: interaction_ray.target_position = Vector2(0, 32)
+		Direction.UP: interaction_ray.target_position = Vector2(0, -32)
+		Direction.LEFT: interaction_ray.target_position = Vector2(-32, 0)
+		Direction.RIGHT: interaction_ray.target_position = Vector2(32, 0)
+		Direction.DOWN_RIGHT: interaction_ray.target_position = Vector2(24, 24)
+		Direction.DOWN_LEFT: interaction_ray.target_position = Vector2(-24, 24)
+		Direction.UP_RIGHT: interaction_ray.target_position = Vector2(24, -24)
+		Direction.UP_LEFT: interaction_ray.target_position = Vector2(-24, -24)
 
 
 func _update_ray_sensing() -> void:

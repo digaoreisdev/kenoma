@@ -19,3 +19,4 @@ static func from_dict(data: Dictionary) -> DialogueLine:
 	var t: String = str(data.get("text", ""))
 	var p: Texture2D = data.get("portrait", null) as Texture2D
 	return DialogueLine.new(s, t, p)
+

@@ -95,3 +95,4 @@ func _update_prompt(delta: float) -> void:
 		return
 	var target_alpha: float = 1.0 if _is_highlighted else 0.0
 	prompt_icon.modulate.a = move_toward(prompt_icon.modulate.a, target_alpha, 8.0 * delta)
+

@@ -7,6 +7,7 @@
 size = Vector2(14, 8)
 
 [node name="Player" type="CharacterBody2D"]
+y_sort_enabled = true
 collision_layer = 1
 collision_mask = 1
 script = ExtResource("1_player_script")
@@ -42,7 +43,7 @@ zoom = Vector2(3, 3)
 position_smoothing_enabled = true
 
 [node name="InteractionRay" type="RayCast2D" parent="."]
-target_position = Vector2(0, 16)
+target_position = Vector2(0, 32)
 collision_mask = 1
 collide_with_areas = false
 collide_with_bodies = true

@@ -112,3 +112,4 @@ func hide_dialogue() -> void:
 	_is_typing = false
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
+

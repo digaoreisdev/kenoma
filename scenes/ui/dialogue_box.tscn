@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c3q8y9m1x4p7w"]
+[gd_scene format=3 uid="uid://c3q80am1x4p7w"]
 
 [ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="1_dialogue_script"]
 
@@ -88,3 +88,4 @@ alignment = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
 text = "▼"
+

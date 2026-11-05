@@ -19,6 +19,7 @@ size = Vector2(20, 600)
 size = Vector2(20, 600)
 
 [node name="TestMap" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_map_script")
 
 [node name="Floor" type="ColorRect" parent="."]

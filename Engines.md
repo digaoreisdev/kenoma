@@ -45,6 +45,7 @@ Para qualquer defeito identificado ou relatado:
 | *REG-000* | *2026-11-04* | *Template inicial de exemplo* | *N/A* | *res://tests/test_example.gd* | *PASS* |
 | REG-001 | 2026-11-04 | Trepidação (jitter) ao empurrar caixa para Cima/Laterais por histerese de contato e micro-separação | Adicionado buffer de persistência (0.15s), extensão do InteractionRay (+6px) e acoplamento de alvo empurrável | res://tests/test_push_physics.gd | PASS |
 | REG-002 | 2026-11-04 | Ciclo incompleto de animação de empurrão (stutter/reset a frame 0) ao empurrar Cima/Laterais por dupla movimentação da caixa e chamadas repetidas de play() | Inclusão de trava _is_being_pushed no PushCrate, proteção em _play_push_animation (sem reinício de frame se mesma animação), registro de push_side e retenção de alvo por proximidade | res://tests/test_push_physics.gd | PASS |
+| REG-003 | 2026-11-05 | Sobreposição/clipping de sprite do NPC e necessidade de colar no colisor para conversar | Ajustada colisão dos pés do NPC para 24x16 px em (0, -4), ativado y_sort_enabled em entidades e salas, e estendido InteractionRay do Player para 32px (cardinais) / 24px (diagonais) | res://tests/test_dialogue_system.gd | PASS |
 
 ---
 
@@ -64,4 +65,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.13 (2026-11-05):** Sincronização de impulso rítmico com animação original pull_* (F1.12 - Step 8.1): preservação das animações originais de esforço intenso pull_* nas 8 direções, acoplamento de velocidade via curva de impulso (_get_pull_impulse_multiplier) com pico de tração nos frames de força e desaceleração nos frames de alcance dos braços, e testes unitários em test_push_physics.gd.
 * **v0.14 (2026-11-05):** Implementação do SceneManager e pipeline de transição de salas (F1.13 - Step 9): singleton global com transição de fade preto (Tween 0.35s), bloqueio de inputs durante a transição, gatilho Doorway (Area2D), componente SpawnPoint (Marker2D), ambiente de testes dual com test_map e test_room_b, e suíte de testes em test_scene_manager.gd.
 * **v0.15 (2026-11-05):** Início da Fase F2 - Sistema de Diálogos Clássico e NPC de Teste (F2.1 - Step 1): singleton global DialogueManager, caixa de diálogos inferior DialogueBox com máquina de escrever e suporte a retrato/speaker, estrutura DialogueLine, NPC interativo com orientação de olhar voltada para o jogador e suíte de testes em test_dialogue_system.gd.
+* **v0.16 (2026-11-05):** Correção de colisão e distância de conversa do NPC (F2.2 - Step 1.1 / REG-003): expansão do colisor dos pés do NPC (24x16 px em 0, -4), ativação de y_sort_enabled (Player, NPC, TestRoomB, TestMap), extensão do InteractionRay para 32px cardinais / 24px diagonais para conversa a distância natural e testes em test_dialogue_system.gd.
 

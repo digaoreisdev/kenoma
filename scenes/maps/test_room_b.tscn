@@ -17,6 +17,7 @@ size = Vector2(180, 20)
 size = Vector2(20, 300)
 
 [node name="TestRoomB" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_room_script")
 
 [node name="Floor" type="ColorRect" parent="."]
