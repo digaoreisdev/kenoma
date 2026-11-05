@@ -1,4 +1,3 @@
-class_name PartyManager
 extends Node
 
 ## Singleton global para gerenciamento da equipe (Party), recursos e tempo de jogo.

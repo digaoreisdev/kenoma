@@ -52,3 +52,4 @@ static func create_default_lucas() -> CharacterData:
 		portrait_tex,
 		""
 	)
+

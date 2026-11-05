@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://b6p8y1m7x3k9w"]
+[gd_scene format=3 uid="uid://b6p8y1m7x3law"]
 
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="1_pause_script"]
 
@@ -1122,3 +1122,4 @@ text = "Sistema de Habilidades em desenvolvimento"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+

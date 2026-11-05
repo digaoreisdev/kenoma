@@ -1,4 +1,3 @@
-class_name PauseMenu
 extends CanvasLayer
 
 ## Menu de pausa clássico JRPG HD-2D com suporte a grupo de 4 heróis, habilidades e primordiais.
@@ -308,3 +307,4 @@ func _get_party_member(idx: int) -> CharacterData:
 		var pm: Node = get_node("/root/PartyManager")
 		return pm.call("get_member", idx) as CharacterData
 	return null
+
