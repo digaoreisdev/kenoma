@@ -1,0 +1,1124 @@
+[gd_scene format=3 uid="uid://b6p8y1m7x3k9w"]
+
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="1_pause_script"]
+
+[node name="PauseMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 80
+script = ExtResource("1_pause_script")
+
+[node name="MenuRoot" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundDim" type="ColorRect" parent="MenuRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.05, 0.82)
+
+[node name="BodyHBox" type="HBoxContainer" parent="MenuRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = 28.0
+offset_right = -32.0
+offset_bottom = -96.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="PartyPanel" type="ColorRect" parent="MenuRoot/BodyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 3.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/PartyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="SlotsVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Slot0" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox"]
+custom_minimum_size = Vector2(0, 125)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActiveBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.1, 0.14, 0.9)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.4, 0.45, 0.55, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="PortraitFrame" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 14.0
+offset_top = -42.0
+offset_right = 98.0
+offset_bottom = 42.0
+grow_vertical = 2
+
+[node name="PortraitBg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 1)
+
+[node name="PortraitBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.7)
+border_width = 1.5
+editor_only = false
+
+[node name="Portrait" type="TextureRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/PortraitFrame"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Details" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 112.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 26.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+
+[node name="NameLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+text = "Lucas Reis"
+
+[node name="LevelLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "Nv. 1"
+
+[node name="Stats" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 34.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_constants/separation = 28
+
+[node name="HPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Stats/HPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.95, 0.5, 1)
+text = "PV: 120 / 120"
+
+[node name="HPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Stats/HPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 120.0
+value = 120.0
+show_percentage = false
+
+[node name="MPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Stats/MPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+text = "PM: 45 / 45"
+
+[node name="MPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details/Stats/MPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 45.0
+value = 45.0
+show_percentage = false
+
+[node name="PrimordialLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 70.0
+offset_bottom = 94.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.4, 1)
+text = "Primordial: Nenhum"
+
+[node name="EmptyBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.07, 0.4)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.3, 0.35, 0.4, 0.4)
+border_width = 1.5
+editor_only = false
+
+[node name="Label" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0/EmptyBox"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -12.0
+offset_right = 60.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 0.6)
+text = "(Espaço Vazio)"
+horizontal_alignment = 1
+
+[node name="HighlightBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot0"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 0.9, 0.3, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Slot1" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox"]
+custom_minimum_size = Vector2(0, 125)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActiveBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.1, 0.14, 0.9)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.4, 0.45, 0.55, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="PortraitFrame" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 14.0
+offset_top = -42.0
+offset_right = 98.0
+offset_bottom = 42.0
+grow_vertical = 2
+
+[node name="PortraitBg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 1)
+
+[node name="PortraitBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.7)
+border_width = 1.5
+editor_only = false
+
+[node name="Portrait" type="TextureRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/PortraitFrame"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Details" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 112.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 26.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+
+[node name="NameLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+text = "Membro 2"
+
+[node name="LevelLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "Nv. 1"
+
+[node name="Stats" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 34.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_constants/separation = 28
+
+[node name="HPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Stats/HPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.95, 0.5, 1)
+text = "PV: 100 / 100"
+
+[node name="HPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Stats/HPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="MPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Stats/MPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+text = "PM: 30 / 30"
+
+[node name="MPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details/Stats/MPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="PrimordialLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 70.0
+offset_bottom = 94.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.4, 1)
+text = "Primordial: Nenhum"
+
+[node name="EmptyBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.07, 0.4)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.3, 0.35, 0.4, 0.4)
+border_width = 1.5
+editor_only = false
+
+[node name="Label" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1/EmptyBox"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -12.0
+offset_right = 60.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 0.6)
+text = "(Espaço Vazio)"
+horizontal_alignment = 1
+
+[node name="HighlightBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot1"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 0.9, 0.3, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Slot2" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox"]
+custom_minimum_size = Vector2(0, 125)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActiveBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.1, 0.14, 0.9)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.4, 0.45, 0.55, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="PortraitFrame" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 14.0
+offset_top = -42.0
+offset_right = 98.0
+offset_bottom = 42.0
+grow_vertical = 2
+
+[node name="PortraitBg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 1)
+
+[node name="PortraitBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.7)
+border_width = 1.5
+editor_only = false
+
+[node name="Portrait" type="TextureRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/PortraitFrame"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Details" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 112.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 26.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+
+[node name="NameLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+text = "Membro 3"
+
+[node name="LevelLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "Nv. 1"
+
+[node name="Stats" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 34.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_constants/separation = 28
+
+[node name="HPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Stats/HPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.95, 0.5, 1)
+text = "PV: 100 / 100"
+
+[node name="HPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Stats/HPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="MPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Stats/MPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+text = "PM: 30 / 30"
+
+[node name="MPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details/Stats/MPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="PrimordialLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 70.0
+offset_bottom = 94.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.4, 1)
+text = "Primordial: Nenhum"
+
+[node name="EmptyBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.07, 0.4)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.3, 0.35, 0.4, 0.4)
+border_width = 1.5
+editor_only = false
+
+[node name="Label" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2/EmptyBox"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -12.0
+offset_right = 60.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 0.6)
+text = "(Espaço Vazio)"
+horizontal_alignment = 1
+
+[node name="HighlightBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot2"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 0.9, 0.3, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Slot3" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox"]
+custom_minimum_size = Vector2(0, 125)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActiveBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.1, 0.14, 0.9)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.4, 0.45, 0.55, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="PortraitFrame" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 14.0
+offset_top = -42.0
+offset_right = 98.0
+offset_bottom = 42.0
+grow_vertical = 2
+
+[node name="PortraitBg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 1)
+
+[node name="PortraitBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.7)
+border_width = 1.5
+editor_only = false
+
+[node name="Portrait" type="TextureRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/PortraitFrame"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Details" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 112.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 26.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+
+[node name="NameLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+text = "Membro 4"
+
+[node name="LevelLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "Nv. 1"
+
+[node name="Stats" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 34.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_constants/separation = 28
+
+[node name="HPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Stats/HPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.95, 0.5, 1)
+text = "PV: 100 / 100"
+
+[node name="HPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Stats/HPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="MPContainer" type="HBoxContainer" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MPLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Stats/MPContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+text = "PM: 30 / 30"
+
+[node name="MPBar" type="ProgressBar" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details/Stats/MPContainer"]
+custom_minimum_size = Vector2(110, 14)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="PrimordialLabel" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/ActiveBox/Details"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 70.0
+offset_bottom = 94.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.4, 1)
+text = "Primordial: Nenhum"
+
+[node name="EmptyBox" type="Control" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.07, 0.4)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/EmptyBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.3, 0.35, 0.4, 0.4)
+border_width = 1.5
+editor_only = false
+
+[node name="Label" type="Label" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3/EmptyBox"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -12.0
+offset_right = 60.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.6, 0.6)
+text = "(Espaço Vazio)"
+horizontal_alignment = 1
+
+[node name="HighlightBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox/Slot3"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 0.9, 0.3, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="CommandPanel" type="ColorRect" parent="MenuRoot/BodyHBox"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/CommandPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 3.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/CommandPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="CommandsVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/CommandPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Btn0" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Itens"
+
+[node name="Btn1" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Habilidades"
+
+[node name="Btn2" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Primordiais"
+
+[node name="Btn3" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Equipamento"
+
+[node name="Btn4" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Status"
+
+[node name="Btn5" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Formação"
+
+[node name="Btn6" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Configurações"
+
+[node name="Btn7" type="Button" parent="MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Salvar"
+
+[node name="FooterPanel" type="ColorRect" parent="MenuRoot"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -80.0
+offset_right = -32.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/FooterPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 2.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/FooterPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
+
+[node name="HBox" type="HBoxContainer" parent="MenuRoot/FooterPanel/Margin"]
+layout_mode = 2
+
+[node name="MapLabel" type="Label" parent="MenuRoot/FooterPanel/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+text = "Local: Ruínas de Kenoma"
+
+[node name="PlaytimeLabel" type="Label" parent="MenuRoot/FooterPanel/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.85, 0.6, 1)
+text = "Tempo: 00:00:00"
+horizontal_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="MenuRoot/FooterPanel/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "Moedas: 0 G"
+horizontal_alignment = 2
+
+[node name="NotificationBanner" type="Control" parent="MenuRoot"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -60.0
+offset_right = 280.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="MenuRoot/NotificationBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.08, 0.12, 0.98)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/NotificationBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 0.85, 0.4, 1)
+border_width = 2.5
+editor_only = false
+
+[node name="BannerLabel" type="Label" parent="MenuRoot/NotificationBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+text = "Sistema de Habilidades em desenvolvimento"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

@@ -39,3 +39,4 @@ Ao conceber novos NPCs ou membros da equipe, preencher:
 
 ## 4. Fórmula Padrão de Prompt para IAs Visuais
 > `HD-2D JRPG dialogue portrait, bust shot, character face, [IDADE E TIPO DO PERSONAGEM], [TRAÇOS FACIAIS E CABELO], [EXPRESSÃO], [VESTIMENTAS E ACESSÓRIOS], three-quarter angle looking slightly right, clean refined line art, Octopath Traveler and Bravely Default portrait art style, digital watercolor shading, solid neutral light background, high resolution illustration.`
+

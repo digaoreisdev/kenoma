@@ -20,6 +20,8 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/autoload/game_state.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
 DialogueManager="*res://scripts/core/dialogue_manager.gd"
+PartyManager="*res://scripts/core/party_manager.gd"
+PauseMenu="*res://scenes/ui/pause_menu.tscn"
 
 [display]
 
