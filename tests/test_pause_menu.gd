@@ -7,13 +7,15 @@ const PartyManagerScript: GDScript = preload("res://scripts/core/party_manager.g
 const PauseMenuScript: GDScript = preload("res://scripts/ui/pause_menu.gd")
 
 
-static func run_tests() -> bool:
+static func run_tests(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var passed: bool = true
 	passed = passed and test_character_data_defaults()
 	passed = passed and test_party_manager_slots_and_swap()
-	passed = passed and test_pause_menu_lifecycle()
-	passed = passed and test_pause_menu_pt_br_commands()
-	passed = passed and test_character_select_and_banner()
+	passed = passed and test_pause_menu_lifecycle(tree)
+	passed = passed and test_pause_menu_pt_br_commands(tree)
+	passed = passed and test_character_select_and_banner(tree)
 	return passed
 
 
@@ -46,11 +48,15 @@ static func test_party_manager_slots_and_swap() -> bool:
 	return true
 
 
-static func test_pause_menu_lifecycle() -> bool:
+static func test_pause_menu_lifecycle(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var menu_scene: PackedScene = load("res://scenes/ui/pause_menu.tscn")
 	assert(menu_scene != null, "pause_menu.tscn must be loadable")
 	var menu: CanvasLayer = menu_scene.instantiate() as CanvasLayer
 	assert(menu != null, "PauseMenu must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(menu)
 	
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.CLOSED), "Menu must start closed")
 	menu.call("open_menu")
@@ -61,11 +67,15 @@ static func test_pause_menu_lifecycle() -> bool:
 	menu.call("close_menu")
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.CLOSED), "State must be CLOSED")
 	assert(root.visible == false, "Root panel must be hidden")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(menu)
 	menu.free()
 	return true
 
 
-static func test_pause_menu_pt_br_commands() -> bool:
+static func test_pause_menu_pt_br_commands(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var expected_commands: Array[String] = [
 		"Itens", "Habilidades", "Primordiais", "Equipamento",
 		"Status", "Formação", "Configurações", "Salvar"
@@ -75,6 +85,8 @@ static func test_pause_menu_pt_br_commands() -> bool:
 	
 	var menu_scene: PackedScene = load("res://scenes/ui/pause_menu.tscn")
 	var menu: CanvasLayer = menu_scene.instantiate() as CanvasLayer
+	if tree != null and tree.root != null:
+		tree.root.add_child(menu)
 	menu.call("open_menu")
 	
 	menu.call("_on_command_chosen", 1)
@@ -83,13 +95,19 @@ static func test_pause_menu_pt_br_commands() -> bool:
 	
 	menu.call("_handle_cancel")
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.COMMAND_SELECT), "Cancel must return to command select")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(menu)
 	menu.free()
 	return true
 
 
-static func test_character_select_and_banner() -> bool:
+static func test_character_select_and_banner(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var menu_scene: PackedScene = load("res://scenes/ui/pause_menu.tscn")
 	var menu: CanvasLayer = menu_scene.instantiate() as CanvasLayer
+	if tree != null and tree.root != null:
+		tree.root.add_child(menu)
 	menu.call("open_menu")
 	
 	menu.call("_on_command_chosen", 2)
@@ -104,5 +122,7 @@ static func test_character_select_and_banner() -> bool:
 	
 	menu.call("_handle_interact")
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.COMMAND_SELECT), "Interact must dismiss banner")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(menu)
 	menu.free()
 	return true

@@ -35,6 +35,7 @@ Para qualquer defeito identificado ou relatado:
 2. **Correção Controlada:** Implementar a alteração no código até que o teste passe com 100% de sucesso.
 3. **Registro na Matriz:** Preencher imediatamente a Matriz de Regressão Contínua abaixo.
 4. **Validação de Regressão:** Executar a suíte completa de testes antes de cada entrega ou commit.
+5. **Validação Obrigatória em Modo Headless pela Engine:** É terminantemente proibido realizar commits ou marcar tarefas como concluídas sem que a suíte completa de testes (`res://tests/test_runner.gd`) tenha sido executada via binário oficial do Godot em modo headless (`--headless -s res://tests/test_runner.gd`) com código de retorno 0 e status `ALL PASS`. Bypasses ou presunções de integridade sem execução real do compilador e do runner configuram quebra gravíssima de governança.
 
 ---
 
@@ -47,7 +48,7 @@ Para qualquer defeito identificado ou relatado:
 | REG-002 | 2026-11-04 | Ciclo incompleto de animação de empurrão (stutter/reset a frame 0) ao empurrar Cima/Laterais por dupla movimentação da caixa e chamadas repetidas de play() | Inclusão de trava _is_being_pushed no PushCrate, proteção em _play_push_animation (sem reinício de frame se mesma animação), registro de push_side e retenção de alvo por proximidade | res://tests/test_push_physics.gd | PASS |
 | REG-003 | 2026-11-05 | Sobreposição/clipping de sprite do NPC e necessidade de colar no colisor para conversar | Ajustada colisão dos pés do NPC para 24x16 px em (0, -4), ativado y_sort_enabled em entidades e salas, e estendido InteractionRay do Player para 32px (cardinais) / 24px (diagonais) | res://tests/test_dialogue_system.gd | PASS |
 | REG-004 | 2026-11-05 | Personagem caminhando parado durante conversa com NPC caso setas continuem pressionadas | Implementado force_idle() com transição imediata para State.IDLE, zeramento de velocidade, atualização da animação para idle_* e sincronização com DialogueManager.dialogue_started | res://tests/test_dialogue_system.gd | PASS |
-| REG-005 | 2026-11-05 | Parser Error: Class 'PartyManager' hides an autoload singleton | Removida declaração de class_name dos scripts de Autoload (PartyManager e PauseMenu) mantendo apenas extends, evitando conflito de sombreamento no compilador GDScript | res://tests/test_pause_menu.gd | PASS |
+| REG-005 | 2026-11-05 | Parser Error: Class 'PartyManager' hides an autoload singleton e bypass de teste headless | Removida declaração de class_name dos scripts de Autoload (PartyManager e PauseMenu), implementado test_runner.gd headless com SceneTree e validação 100% verde de todas as suítes antes de commit | res://tests/test_runner.gd | PASS |
 
 ---
 
@@ -73,4 +74,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.20 (2026-11-05):** Formalização do Guia de Direção de Arte e Personagens (*Art Bible*) em `res://docs/art_bible.md`: especificações técnicas para retratos de diálogo HD-2D (256x256 px, PNG transparente, enquadramento busto 3/4), ficha canônica e paleta de Lucas Reis, template de DNA visual para novos NPCs e fórmula padronizada de prompt para geração consistente de assets via IA.
 * **v0.22 (2026-11-05):** Implementação do Menu de Pausa HD-2D para 4 heróis, Habilidades e Primordiais (F2.6 - Step 2.1): arquitetura de dados com `CharacterData` e singleton `PartyManager` (Lucas Reis nível 1 em slot 0 e slots 1..3 vazios reservados), interface de pausa expandida em `res://scenes/ui/pause_menu.tscn` com barras de PV/PM, comandos 100% em PT-BR (Itens, Habilidades, Primordiais, Equipamento, Status, Formação, Configurações, Salvar), seleção de personagens com banners informativos, rodapé com mapa, tempo e moedas, e suíte de testes em `res://tests/test_pause_menu.gd`.
 * **v0.23 (2026-11-05):** Correção de sombreamento de classes em Autoloads (REG-005): remoção de `class_name PartyManager` em `party_manager.gd` e `class_name PauseMenu` em `pause_menu.gd`, mantendo declaração estrita de herança (`extends Node` / `extends CanvasLayer`) e atualizando a suíte `test_pause_menu.gd` com preload isolado para evitar colisões no analisador sintático do Godot.
+* **v0.24 (2026-11-05):** Blindagem do pipeline headless e runner automatizado (REG-005): criação de `res://tests/test_runner.gd` executável via Godot CLI `--headless`, adaptação do ciclo de vida dos testes para SceneTree e carregamento de Autoloads, e resolução integral dos erros de sombreamento e testes de regressão com 100% de aprovação (ALL PASS).
 

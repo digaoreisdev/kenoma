@@ -4,17 +4,19 @@ extends RefCounted
 ## Testes automatizados para o sistema de diálogos, DialogueManager e NPC.
 
 
-static func run_tests() -> bool:
+static func run_tests(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var all_passed: bool = true
 	all_passed = all_passed and test_dialogue_line_data()
-	all_passed = all_passed and test_dialogue_box_lifecycle()
-	all_passed = all_passed and test_dialogue_manager_state_lock()
+	all_passed = all_passed and test_dialogue_box_lifecycle(tree)
+	all_passed = all_passed and test_dialogue_manager_state_lock(tree)
 	all_passed = all_passed and test_npc_facing_and_interact()
 	all_passed = all_passed and test_npc_collision_bounds()
-	all_passed = all_passed and test_player_interaction_reach()
-	all_passed = all_passed and test_player_walk_lock_on_dialogue()
+	all_passed = all_passed and test_player_interaction_reach(tree)
+	all_passed = all_passed and test_player_walk_lock_on_dialogue(tree)
 	all_passed = all_passed and test_portrait_expressions_resolution()
-	all_passed = all_passed and test_portrait_frame_autocollapse()
+	all_passed = all_passed and test_portrait_frame_autocollapse(tree)
 	return all_passed
 
 
@@ -37,11 +39,15 @@ static func test_dialogue_line_data() -> bool:
 	return true
 
 
-static func test_dialogue_box_lifecycle() -> bool:
+static func test_dialogue_box_lifecycle(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var box_scene: PackedScene = load("res://scenes/ui/dialogue_box.tscn")
 	assert(box_scene != null, "DialogueBox scene must be loadable")
 	var box: DialogueBox = box_scene.instantiate() as DialogueBox
 	assert(box != null, "DialogueBox must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(box)
 	
 	var test_lines: Array[Dictionary] = [
 		{"speaker": "Narrator", "text": "First line of text.", "portrait": null},
@@ -58,11 +64,15 @@ static func test_dialogue_box_lifecycle() -> bool:
 	assert(box.get("_current_index") == 1, "Must advance to index 1")
 	
 	box.advance()
+	if tree != null and tree.root != null:
+		tree.root.remove_child(box)
 	box.free()
 	return true
 
 
-static func test_dialogue_manager_state_lock() -> bool:
+static func test_dialogue_manager_state_lock(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var sm: DialogueManagerSingleton = DialogueManagerSingleton.new()
 	assert(sm != null, "DialogueManagerSingleton must instantiate")
 	assert(sm.is_active() == false, "Must start inactive")
@@ -72,7 +82,11 @@ static func test_dialogue_manager_state_lock() -> bool:
 	assert(player_scene != null, "Player scene must be loadable")
 	var player: Player = player_scene.instantiate() as Player
 	assert(player != null, "Player must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(player)
 	assert(player._can_walk() == true, "Player can walk normally")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(player)
 	player.free()
 	return true
 
@@ -116,11 +130,15 @@ static func test_npc_collision_bounds() -> bool:
 	return true
 
 
-static func test_player_interaction_reach() -> bool:
+static func test_player_interaction_reach(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
 	assert(player_scene != null, "Player scene must be loadable")
 	var player: Player = player_scene.instantiate() as Player
 	assert(player != null, "Player must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(player)
 	assert(player.y_sort_enabled == true, "Player must have y_sort_enabled = true")
 	
 	var ray: RayCast2D = player.get_node_or_null("InteractionRay") as RayCast2D
@@ -134,15 +152,21 @@ static func test_player_interaction_reach() -> bool:
 	player._resolve_8way_direction(Vector2(-1, 0))
 	assert(ray.target_position.x <= -30.0, "InteractionRay left reach must be <= -30px")
 	
+	if tree != null and tree.root != null:
+		tree.root.remove_child(player)
 	player.free()
 	return true
 
 
-static func test_player_walk_lock_on_dialogue() -> bool:
+static func test_player_walk_lock_on_dialogue(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
 	assert(player_scene != null, "Player scene must be loadable")
 	var player: Player = player_scene.instantiate() as Player
 	assert(player != null, "Player must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(player)
 	
 	player.current_state = Player.State.WALK
 	player.velocity = Vector2(0, 120)
@@ -152,6 +176,8 @@ static func test_player_walk_lock_on_dialogue() -> bool:
 	if player.animated_sprite != null:
 		assert(player.animated_sprite.animation.begins_with("idle_"), "Animation must switch to idle")
 	
+	if tree != null and tree.root != null:
+		tree.root.remove_child(player)
 	player.free()
 	return true
 
@@ -170,11 +196,15 @@ static func test_portrait_expressions_resolution() -> bool:
 	return true
 
 
-static func test_portrait_frame_autocollapse() -> bool:
+static func test_portrait_frame_autocollapse(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var box_scene: PackedScene = load("res://scenes/ui/dialogue_box.tscn")
 	assert(box_scene != null, "DialogueBox scene must be loadable")
 	var box: DialogueBox = box_scene.instantiate() as DialogueBox
 	assert(box != null, "DialogueBox must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(box)
 	
 	var lines: Array[Dictionary] = [
 		{"speaker": "Guard", "text": "No portrait line.", "portrait": null},
@@ -184,10 +214,13 @@ static func test_portrait_frame_autocollapse() -> bool:
 	assert(box.portrait_frame != null, "Must have portrait_frame")
 	assert(box.portrait_frame.visible == false, "Must auto-collapse when no portrait")
 	
+	box.skip_typing()
 	box.advance()
 	assert(box.portrait_frame.visible == true, "Must be visible when expression has portrait")
 	assert(box.portrait_rect.texture != null, "Texture must be assigned")
 	
+	if tree != null and tree.root != null:
+		tree.root.remove_child(box)
 	box.free()
 	return true
 

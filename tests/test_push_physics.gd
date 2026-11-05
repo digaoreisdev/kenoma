@@ -4,17 +4,19 @@ extends RefCounted
 ## Teste automatizado para histerese (REG-001), integridade de empurrão (REG-002) e mecânica de puxar (F1.10).
 
 
-static func run_tests() -> bool:
+static func run_tests(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var all_passed: bool = true
 	all_passed = all_passed and test_interaction_ray_lengths()
 	all_passed = all_passed and test_push_alignment()
 	all_passed = all_passed and test_hysteresis_buffer()
 	all_passed = all_passed and test_push_animation_cycle_integrity()
-	all_passed = all_passed and test_push_crate_single_step()
+	all_passed = all_passed and test_push_crate_single_step(tree)
 	all_passed = all_passed and test_pull_vector_opposition()
 	all_passed = all_passed and test_pull_animation_cycle_integrity()
-	all_passed = all_passed and test_pull_crate_step()
-	all_passed = all_passed and test_pull_impulse_sync()
+	all_passed = all_passed and test_pull_crate_step(tree)
+	all_passed = all_passed and test_pull_impulse_sync(tree)
 	return all_passed
 
 
@@ -63,11 +65,17 @@ static func test_push_animation_cycle_integrity() -> bool:
 	return true
 
 
-static func test_push_crate_single_step() -> bool:
+static func test_push_crate_single_step(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var crate: PushCrate = PushCrate.new()
 	assert(crate != null, "PushCrate must be instantiable")
+	if tree != null and tree.root != null:
+		tree.root.add_child(crate)
 	crate.push_by(Vector2.UP, 45.0)
 	assert(crate.get("_is_being_pushed") == true, "Flag _is_being_pushed must be active after push_by")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(crate)
 	crate.free()
 	return true
 
@@ -103,20 +111,30 @@ static func test_pull_animation_cycle_integrity() -> bool:
 	return true
 
 
-static func test_pull_crate_step() -> bool:
+static func test_pull_crate_step(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var crate: PushCrate = PushCrate.new()
 	assert(crate != null, "PushCrate must be instantiable")
+	if tree != null and tree.root != null:
+		tree.root.add_child(crate)
 	crate.pull_by(Vector2.DOWN, 45.0)
 	assert(crate.get("_is_being_pushed") == true, "Flag _is_being_pushed must be active after pull_by")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(crate)
 	crate.free()
 	return true
 
 
-static func test_pull_impulse_sync() -> bool:
+static func test_pull_impulse_sync(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
 	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
 	assert(player_scene != null, "Player scene must be loadable")
 	var player: Player = player_scene.instantiate() as Player
 	assert(player != null, "Player must instantiate")
+	if tree != null and tree.root != null:
+		tree.root.add_child(player)
 	
 	player.call("_play_pull_animation", Player.Direction.UP)
 	var sprite: AnimatedSprite2D = player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
@@ -135,6 +153,8 @@ static func test_pull_impulse_sync() -> bool:
 	
 	player.call("_reset_push_state")
 	assert(sprite.speed_scale == 1.0, "Resetting push state must restore speed_scale to 1.0")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(player)
 	player.free()
 	return true
 
