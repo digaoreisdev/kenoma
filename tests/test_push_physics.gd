@@ -14,7 +14,7 @@ static func run_tests() -> bool:
 	all_passed = all_passed and test_pull_vector_opposition()
 	all_passed = all_passed and test_pull_animation_cycle_integrity()
 	all_passed = all_passed and test_pull_crate_step()
-	all_passed = all_passed and test_reverse_pull_speed_scale()
+	all_passed = all_passed and test_pull_impulse_sync()
 	return all_passed
 
 
@@ -112,7 +112,7 @@ static func test_pull_crate_step() -> bool:
 	return true
 
 
-static func test_reverse_pull_speed_scale() -> bool:
+static func test_pull_impulse_sync() -> bool:
 	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
 	assert(player_scene != null, "Player scene must be loadable")
 	var player: Player = player_scene.instantiate() as Player
@@ -121,8 +121,17 @@ static func test_reverse_pull_speed_scale() -> bool:
 	player.call("_play_pull_animation", Player.Direction.UP)
 	var sprite: AnimatedSprite2D = player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 	assert(sprite != null, "AnimatedSprite2D must exist")
-	assert(sprite.speed_scale < 0.0, "Pulling must use negative speed_scale for reverse playback")
-	assert(sprite.animation.begins_with("push_"), "Pulling must use braced push animation in reverse")
+	assert(sprite.animation == "pull_up", "Pulling UP must play original pull_up animation")
+	assert(sprite.speed_scale == 1.0, "Original pull animation must play forward at 1.0 speed_scale")
+	
+	# Test impulse multiplier curve
+	sprite.frame = 0
+	var mult_reach: float = float(player.call("_get_pull_impulse_multiplier"))
+	assert(mult_reach <= 0.2, "Reach frame 0 must have minimal impulse")
+	
+	sprite.frame = 3
+	var mult_tug: float = float(player.call("_get_pull_impulse_multiplier"))
+	assert(mult_tug >= 2.0, "Exertion frame 3 must have high tug impulse")
 	
 	player.call("_reset_push_state")
 	assert(sprite.speed_scale == 1.0, "Resetting push state must restore speed_scale to 1.0")

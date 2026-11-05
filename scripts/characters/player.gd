@@ -147,11 +147,27 @@ func _try_pull(input_dir: Vector2) -> bool:
 		return false
 	
 	current_state = State.INTERACTING
-	velocity = input_dir * pull_speed
-	move_and_slide()
-	target_crate.pull_by(input_dir, pull_speed)
 	_play_pull_animation(current_direction)
+	var impulse_mult: float = _get_pull_impulse_multiplier()
+	var current_pull_speed: float = pull_speed * impulse_mult
+	velocity = input_dir * current_pull_speed
+	move_and_slide()
+	target_crate.pull_by(input_dir, current_pull_speed)
 	return true
+
+
+func _get_pull_impulse_multiplier() -> float:
+	if animated_sprite == null:
+		return 1.0
+	var f: int = animated_sprite.frame % 8
+	match f:
+		0, 1: return 0.1
+		2: return 0.8
+		3, 4: return 2.2
+		5: return 1.8
+		6: return 0.7
+		7: return 0.1
+		_: return 1.0
 
 
 func _find_pushable_target(input_dir: Vector2) -> PushCrate:
@@ -297,7 +313,7 @@ func _play_push_animation(dir: Direction) -> void:
 			target_anim = "push_side"
 		else:
 			return
-	animated_sprite.speed_scale = push_speed / 45.0
+	animated_sprite.speed_scale = 1.0
 	if animated_sprite.animation != target_anim:
 		animated_sprite.play(target_anim)
 	elif not animated_sprite.is_playing():
@@ -307,18 +323,15 @@ func _play_push_animation(dir: Direction) -> void:
 func _play_pull_animation(dir: Direction) -> void:
 	if animated_sprite == null or animated_sprite.sprite_frames == null:
 		return
-	var target_anim: String = "push_" + _direction_to_string(dir)
+	var target_anim: String = "pull_" + _direction_to_string(dir)
 	if not animated_sprite.sprite_frames.has_animation(target_anim):
-		if animated_sprite.sprite_frames.has_animation("push_side") and (dir == Direction.LEFT or dir == Direction.RIGHT):
-			target_anim = "push_side"
+		if animated_sprite.sprite_frames.has_animation("pull_side") and (dir == Direction.LEFT or dir == Direction.RIGHT):
+			target_anim = "pull_side"
 		else:
 			return
-	animated_sprite.speed_scale = -(pull_speed / 45.0)
+	animated_sprite.speed_scale = 1.0
 	if animated_sprite.animation != target_anim:
 		animated_sprite.play(target_anim)
-		var count: int = animated_sprite.sprite_frames.get_frame_count(target_anim)
-		if count > 0 and animated_sprite.frame == 0:
-			animated_sprite.frame = count - 1
 	elif not animated_sprite.is_playing():
 		animated_sprite.play()
 

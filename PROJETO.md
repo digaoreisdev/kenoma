@@ -50,6 +50,7 @@
 * [x] **F1.9 (Bugfix):** Resolução do ciclo incompleto de animação de empurrão (REG-002): sincronização de movimentação física única no PushCrate (_is_being_pushed), proteção contra reinício de frame em _play_push_animation, cadastro de push_side (16 frames, loop) e ampliação de testes em test_push_physics.gd.
 * [x] **F1.10 (Passo 8):** Implementação da mecânica de puxar objetos interativos (Pull): bloqueio direcional com facing lock ao se afastar da caixa segurando ação, execução de animações pull_* nas 8 direções com proteção de ciclo completo, sincronização de movimentação pull_by no PushCrate e testes automatizados em test_push_physics.gd.
 * [x] **F1.11 (Passo 8.1 - Opção 2):** Refinamento da animação de puxar para postura apoiada reversa: reprodução reversa de push_<dir> com speed_scale proporcional (-pull_speed / 45.0), mantendo as mãos firmemente apoiadas na caixa ao recuar, restauração garantida de speed_scale = 1.0 ao soltar e testes automatizados em test_push_physics.gd.
+* [x] **F1.12 (Passo 8.1 - Sincronização Rítmica):** Preservação do conjunto original de animações pull_* com sincronização física rítmica por frame (_get_pull_impulse_multiplier): alta tração no golpe de puxar e desaceleração na extensão dos braços, eliminando o deslizamento constante com esforço pesado convincente.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
