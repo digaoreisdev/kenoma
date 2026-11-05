@@ -56,6 +56,7 @@
 * [x] **F2.2 (Passo 1.1):** Correção de colisão e distância de conversa do NPC (REG-003): ampliação da caixa de colisão dos pés do NPC para 24x16 px em (0, -4), ativação de renderização em profundidade vertical (y_sort_enabled) nas entidades e cenários de teste, extensão do alcance do InteractionRay para 32 px (cardinais) e 24 px (diagonais) viabilizando interação sem contato físico excessivo e novos testes em test_dialogue_system.gd.
 * [x] **F2.3 (Passo 1.2):** Bloqueio de locomoção em diálogos (REG-004): implementação de `force_idle()` no Player com zeramento de velocidade, transição forçada para `State.IDLE`, atualização imediata da animação para `idle_*` e captura do sinal `DialogueManager.dialogue_started`, eliminando o caminhar parado quando o usuário mantém direcionais pressionados.
 * [x] **F2.4 (Passo 1.3):** Conexão de retratos HD-2D ao sistema de diálogos: estruturação dos retratos de Lucas Reis (neutral, serious, shock, confident) em `res://assets/art/portraits/lucas/`, criação do `PortraitFrame` estilizado com proporção preservada no `DialogueBox`, troca dinâmica de expressões faciais via `DialogueLine.portrait` ou tag `expression`, auto-colapso quando não houver retrato e diálogo de teste com o Guardião em `test_room_b.tscn`.
+* [x] **F2.5 (Passo 1.4 / Governança):** Criação da Art Bible em `res://docs/art_bible.md`: especificações técnicas para portraits HD-2D (256x256 px, PNG transparente, busto 3/4), ficha canônica e paleta do protagonista Lucas Reis, template de DNA visual para novos personagens/NPCs e fórmula padronizada de prompt para geração de arte consistente via IA.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
@@ -67,6 +68,6 @@
 
 ## Problemas em Aberto
 1. **Dispositivo móvel alvo:** Coletar o modelo exato e versão do Android do smartphone do criador no fim da Fase F1 para validar os testes.
-2. **Consistência visual:** Monitorar e mitigar o risco de divergência de estilo nas artes geradas por IA (definição de pipeline e regras de estilo na Fase F2).
+2. **Consistência visual:** Resolvido na Fase F2 com a padronização das diretrizes e fórmulas de prompt em `res://docs/art_bible.md`.
 3. **Tamanho do tile:** Pendente de definição (recomendado 32 px; decidir antes da Fase F2).
 4. **Exportação do AutoSprite:** Confirmar se o AutoSprite exporta os spritesheets em 48x64 px com filtro Nearest.
