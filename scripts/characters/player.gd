@@ -82,11 +82,22 @@ func set_camera_limits(left: int, top: int, right: int, bottom: int) -> void:
 func _can_walk() -> bool:
 	if current_state in [State.HURT, State.DEAD, State.RESTING]:
 		return false
+	if has_node("/root/SceneManager"):
+		var sm: Node = get_node("/root/SceneManager")
+		if sm.get("is_transitioning") == true:
+			return false
 	if has_node("/root/GameState"):
 		var state_mgr: Node = get_node("/root/GameState")
 		if state_mgr.has_method("is_exploration"):
 			return bool(state_mgr.call("is_exploration"))
 	return true
+
+
+func set_facing_direction(dir: Direction) -> void:
+	current_direction = dir
+	current_state = State.IDLE
+	_update_interaction_ray()
+	_update_locomotion_animation()
 
 
 func _handle_movement() -> void:

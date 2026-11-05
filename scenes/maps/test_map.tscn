@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://scripts/core/test_map.gd" id="1_map_script"]
 [ext_resource type="PackedScene" path="res://scenes/characters/player.tscn" id="2_player_scene"]
 [ext_resource type="PackedScene" path="res://scenes/objects/push_crate.tscn" id="3_crate_scene"]
+[ext_resource type="PackedScene" path="res://scenes/objects/doorway.tscn" id="4_doorway_scene"]
+[ext_resource type="PackedScene" path="res://scenes/objects/spawn_point.tscn" id="5_spawn_scene"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_top"]
 size = Vector2(800, 20)
@@ -58,6 +60,16 @@ position = Vector2(-120, -60)
 
 [node name="PushCrate2" parent="." instance=ExtResource("3_crate_scene")]
 position = Vector2(120, 60)
+
+[node name="SpawnFromRoomB" parent="." instance=ExtResource("5_spawn_scene")]
+position = Vector2(0, -250)
+spawn_id = "from_room_b"
+
+[node name="DoorwayToRoomB" parent="." instance=ExtResource("4_doorway_scene")]
+position = Vector2(0, -288)
+target_scene = "res://scenes/maps/test_room_b.tscn"
+target_spawn_id = "from_test_map"
+exit_direction = 1
 
 [node name="Player" parent="." instance=ExtResource("2_player_scene")]
 position = Vector2(0, 0)

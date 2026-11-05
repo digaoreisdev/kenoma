@@ -34,7 +34,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F1 - Fundação de Gameplay & Movimentação** (Passo 8.1 concluído).
+* **F1 - Fundação de Gameplay & Movimentação** (Passo 9 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -51,6 +51,7 @@
 * [x] **F1.10 (Passo 8):** Implementação da mecânica de puxar objetos interativos (Pull): bloqueio direcional com facing lock ao se afastar da caixa segurando ação, execução de animações pull_* nas 8 direções com proteção de ciclo completo, sincronização de movimentação pull_by no PushCrate e testes automatizados em test_push_physics.gd.
 * [x] **F1.11 (Passo 8.1 - Opção 2):** Refinamento da animação de puxar para postura apoiada reversa: reprodução reversa de push_<dir> com speed_scale proporcional (-pull_speed / 45.0), mantendo as mãos firmemente apoiadas na caixa ao recuar, restauração garantida de speed_scale = 1.0 ao soltar e testes automatizados em test_push_physics.gd.
 * [x] **F1.12 (Passo 8.1 - Sincronização Rítmica):** Preservação do conjunto original de animações pull_* com sincronização física rítmica por frame (_get_pull_impulse_multiplier): alta tração no golpe de puxar e desaceleração na extensão dos braços, eliminando o deslizamento constante com esforço pesado convincente.
+* [x] **F1.13 (Passo 9):** Implementação do singleton global SceneManager com transições suaves em fade out/in (Tween preto 0.35s), bloqueio de inputs durante a transição, criação dos componentes Doorway (Area2D) e SpawnPoint (Marker2D), ambiente de testes dual com test_map e test_room_b, e testes em test_scene_manager.gd.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
