@@ -4,8 +4,10 @@ extends Node
 
 signal party_updated
 signal gold_changed(new_gold: int)
+signal inventory_updated
 
 var party_slots: Array[CharacterData] = [null, null, null, null]
+var inventory: Array[Dictionary] = []
 var gold: int = 0
 var playtime_seconds: float = 0.0
 var current_map_name: String = "Ruínas de Kenoma"
@@ -29,7 +31,65 @@ func reset_to_defaults() -> void:
 	]
 	gold = 0
 	playtime_seconds = 0.0
+	inventory.clear()
+	add_item(ItemData.create_potion(), 3)
 	party_updated.emit()
+	inventory_updated.emit()
+
+
+func get_inventory() -> Array[Dictionary]:
+	return inventory
+
+
+func add_item(item: ItemData, qty: int = 1) -> void:
+	if item == null or qty <= 0:
+		return
+	for entry: Dictionary in inventory:
+		var it: ItemData = entry.get("item") as ItemData
+		if it != null and it.id == item.id:
+			entry["quantity"] = int(entry.get("quantity", 0)) + qty
+			inventory_updated.emit()
+			return
+	inventory.append({"item": item, "quantity": qty})
+	inventory_updated.emit()
+
+
+func remove_item(item: ItemData, qty: int = 1) -> bool:
+	if item == null or qty <= 0:
+		return false
+	for i: int in range(inventory.size()):
+		var it: ItemData = inventory[i].get("item") as ItemData
+		if it != null and it.id == item.id:
+			var current_qty: int = int(inventory[i].get("quantity", 0))
+			if current_qty < qty:
+				return false
+			inventory[i]["quantity"] = current_qty - qty
+			if int(inventory[i]["quantity"]) <= 0:
+				inventory.remove_at(i)
+			inventory_updated.emit()
+			return true
+	return false
+
+
+func get_item_count(item_id: String) -> int:
+	for entry: Dictionary in inventory:
+		var it: ItemData = entry.get("item") as ItemData
+		if it != null and it.id == item_id:
+			return int(entry.get("quantity", 0))
+	return 0
+
+
+func use_item(item: ItemData, target_member_index: int) -> bool:
+	if item == null or target_member_index < 0 or target_member_index >= party_slots.size():
+		return false
+	var member: CharacterData = party_slots[target_member_index]
+	if member == null:
+		return false
+	if not remove_item(item, 1):
+		return false
+	member.current_hp = mini(member.current_hp + item.effect_value, member.max_hp)
+	party_updated.emit()
+	return true
 
 
 func get_member(slot_index: int) -> CharacterData:

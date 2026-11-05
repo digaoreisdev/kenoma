@@ -14,6 +14,8 @@ enum MenuState {
 	FORMATION_FIRST,
 	FORMATION_SECOND,
 	BANNER_DISPLAY,
+	ITEM_SELECT,
+	ITEM_TARGET,
 }
 
 const COMMAND_LABELS: Array[String] = [
@@ -30,11 +32,18 @@ const COMMAND_LABELS: Array[String] = [
 var current_state: MenuState = MenuState.CLOSED
 var selected_command_index: int = 0
 var selected_slot_index: int = 0
+var selected_item_index: int = 0
+var current_selected_item: ItemData = null
 var formation_first_slot: int = -1
 var target_system_name: String = ""
 
 @onready var panel_root: Control = get_node_or_null("MenuRoot")
+@onready var command_panel: Control = get_node_or_null("MenuRoot/BodyHBox/CommandPanel")
 @onready var commands_container: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/CommandPanel/Margin/CommandsVBox")
+@onready var item_panel: Control = get_node_or_null("MenuRoot/BodyHBox/ItemPanel")
+@onready var item_list: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/ItemPanel/Margin/ItemVBox/Scroll/ItemList")
+@onready var empty_item_label: Label = get_node_or_null("MenuRoot/BodyHBox/ItemPanel/Margin/ItemVBox/EmptyLabel")
+@onready var item_desc_label: Label = get_node_or_null("MenuRoot/BodyHBox/ItemPanel/Margin/ItemVBox/DescPanel/DescMargin/DescLabel")
 @onready var slots_container: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox")
 @onready var map_label: Label = get_node_or_null("MenuRoot/FooterPanel/Margin/HBox/MapLabel")
 @onready var playtime_label: Label = get_node_or_null("MenuRoot/FooterPanel/Margin/HBox/PlaytimeLabel")
@@ -97,6 +106,12 @@ func open_menu() -> void:
 	current_state = MenuState.COMMAND_SELECT
 	selected_command_index = 0
 	selected_slot_index = 0
+	selected_item_index = 0
+	current_selected_item = null
+	if command_panel != null:
+		command_panel.visible = true
+	if item_panel != null:
+		item_panel.visible = false
 	if panel_root != null:
 		panel_root.visible = true
 	hide_banner()
@@ -110,6 +125,10 @@ func open_menu() -> void:
 
 func close_menu() -> void:
 	current_state = MenuState.CLOSED
+	if item_panel != null:
+		item_panel.visible = false
+	if command_panel != null:
+		command_panel.visible = true
 	if panel_root != null:
 		panel_root.visible = false
 	hide_banner()
@@ -123,6 +142,12 @@ func _handle_cancel() -> void:
 		MenuState.BANNER_DISPLAY:
 			hide_banner()
 			current_state = MenuState.COMMAND_SELECT
+		MenuState.ITEM_TARGET:
+			current_state = MenuState.ITEM_SELECT
+			_update_character_selection()
+			_update_item_selection()
+		MenuState.ITEM_SELECT:
+			_close_item_menu()
 		MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND:
 			current_state = MenuState.COMMAND_SELECT
 			_update_character_selection()
@@ -136,6 +161,10 @@ func _handle_interact() -> void:
 	match current_state:
 		MenuState.COMMAND_SELECT:
 			_on_command_chosen(selected_command_index)
+		MenuState.ITEM_SELECT:
+			_on_item_chosen()
+		MenuState.ITEM_TARGET:
+			_use_current_item_on_slot(selected_slot_index)
 		MenuState.CHARACTER_SELECT:
 			_on_character_chosen(selected_slot_index)
 		MenuState.FORMATION_FIRST:
@@ -154,6 +183,8 @@ func _on_command_chosen(cmd_idx: int) -> void:
 	command_selected.emit(cmd_name)
 	target_system_name = cmd_name
 	match cmd_name:
+		"Itens":
+			_open_item_menu()
 		"Habilidades", "Primordiais", "Equipamento", "Status":
 			current_state = MenuState.CHARACTER_SELECT
 			selected_slot_index = 0
@@ -164,6 +195,112 @@ func _on_command_chosen(cmd_idx: int) -> void:
 			_update_character_selection()
 		_:
 			show_banner("Sistema de " + cmd_name + " em desenvolvimento")
+
+
+func _open_item_menu() -> void:
+	current_state = MenuState.ITEM_SELECT
+	selected_item_index = 0
+	current_selected_item = null
+	if command_panel != null:
+		command_panel.visible = false
+	if item_panel != null:
+		item_panel.visible = true
+	_refresh_item_list()
+	_update_item_selection()
+
+
+func _close_item_menu() -> void:
+	current_state = MenuState.COMMAND_SELECT
+	current_selected_item = null
+	if item_panel != null:
+		item_panel.visible = false
+	if command_panel != null:
+		command_panel.visible = true
+	_update_command_selection()
+	_update_character_selection()
+
+
+func _on_item_chosen() -> void:
+	var inv: Array[Dictionary] = _get_party_inventory()
+	if inv.is_empty() or selected_item_index < 0 or selected_item_index >= inv.size():
+		show_banner("Inventário vazio.")
+		return
+	var entry: Dictionary = inv[selected_item_index]
+	current_selected_item = entry.get("item") as ItemData
+	if current_selected_item == null:
+		return
+	current_state = MenuState.ITEM_TARGET
+	selected_slot_index = 0
+	_update_character_selection()
+
+
+func _use_current_item_on_slot(slot_idx: int) -> void:
+	if current_selected_item == null or not has_node("/root/PartyManager"):
+		return
+	var pm: Node = get_node("/root/PartyManager")
+	var member: CharacterData = pm.call("get_member", slot_idx) as CharacterData
+	if member == null:
+		show_banner("Espaço vazio selecionado")
+		return
+	var success: bool = bool(pm.call("use_item", current_selected_item, slot_idx))
+	if success:
+		_refresh_party_slots()
+		_refresh_item_list()
+		_update_character_selection()
+		show_banner("Usou %s em %s!" % [current_selected_item.name, member.name])
+		var remaining: int = int(pm.call("get_item_count", current_selected_item.id))
+		if remaining <= 0:
+			current_state = MenuState.ITEM_SELECT
+			_update_character_selection()
+			_update_item_selection()
+
+
+func _get_party_inventory() -> Array[Dictionary]:
+	if has_node("/root/PartyManager"):
+		var pm: Node = get_node("/root/PartyManager")
+		return pm.call("get_inventory") as Array[Dictionary]
+	return []
+
+
+func _refresh_item_list() -> void:
+	if item_list == null:
+		return
+	for child in item_list.get_children():
+		child.queue_free()
+	var inv: Array[Dictionary] = _get_party_inventory()
+	var has_items: bool = not inv.is_empty()
+	if empty_item_label != null:
+		empty_item_label.visible = not has_items
+	for i: int in range(inv.size()):
+		var entry: Dictionary = inv[i]
+		var it: ItemData = entry.get("item") as ItemData
+		var qty: int = int(entry.get("quantity", 0))
+		var it_name: String = it.name if it != null else "Desconhecido"
+		var btn: Button = Button.new()
+		btn.custom_minimum_size = Vector2(0, 44)
+		btn.text = "%s   (x%d)" % [it_name, qty]
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		item_list.add_child(btn)
+
+
+func _update_item_selection() -> void:
+	var inv: Array[Dictionary] = _get_party_inventory()
+	if inv.is_empty():
+		if item_desc_label != null:
+			item_desc_label.text = "Inventário vazio."
+		return
+	selected_item_index = clampi(selected_item_index, 0, inv.size() - 1)
+	var entry: Dictionary = inv[selected_item_index]
+	var it: ItemData = entry.get("item") as ItemData
+	if item_desc_label != null:
+		item_desc_label.text = it.description if it != null else ""
+	if item_list != null:
+		var buttons: Array[Node] = item_list.get_children()
+		for i: int in range(buttons.size()):
+			var btn: Button = buttons[i] as Button
+			if btn != null:
+				var is_sel: bool = (i == selected_item_index and current_state == MenuState.ITEM_SELECT)
+				btn.modulate = Color(1.2, 1.2, 0.6, 1.0) if is_sel else Color(1.0, 1.0, 1.0, 1.0)
 
 
 func _on_character_chosen(slot_idx: int) -> void:
@@ -195,7 +332,12 @@ func _navigate(dir: int) -> void:
 	if current_state == MenuState.COMMAND_SELECT:
 		selected_command_index = posmod(selected_command_index + dir, COMMAND_LABELS.size())
 		_update_command_selection()
-	elif current_state in [MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND]:
+	elif current_state == MenuState.ITEM_SELECT:
+		var inv: Array[Dictionary] = _get_party_inventory()
+		if not inv.is_empty():
+			selected_item_index = posmod(selected_item_index + dir, inv.size())
+			_update_item_selection()
+	elif current_state in [MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND, MenuState.ITEM_TARGET]:
 		selected_slot_index = posmod(selected_slot_index + dir, 4)
 		_update_character_selection()
 
@@ -293,7 +435,12 @@ func _update_command_selection() -> void:
 func _update_character_selection() -> void:
 	if slots_container == null:
 		return
-	var in_char_mode: bool = current_state in [MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND]
+	var in_char_mode: bool = current_state in [
+		MenuState.CHARACTER_SELECT,
+		MenuState.FORMATION_FIRST,
+		MenuState.FORMATION_SECOND,
+		MenuState.ITEM_TARGET
+	]
 	for i: int in range(4):
 		var slot_node: Control = slots_container.get_node_or_null("Slot" + str(i)) as Control
 		if slot_node != null:

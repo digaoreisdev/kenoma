@@ -13,9 +13,11 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	var passed: bool = true
 	passed = passed and test_character_data_defaults()
 	passed = passed and test_party_manager_slots_and_swap()
+	passed = passed and test_inventory_item_consumption_and_healing()
 	passed = passed and test_pause_menu_lifecycle(tree)
 	passed = passed and test_pause_menu_pt_br_commands(tree)
 	passed = passed and test_character_select_and_banner(tree)
+	passed = passed and test_pause_menu_item_submenu(tree)
 	return passed
 
 
@@ -122,6 +124,66 @@ static func test_character_select_and_banner(tree: SceneTree = null) -> bool:
 	
 	menu.call("_handle_interact")
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.COMMAND_SELECT), "Interact must dismiss banner")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(menu)
+	menu.free()
+	return true
+
+
+static func test_inventory_item_consumption_and_healing() -> bool:
+	var pm: Node = PartyManagerScript.new()
+	assert(pm != null, "PartyManager instance must be created")
+	pm.call("reset_to_defaults")
+	assert(int(pm.call("get_item_count", "potion")) == 3, "Inventory must start with 3 Potions")
+	
+	var lucas: CharacterData = pm.call("get_member", 0) as CharacterData
+	assert(lucas != null, "Lucas must exist in slot 0")
+	lucas.current_hp = 50
+	
+	var potion: ItemData = ItemData.create_potion()
+	var used: bool = bool(pm.call("use_item", potion, 0))
+	assert(used == true, "Using potion on damaged Lucas must succeed")
+	assert(lucas.current_hp == 100, "50 + 50 must heal Lucas to 100 PV")
+	assert(int(pm.call("get_item_count", "potion")) == 2, "Potion quantity must reduce to 2")
+	
+	var used2: bool = bool(pm.call("use_item", potion, 0))
+	assert(used2 == true, "Second potion must succeed and clamp to max_hp")
+	assert(lucas.current_hp == 120, "100 + 50 must clamp to max 120 PV")
+	assert(int(pm.call("get_item_count", "potion")) == 1, "Potion quantity must reduce to 1")
+	
+	var used_empty: bool = bool(pm.call("use_item", potion, 1))
+	assert(used_empty == false, "Using potion on empty slot must return false")
+	assert(int(pm.call("get_item_count", "potion")) == 1, "Quantity must not reduce on invalid use")
+	pm.free()
+	return true
+
+
+static func test_pause_menu_item_submenu(tree: SceneTree = null) -> bool:
+	if tree == null:
+		tree = Engine.get_main_loop() as SceneTree
+	var menu_scene: PackedScene = load("res://scenes/ui/pause_menu.tscn")
+	var menu: CanvasLayer = menu_scene.instantiate() as CanvasLayer
+	if tree != null and tree.root != null:
+		tree.root.add_child(menu)
+	menu.call("open_menu")
+	
+	menu.call("_on_command_chosen", 0)
+	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.ITEM_SELECT), "State must be ITEM_SELECT")
+	var item_pan: Control = menu.get("item_panel") as Control
+	var cmd_pan: Control = menu.get("command_panel") as Control
+	assert(item_pan != null and item_pan.visible == true, "Item panel must be visible")
+	assert(cmd_pan != null and cmd_pan.visible == false, "Command panel must be hidden")
+	
+	menu.call("_handle_interact")
+	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.ITEM_TARGET), "State must be ITEM_TARGET")
+	
+	menu.call("_handle_cancel")
+	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.ITEM_SELECT), "Cancel must return to ITEM_SELECT")
+	
+	menu.call("_handle_cancel")
+	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.COMMAND_SELECT), "Cancel must return to COMMAND_SELECT")
+	assert(cmd_pan.visible == true, "Command panel must be restored")
+	assert(item_pan.visible == false, "Item panel must be hidden")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(menu)
 	menu.free()
