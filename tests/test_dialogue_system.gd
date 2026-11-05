@@ -13,22 +13,27 @@ static func run_tests() -> bool:
 	all_passed = all_passed and test_npc_collision_bounds()
 	all_passed = all_passed and test_player_interaction_reach()
 	all_passed = all_passed and test_player_walk_lock_on_dialogue()
+	all_passed = all_passed and test_portrait_expressions_resolution()
+	all_passed = all_passed and test_portrait_frame_autocollapse()
 	return all_passed
 
 
 static func test_dialogue_line_data() -> bool:
-	var line: DialogueLine = DialogueLine.new("Hero", "Greetings.")
+	var line: DialogueLine = DialogueLine.new("Hero", "Greetings.", null, "neutral")
 	assert(line.speaker == "Hero", "Speaker must match")
 	assert(line.text == "Greetings.", "Text must match")
 	assert(line.portrait == null, "Portrait defaults to null")
+	assert(line.expression == "neutral", "Expression must match")
 	
 	var from_d: DialogueLine = DialogueLine.from_dict({
 		"speaker": "Elder",
 		"text": "Beware the mist.",
-		"portrait": null
+		"portrait": null,
+		"expression": "shock"
 	})
 	assert(from_d.speaker == "Elder", "from_dict speaker must match")
 	assert(from_d.text == "Beware the mist.", "from_dict text must match")
+	assert(from_d.expression == "shock", "from_dict expression must match")
 	return true
 
 
@@ -149,4 +154,41 @@ static func test_player_walk_lock_on_dialogue() -> bool:
 	
 	player.free()
 	return true
+
+
+static func test_portrait_expressions_resolution() -> bool:
+	var neutral_tex: Texture2D = DialogueBox.get_portrait_by_expression("neutral")
+	var serious_tex: Texture2D = DialogueBox.get_portrait_by_expression("serious")
+	var shock_tex: Texture2D = DialogueBox.get_portrait_by_expression("shock")
+	var confident_tex: Texture2D = DialogueBox.get_portrait_by_expression("confident")
+	
+	assert(neutral_tex != null, "Neutral portrait must resolve")
+	assert(serious_tex != null, "Serious portrait must resolve")
+	assert(shock_tex != null, "Shock portrait must resolve")
+	assert(confident_tex != null, "Confident portrait must resolve")
+	assert(DialogueBox.get_portrait_by_expression("invalid_tag") == null, "Invalid tag must be null")
+	return true
+
+
+static func test_portrait_frame_autocollapse() -> bool:
+	var box_scene: PackedScene = load("res://scenes/ui/dialogue_box.tscn")
+	assert(box_scene != null, "DialogueBox scene must be loadable")
+	var box: DialogueBox = box_scene.instantiate() as DialogueBox
+	assert(box != null, "DialogueBox must instantiate")
+	
+	var lines: Array[Dictionary] = [
+		{"speaker": "Guard", "text": "No portrait line.", "portrait": null},
+		{"speaker": "Lucas", "text": "Portrait line.", "expression": "shock"}
+	]
+	box.start(lines)
+	assert(box.portrait_frame != null, "Must have portrait_frame")
+	assert(box.portrait_frame.visible == false, "Must auto-collapse when no portrait")
+	
+	box.advance()
+	assert(box.portrait_frame.visible == true, "Must be visible when expression has portrait")
+	assert(box.portrait_rect.texture != null, "Texture must be assigned")
+	
+	box.free()
+	return true
+
 

@@ -12,6 +12,7 @@ enum Direction {
 
 @export var npc_name: String = "Guardião"
 @export var initial_direction: Direction = Direction.DOWN
+@export var dialogue_lines: Array[Dictionary] = []
 
 var current_direction: Direction = Direction.DOWN
 var _is_highlighted: bool = false
@@ -70,24 +71,33 @@ func _start_dialogue() -> void:
 	if not has_node("/root/DialogueManager"):
 		return
 	var dm: Node = get_node("/root/DialogueManager")
-	var lines: Array[Dictionary] = [
+	var lines: Array[Dictionary] = dialogue_lines if not dialogue_lines.is_empty() else _get_default_dialogue()
+	dm.call("start_dialogue", lines, "guardian_intro")
+
+
+func _get_default_dialogue() -> Array[Dictionary]:
+	return [
 		{
 			"speaker": npc_name,
-			"text": "Saudações, viajante. Bem-vindo aos limites esquecidos de Kenoma.",
+			"text": "Greetings, traveler. Welcome to the forgotten borders of Kenoma.",
 			"portrait": null
 		},
 		{
-			"speaker": npc_name,
-			"text": "Cuidado ao explorar as ruínas mais adiante... há forças ancestrais adormecidas sob as pedras.",
-			"portrait": null
+			"speaker": "Lucas",
+			"text": "Who are you? What is this place?",
+			"portrait": preload("res://assets/art/portraits/lucas/lucas_neutral.png")
 		},
 		{
 			"speaker": npc_name,
-			"text": "Se encontrar blocos pesados bloqueando o caminho, segure o botão de ação para empurrar ou puxar com firmeza.",
+			"text": "Beware the ruins ahead... ancient forces sleep beneath the stones.",
 			"portrait": null
+		},
+		{
+			"speaker": "Lucas",
+			"text": "Ancient forces...? I must tread carefully, then.",
+			"expression": "serious"
 		}
 	]
-	dm.call("start_dialogue", lines, "guardian_intro")
 
 
 func _update_prompt(delta: float) -> void:

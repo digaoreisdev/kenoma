@@ -8,6 +8,13 @@ signal dialogue_completed
 
 @export var text_speed: float = 0.025
 
+const LUCAS_PORTRAITS: Dictionary = {
+	"neutral": preload("res://assets/art/portraits/lucas/lucas_neutral.png"),
+	"serious": preload("res://assets/art/portraits/lucas/lucas_serious.png"),
+	"shock": preload("res://assets/art/portraits/lucas/lucas_shock.png"),
+	"confident": preload("res://assets/art/portraits/lucas/lucas_confident.png"),
+}
+
 var _lines: Array[DialogueLine] = []
 var _current_index: int = 0
 var _is_typing: bool = false
@@ -16,7 +23,8 @@ var _tween: Tween = null
 @onready var panel_root: Control = get_node_or_null("PanelRoot")
 @onready var speaker_label: Label = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/TextVBox/SpeakerLabel")
 @onready var content_label: Label = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/TextVBox/ContentLabel")
-@onready var portrait_rect: TextureRect = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/Portrait")
+@onready var portrait_frame: Control = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/PortraitFrame")
+@onready var portrait_rect: TextureRect = _find_portrait_rect()
 @onready var next_arrow: CanvasItem = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/TextVBox/ArrowContainer/NextArrow")
 
 
@@ -66,9 +74,38 @@ func _setup_speaker_and_portrait(line: DialogueLine) -> void:
 	if speaker_label != null:
 		speaker_label.text = line.speaker
 		speaker_label.visible = not line.speaker.is_empty()
+	var tex: Texture2D = _resolve_portrait(line)
 	if portrait_rect != null:
-		portrait_rect.texture = line.portrait
-		portrait_rect.visible = (line.portrait != null)
+		portrait_rect.texture = tex
+	if portrait_frame != null:
+		portrait_frame.visible = (tex != null)
+	elif portrait_rect != null:
+		portrait_rect.visible = (tex != null)
+
+
+func _resolve_portrait(line: DialogueLine) -> Texture2D:
+	if line.portrait != null:
+		return line.portrait
+	return get_portrait_by_expression(line.expression)
+
+
+static func get_portrait_by_expression(expr: String) -> Texture2D:
+	var key: String = expr.strip_edges().to_lower()
+	if key.is_empty():
+		return null
+	if LUCAS_PORTRAITS.has(key):
+		return LUCAS_PORTRAITS[key] as Texture2D
+	var path_lucas: String = "res://assets/art/portraits/lucas/lucas_" + key + ".png"
+	if ResourceLoader.exists(path_lucas):
+		return load(path_lucas) as Texture2D
+	return null
+
+
+func _find_portrait_rect() -> TextureRect:
+	var p: TextureRect = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/PortraitFrame/Portrait") as TextureRect
+	if p == null:
+		p = get_node_or_null("PanelRoot/DialoguePanel/Margin/HBox/Portrait") as TextureRect
+	return p
 
 
 func _start_typewriter(full_text: String) -> void:
