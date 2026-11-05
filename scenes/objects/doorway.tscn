@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://d4e7x8p1m9wk3"]
+[gd_scene format=3 uid="uid://d4e7x8p1nawk3"]
 
 [ext_resource type="Script" path="res://scripts/objects/doorway.gd" id="1_door_script"]
 
@@ -26,3 +26,4 @@ color = Color(0.35, 0.45, 0.55, 0.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_door")
+

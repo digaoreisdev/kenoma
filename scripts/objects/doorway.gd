@@ -24,3 +24,4 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	_is_triggered = true
 	sm.call("change_scene", target_scene, target_spawn_id, exit_direction)
+

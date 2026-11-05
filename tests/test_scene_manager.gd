@@ -62,3 +62,4 @@ static func test_player_transition_input_block() -> bool:
 	assert(player.current_state == Player.State.IDLE, "State must be IDLE on arrival")
 	player.free()
 	return true
+

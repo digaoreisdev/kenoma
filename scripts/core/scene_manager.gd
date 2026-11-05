@@ -96,3 +96,4 @@ func _find_spawn_point(node: Node, target_id: String) -> SpawnPoint:
 		if found != null:
 			return found
 	return null
+

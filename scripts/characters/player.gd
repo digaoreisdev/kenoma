@@ -82,6 +82,10 @@ func set_camera_limits(left: int, top: int, right: int, bottom: int) -> void:
 func _can_walk() -> bool:
 	if current_state in [State.HURT, State.DEAD, State.RESTING]:
 		return false
+	if has_node("/root/DialogueManager"):
+		var dm: Node = get_node("/root/DialogueManager")
+		if dm.get("is_dialogue_active") == true:
+			return false
 	if has_node("/root/SceneManager"):
 		var sm: Node = get_node("/root/SceneManager")
 		if sm.get("is_transitioning") == true:
@@ -91,6 +95,24 @@ func _can_walk() -> bool:
 		if state_mgr.has_method("is_exploration"):
 			return bool(state_mgr.call("is_exploration"))
 	return true
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _can_walk():
+		return
+	if event.is_action_pressed("action_interact"):
+		if _try_interact():
+			get_viewport().set_input_as_handled()
+
+
+func _try_interact() -> bool:
+	if interaction_ray == null or not interaction_ray.is_colliding():
+		return false
+	var collider: Object = interaction_ray.get_collider()
+	if collider != null and collider.has_method("interact"):
+		collider.call("interact", self)
+		return true
+	return false
 
 
 func set_facing_direction(dir: Direction) -> void:

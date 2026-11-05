@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://c7m8x9y2z1w4p"]
+[gd_scene format=3 uid="uid://c7m8yay201w4p"]
 
 [ext_resource type="Script" path="res://scripts/core/test_room_b.gd" id="1_room_script"]
 [ext_resource type="PackedScene" path="res://scenes/characters/player.tscn" id="2_player_scene"]
 [ext_resource type="PackedScene" path="res://scenes/objects/doorway.tscn" id="3_doorway_scene"]
 [ext_resource type="PackedScene" path="res://scenes/objects/spawn_point.tscn" id="4_spawn_scene"]
 [ext_resource type="PackedScene" path="res://scenes/objects/push_crate.tscn" id="5_crate_scene"]
+[ext_resource type="PackedScene" path="res://scenes/characters/npc.tscn" id="6_npc_scene"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_top"]
 size = Vector2(400, 20)
@@ -69,5 +70,9 @@ exit_direction = 0
 [node name="PushCrate" parent="." instance=ExtResource("5_crate_scene")]
 position = Vector2(-60, -40)
 
+[node name="GuardianNPC" parent="." instance=ExtResource("6_npc_scene")]
+position = Vector2(60, -30)
+
 [node name="Player" parent="." instance=ExtResource("2_player_scene")]
 position = Vector2(0, 90)
+
