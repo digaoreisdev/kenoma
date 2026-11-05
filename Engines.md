@@ -60,4 +60,5 @@ Para qualquer defeito identificado ou relatado:
 * **v0.9 (2026-11-04):** Correção do bug REG-001 (eliminação de trepidação ao empurrar para Cima e Laterais via buffer de histerese de 0.15s e extensão de alcance do InteractionRay).
 * **v0.10 (2026-11-04):** Correção do bug REG-002 (proteção contra reinício da animação de empurrão a frame 0, sincronização estrita de física da caixa com _is_being_pushed e garantia de loop completo de 16 passos).
 * **v0.11 (2026-11-05):** Implementação da mecânica de puxar caixas interativas (F1.10 - Step 8): bloqueio de direção de visualização voltada para a caixa (facing lock sem inversão de 180°), sincronização física em pull_by, animações direcionais pull_* com proteção contra reset de frames e testes unitários em test_push_physics.gd.
+* **v0.12 (2026-11-05):** Refinamento da animação de puxar para postura apoiada reversa (F1.11 - Step 8.1 - Option 2): reprodução reversa de push_<dir> com speed_scale proporcional (-pull_speed / 45.0), eliminação do efeito de remada solta, restauração estrita de speed_scale = 1.0 ao interromper e teste automatizado em test_push_physics.gd.
 

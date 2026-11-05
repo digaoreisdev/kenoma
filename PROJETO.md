@@ -34,7 +34,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F1 - Fundação de Gameplay & Movimentação** (Passo 8 concluído).
+* **F1 - Fundação de Gameplay & Movimentação** (Passo 8.1 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -49,6 +49,7 @@
 * [x] **F1.8 (Bugfix):** Correção de trepidação (jitter) no empurrão nas direções Cima e Laterais (REG-001) com extensão de 6px no InteractionRay, buffer de persistência de 0.15s e teste unitário automatizado em test_push_physics.gd.
 * [x] **F1.9 (Bugfix):** Resolução do ciclo incompleto de animação de empurrão (REG-002): sincronização de movimentação física única no PushCrate (_is_being_pushed), proteção contra reinício de frame em _play_push_animation, cadastro de push_side (16 frames, loop) e ampliação de testes em test_push_physics.gd.
 * [x] **F1.10 (Passo 8):** Implementação da mecânica de puxar objetos interativos (Pull): bloqueio direcional com facing lock ao se afastar da caixa segurando ação, execução de animações pull_* nas 8 direções com proteção de ciclo completo, sincronização de movimentação pull_by no PushCrate e testes automatizados em test_push_physics.gd.
+* [x] **F1.11 (Passo 8.1 - Opção 2):** Refinamento da animação de puxar para postura apoiada reversa: reprodução reversa de push_<dir> com speed_scale proporcional (-pull_speed / 45.0), mantendo as mãos firmemente apoiadas na caixa ao recuar, restauração garantida de speed_scale = 1.0 ao soltar e testes automatizados em test_push_physics.gd.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

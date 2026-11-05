@@ -200,6 +200,8 @@ func _find_pullable_target() -> PushCrate:
 func _reset_push_state() -> void:
 	_push_buffer = 0.0
 	_pushed_crate = null
+	if animated_sprite != null:
+		animated_sprite.speed_scale = 1.0
 
 
 func _resolve_8way_direction(dir: Vector2) -> void:
@@ -279,6 +281,8 @@ func _update_state_from_action(action_name: String) -> void:
 func _update_locomotion_animation() -> void:
 	if current_state == State.INTERACTING:
 		return
+	if animated_sprite != null and animated_sprite.speed_scale != 1.0:
+		animated_sprite.speed_scale = 1.0
 	var prefix: String = "walk" if current_state == State.WALK else "idle"
 	var anim_name: String = prefix + "_" + _direction_to_string(current_direction)
 	_play_raw_animation(anim_name)
@@ -293,6 +297,7 @@ func _play_push_animation(dir: Direction) -> void:
 			target_anim = "push_side"
 		else:
 			return
+	animated_sprite.speed_scale = push_speed / 45.0
 	if animated_sprite.animation != target_anim:
 		animated_sprite.play(target_anim)
 	elif not animated_sprite.is_playing():
@@ -302,14 +307,18 @@ func _play_push_animation(dir: Direction) -> void:
 func _play_pull_animation(dir: Direction) -> void:
 	if animated_sprite == null or animated_sprite.sprite_frames == null:
 		return
-	var target_anim: String = "pull_" + _direction_to_string(dir)
+	var target_anim: String = "push_" + _direction_to_string(dir)
 	if not animated_sprite.sprite_frames.has_animation(target_anim):
-		if animated_sprite.sprite_frames.has_animation("pull_side") and (dir == Direction.LEFT or dir == Direction.RIGHT):
-			target_anim = "pull_side"
+		if animated_sprite.sprite_frames.has_animation("push_side") and (dir == Direction.LEFT or dir == Direction.RIGHT):
+			target_anim = "push_side"
 		else:
 			return
+	animated_sprite.speed_scale = -(pull_speed / 45.0)
 	if animated_sprite.animation != target_anim:
 		animated_sprite.play(target_anim)
+		var count: int = animated_sprite.sprite_frames.get_frame_count(target_anim)
+		if count > 0 and animated_sprite.frame == 0:
+			animated_sprite.frame = count - 1
 	elif not animated_sprite.is_playing():
 		animated_sprite.play()
 

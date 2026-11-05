@@ -14,6 +14,7 @@ static func run_tests() -> bool:
 	all_passed = all_passed and test_pull_vector_opposition()
 	all_passed = all_passed and test_pull_animation_cycle_integrity()
 	all_passed = all_passed and test_pull_crate_step()
+	all_passed = all_passed and test_reverse_pull_speed_scale()
 	return all_passed
 
 
@@ -108,5 +109,23 @@ static func test_pull_crate_step() -> bool:
 	crate.pull_by(Vector2.DOWN, 45.0)
 	assert(crate.get("_is_being_pushed") == true, "Flag _is_being_pushed must be active after pull_by")
 	crate.free()
+	return true
+
+
+static func test_reverse_pull_speed_scale() -> bool:
+	var player_scene: PackedScene = load("res://scenes/characters/player.tscn")
+	assert(player_scene != null, "Player scene must be loadable")
+	var player: Player = player_scene.instantiate() as Player
+	assert(player != null, "Player must instantiate")
+	
+	player.call("_play_pull_animation", Player.Direction.UP)
+	var sprite: AnimatedSprite2D = player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	assert(sprite != null, "AnimatedSprite2D must exist")
+	assert(sprite.speed_scale < 0.0, "Pulling must use negative speed_scale for reverse playback")
+	assert(sprite.animation.begins_with("push_"), "Pulling must use braced push animation in reverse")
+	
+	player.call("_reset_push_state")
+	assert(sprite.speed_scale == 1.0, "Resetting push state must restore speed_scale to 1.0")
+	player.free()
 	return true
 
