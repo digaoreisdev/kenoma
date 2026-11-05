@@ -37,3 +37,4 @@ static func create_potion() -> ItemData:
 		50,
 		TargetType.SINGLE_ALLY
 	)
+

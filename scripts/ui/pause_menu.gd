@@ -16,6 +16,8 @@ enum MenuState {
 	BANNER_DISPLAY,
 	ITEM_SELECT,
 	ITEM_TARGET,
+	STATUS_VIEW,
+	EQUIPMENT_VIEW,
 }
 
 const COMMAND_LABELS: Array[String] = [
@@ -29,10 +31,14 @@ const COMMAND_LABELS: Array[String] = [
 	"Salvar"
 ]
 
+const EQUIP_SLOT_KEYS: Array[String] = ["main_hand", "off_hand", "head", "body", "accessory"]
+const EQUIP_SLOT_NAMES: Array[String] = ["Mão Princ.", "Mão Secund.", "Cabeça", "Corpo", "Acessório"]
+
 var current_state: MenuState = MenuState.CLOSED
 var selected_command_index: int = 0
 var selected_slot_index: int = 0
 var selected_item_index: int = 0
+var selected_equip_slot_index: int = 0
 var current_selected_item: ItemData = null
 var formation_first_slot: int = -1
 var target_system_name: String = ""
@@ -44,6 +50,16 @@ var target_system_name: String = ""
 @onready var item_list: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/ItemPanel/Margin/ItemVBox/Scroll/ItemList")
 @onready var empty_item_label: Label = get_node_or_null("MenuRoot/BodyHBox/ItemPanel/Margin/ItemVBox/EmptyLabel")
 @onready var item_desc_label: Label = get_node_or_null("MenuRoot/BodyHBox/ItemPanel/Margin/ItemVBox/DescPanel/DescMargin/DescLabel")
+@onready var status_panel: Control = get_node_or_null("MenuRoot/BodyHBox/StatusPanel")
+@onready var status_portrait: TextureRect = get_node_or_null("MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/PortraitFrame/Portrait")
+@onready var status_name_label: Label = get_node_or_null("MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/InfoVBox/NameLabel")
+@onready var status_level_label: Label = get_node_or_null("MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/InfoVBox/LevelLabel")
+@onready var status_exp_label: Label = get_node_or_null("MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/ExpVBox/ExpLabel")
+@onready var status_next_exp_label: Label = get_node_or_null("MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/ExpVBox/NextExpLabel")
+@onready var status_stats_grid: GridContainer = get_node_or_null("MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/StatsGrid")
+@onready var equip_panel: Control = get_node_or_null("MenuRoot/BodyHBox/EquipmentPanel")
+@onready var equip_slots_vbox: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox")
+@onready var equip_preview_label: Label = get_node_or_null("MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/PreviewPanel/Margin/PreviewLabel")
 @onready var slots_container: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox")
 @onready var map_label: Label = get_node_or_null("MenuRoot/FooterPanel/Margin/HBox/MapLabel")
 @onready var playtime_label: Label = get_node_or_null("MenuRoot/FooterPanel/Margin/HBox/PlaytimeLabel")
@@ -107,13 +123,13 @@ func open_menu() -> void:
 	selected_command_index = 0
 	selected_slot_index = 0
 	selected_item_index = 0
+	selected_equip_slot_index = 0
 	current_selected_item = null
-	if command_panel != null:
-		command_panel.visible = true
-	if item_panel != null:
-		item_panel.visible = false
-	if panel_root != null:
-		panel_root.visible = true
+	if command_panel != null: command_panel.visible = true
+	if item_panel != null: item_panel.visible = false
+	if status_panel != null: status_panel.visible = false
+	if equip_panel != null: equip_panel.visible = false
+	if panel_root != null: panel_root.visible = true
 	hide_banner()
 	_refresh_all()
 	_update_command_selection()
@@ -125,12 +141,11 @@ func open_menu() -> void:
 
 func close_menu() -> void:
 	current_state = MenuState.CLOSED
-	if item_panel != null:
-		item_panel.visible = false
-	if command_panel != null:
-		command_panel.visible = true
-	if panel_root != null:
-		panel_root.visible = false
+	if item_panel != null: item_panel.visible = false
+	if status_panel != null: status_panel.visible = false
+	if equip_panel != null: equip_panel.visible = false
+	if command_panel != null: command_panel.visible = true
+	if panel_root != null: panel_root.visible = false
 	hide_banner()
 	if has_node("/root/GameState"):
 		get_node("/root/GameState").call("change_state", GameState.State.EXPLORATION)
@@ -142,6 +157,10 @@ func _handle_cancel() -> void:
 		MenuState.BANNER_DISPLAY:
 			hide_banner()
 			current_state = MenuState.COMMAND_SELECT
+		MenuState.STATUS_VIEW:
+			_close_status_menu()
+		MenuState.EQUIPMENT_VIEW:
+			_close_equipment_menu()
 		MenuState.ITEM_TARGET:
 			current_state = MenuState.ITEM_SELECT
 			_update_character_selection()
@@ -185,7 +204,11 @@ func _on_command_chosen(cmd_idx: int) -> void:
 	match cmd_name:
 		"Itens":
 			_open_item_menu()
-		"Habilidades", "Primordiais", "Equipamento", "Status":
+		"Status":
+			_open_status_menu(_get_party_member(selected_slot_index))
+		"Equipamento":
+			_open_equipment_menu(_get_party_member(selected_slot_index))
+		"Habilidades", "Primordiais":
 			current_state = MenuState.CHARACTER_SELECT
 			selected_slot_index = 0
 			_update_character_selection()
@@ -307,9 +330,134 @@ func _on_character_chosen(slot_idx: int) -> void:
 	var member: CharacterData = _get_party_member(slot_idx)
 	if member != null:
 		character_selected.emit(slot_idx, member)
-		show_banner("Sistema de " + target_system_name + " (" + member.name + ") em desenvolvimento")
+		match target_system_name:
+			"Status":
+				_open_status_menu(member)
+			"Equipamento":
+				_open_equipment_menu(member)
+			_:
+				show_banner("Sistema de " + target_system_name + " (" + member.name + ") em desenvolvimento")
 	else:
 		show_banner("Espaço vazio selecionado")
+
+
+func _open_status_menu(member: CharacterData) -> void:
+	if member == null:
+		member = _get_party_member(0)
+	if member == null:
+		show_banner("Nenhum personagem disponível.")
+		return
+	current_state = MenuState.STATUS_VIEW
+	if command_panel != null: command_panel.visible = false
+	if item_panel != null: item_panel.visible = false
+	if equip_panel != null: equip_panel.visible = false
+	if status_panel != null: status_panel.visible = true
+	_populate_status_info(member)
+
+
+func _populate_status_info(member: CharacterData) -> void:
+	if status_name_label != null: status_name_label.text = member.name
+	if status_level_label != null: status_level_label.text = "Nível %d" % member.level
+	if status_portrait != null: status_portrait.texture = member.portrait
+	if status_exp_label != null: status_exp_label.text = "EXP Atual: %d" % member.current_exp
+	if status_next_exp_label != null: status_next_exp_label.text = "Próx. Nível: %d" % member.next_level_exp
+	_populate_stats_grid(member)
+
+
+func _populate_stats_grid(member: CharacterData) -> void:
+	if status_stats_grid == null:
+		return
+	for c in status_stats_grid.get_children():
+		c.queue_free()
+	var stats_to_show: Array[Dictionary] = [
+		{"name": "Força", "key": "strength"},
+		{"name": "Defesa", "key": "defense"},
+		{"name": "Poder Mágico", "key": "magic_power"},
+		{"name": "Defesa Mágica", "key": "magic_defense"},
+		{"name": "Agilidade", "key": "agility"},
+		{"name": "Sorte", "key": "luck"},
+	]
+	for s: Dictionary in stats_to_show:
+		var stat_name: String = s["name"]
+		var key: String = s["key"]
+		var base_val: int = member.get_base_stat(key)
+		var bonus_val: int = member.get_equipment_bonus(key)
+		var total_val: int = member.get_total_stat(key)
+		var lbl_name: Label = Label.new()
+		lbl_name.text = stat_name
+		var lbl_val: Label = Label.new()
+		if bonus_val > 0:
+			lbl_val.text = "%d (+%d) = %d" % [base_val, bonus_val, total_val]
+			lbl_val.modulate = Color(0.6, 1.0, 0.6, 1.0)
+		else:
+			lbl_val.text = str(total_val)
+		status_stats_grid.add_child(lbl_name)
+		status_stats_grid.add_child(lbl_val)
+
+
+func _close_status_menu() -> void:
+	if status_panel != null: status_panel.visible = false
+	if command_panel != null: command_panel.visible = true
+	current_state = MenuState.COMMAND_SELECT
+	_update_command_selection()
+
+
+func _open_equipment_menu(member: CharacterData) -> void:
+	if member == null:
+		member = _get_party_member(0)
+	if member == null:
+		show_banner("Nenhum personagem disponível.")
+		return
+	current_state = MenuState.EQUIPMENT_VIEW
+	selected_equip_slot_index = 0
+	if command_panel != null: command_panel.visible = false
+	if item_panel != null: item_panel.visible = false
+	if status_panel != null: status_panel.visible = false
+	if equip_panel != null: equip_panel.visible = true
+	_refresh_equipment_slots(member)
+	_update_equipment_selection(member)
+
+
+func _close_equipment_menu() -> void:
+	if equip_panel != null: equip_panel.visible = false
+	if command_panel != null: command_panel.visible = true
+	current_state = MenuState.COMMAND_SELECT
+	_update_command_selection()
+
+
+func _refresh_equipment_slots(member: CharacterData) -> void:
+	if equip_slots_vbox == null or member == null:
+		return
+	var buttons: Array[Node] = equip_slots_vbox.get_children()
+	for i: int in range(mini(buttons.size(), EQUIP_SLOT_KEYS.size())):
+		var btn: Button = buttons[i] as Button
+		var slot_key: String = EQUIP_SLOT_KEYS[i]
+		var slot_name: String = EQUIP_SLOT_NAMES[i]
+		var eq: EquipmentData = member.equipment.get(slot_key) as EquipmentData
+		var eq_text: String = eq.name if eq != null else "(Vazio)"
+		btn.text = "%s: %s" % [slot_name, eq_text]
+
+
+func _update_equipment_selection(member: CharacterData) -> void:
+	if equip_slots_vbox == null or member == null:
+		return
+	var buttons: Array[Node] = equip_slots_vbox.get_children()
+	for i: int in range(buttons.size()):
+		var btn: Button = buttons[i] as Button
+		if btn != null:
+			var is_sel: bool = (i == selected_equip_slot_index and current_state == MenuState.EQUIPMENT_VIEW)
+			btn.modulate = Color(1.2, 1.2, 0.6, 1.0) if is_sel else Color(1.0, 1.0, 1.0, 1.0)
+	if selected_equip_slot_index >= 0 and selected_equip_slot_index < EQUIP_SLOT_KEYS.size():
+		var slot_key: String = EQUIP_SLOT_KEYS[selected_equip_slot_index]
+		var eq: EquipmentData = member.equipment.get(slot_key) as EquipmentData
+		if equip_preview_label != null:
+			if eq != null:
+				var bonus_str: String = ""
+				for b_key in eq.stat_bonuses:
+					bonus_str += "%s +%d " % [b_key.capitalize(), eq.stat_bonuses[b_key]]
+				equip_preview_label.text = "%s [%s]" % [eq.name, bonus_str.strip_edges()]
+			else:
+				equip_preview_label.text = "Nenhum equipamento equipado neste slot."
 
 
 func _handle_formation_first(slot_idx: int) -> void:
@@ -337,6 +485,9 @@ func _navigate(dir: int) -> void:
 		if not inv.is_empty():
 			selected_item_index = posmod(selected_item_index + dir, inv.size())
 			_update_item_selection()
+	elif current_state == MenuState.EQUIPMENT_VIEW:
+		selected_equip_slot_index = posmod(selected_equip_slot_index + dir, EQUIP_SLOT_KEYS.size())
+		_update_equipment_selection(_get_party_member(selected_slot_index))
 	elif current_state in [MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND, MenuState.ITEM_TARGET]:
 		selected_slot_index = posmod(selected_slot_index + dir, 4)
 		_update_character_selection()

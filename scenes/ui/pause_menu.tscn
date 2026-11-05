@@ -1106,6 +1106,227 @@ theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 text = "Selecione um item."
 autowrap_mode = 3
 
+[node name="StatusPanel" type="ColorRect" parent="MenuRoot/BodyHBox"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/StatusPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 3.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/StatusPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="StatusVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/StatusPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "STATUS DO PERSONAGEM"
+horizontal_alignment = 1
+
+[node name="CharInfoHBox" type="HBoxContainer" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PortraitFrame" type="Control" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="PortraitBg" type="ColorRect" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.05, 1)
+
+[node name="PortraitBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.7)
+border_width = 1.5
+editor_only = false
+
+[node name="Portrait" type="TextureRect" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/PortraitFrame"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameLabel" type="Label" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/InfoVBox"]
+layout_mode = 2
+text = "Lucas Reis"
+
+[node name="LevelLabel" type="Label" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/CharInfoHBox/InfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Nível 1"
+
+[node name="ExpVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ExpLabel" type="Label" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/ExpVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+text = "EXP Atual: 0"
+
+[node name="NextExpLabel" type="Label" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox/ExpVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+text = "Próx. Nível: 100"
+
+[node name="StatsGrid" type="GridContainer" parent="MenuRoot/BodyHBox/StatusPanel/Margin/StatusVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="EquipmentPanel" type="ColorRect" parent="MenuRoot/BodyHBox"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/EquipmentPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 3.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/EquipmentPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="EquipVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "EQUIPAMENTO"
+horizontal_alignment = 1
+
+[node name="SlotsVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="SlotMainHand" type="Button" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+alignment = 0
+text = "Mão Princ.: Espada Curta"
+
+[node name="SlotOffHand" type="Button" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+alignment = 0
+text = "Mão Secund.: (Vazio)"
+
+[node name="SlotHead" type="Button" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+alignment = 0
+text = "Cabeça: (Vazio)"
+
+[node name="SlotBody" type="Button" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+alignment = 0
+text = "Corpo: (Vazio)"
+
+[node name="SlotAccessory" type="Button" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+alignment = 0
+text = "Acessório: (Vazio)"
+
+[node name="PreviewPanel" type="ColorRect" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox"]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+color = Color(0.02, 0.03, 0.05, 0.9)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/PreviewPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/PreviewPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="PreviewLabel" type="Label" parent="MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/PreviewPanel/Margin"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+text = "Selecione um slot de equipamento."
+autowrap_mode = 3
+
 [node name="FooterPanel" type="ColorRect" parent="MenuRoot"]
 layout_mode = 1
 anchors_preset = 12

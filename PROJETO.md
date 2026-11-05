@@ -61,6 +61,7 @@
 * [x] **F2.7 (Bugfix Autoload & Runner Headless):** Eliminação de conflito de sombreamento no compilador GDScript (REG-005): remoção de `class_name` em `PartyManager` e `PauseMenu`, criação do runner headless `res://tests/test_runner.gd` e execução 100% verde das 4 suítes de testes automatizados via Godot CLI.
 * [x] **F2.8 (Governança):** Atualização do `Engines.md` (v0.25) instituindo o protocolo mandatório de saída ultra-compacto em 4 linhas (STATUS, FILES, ACTIONS, COMO TESTAR) para eficiência de tokens e eliminação de narrativas extensas.
 * [x] **F2.9 (Passo 3):** Implementação de inventário e submenu funcional de itens: recurso `ItemData` com consumível Poção (+50 PV), lógica de armazenamento/consumo no `PartyManager` com cura limitada a `max_hp`, submenu `ItemPanel` navegável no `PauseMenu` com descrição de itens, fluxo de seleção de aliado para cura e testes automatizados em `test_pause_menu.gd`.
+* [x] **F2.10 (Passo 4):** Implementação dos submenus de Status e Equipamento: atributos de combate e cálculo de bônus em `CharacterData`, recurso `EquipmentData` com Espada Curta (+5 Força), submenus `StatusPanel` e `EquipmentPanel` navegáveis com prévia de equipamentos e testes automatizados em `test_pause_menu.gd`.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**
