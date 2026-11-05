@@ -8542,6 +8542,28 @@ animations = [
 "speed": 10.0
 }, {
 "frames": [
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_0") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_1") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_2") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_3") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_4") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_5") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_6") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_7") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_8") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_9") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_10") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_11") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_12") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_13") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_14") },
+{ "duration": 1.0, "texture": SubResource("AtlasTexture_pull_right_15") }
+],
+"loop": true,
+"name": &"pull_side",
+"speed": 10.0
+}, {
+"frames": [
 { "duration": 1.0, "texture": SubResource("AtlasTexture_push_down_0") },
 { "duration": 1.0, "texture": SubResource("AtlasTexture_push_down_1") },
 { "duration": 1.0, "texture": SubResource("AtlasTexture_push_down_2") },

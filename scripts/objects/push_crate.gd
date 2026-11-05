@@ -29,6 +29,12 @@ func push_by(dir: Vector2, speed: float) -> void:
 	move_and_slide()
 
 
+func pull_by(dir: Vector2, speed: float) -> void:
+	_is_being_pushed = true
+	velocity = dir.normalized() * speed
+	move_and_slide()
+
+
 func _update_prompt(delta: float) -> void:
 	if prompt_icon == null:
 		return

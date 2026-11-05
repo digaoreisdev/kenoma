@@ -30,6 +30,7 @@ signal action_finished(action_name: String)
 
 @export var move_speed: float = 120.0
 @export var push_speed: float = 45.0
+@export var pull_speed: float = 45.0
 @export var max_health: int = 100
 
 var current_health: int = 100
@@ -91,9 +92,9 @@ func _can_walk() -> bool:
 func _handle_movement() -> void:
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if input_dir != Vector2.ZERO:
-		_resolve_8way_direction(input_dir)
-		if Input.is_action_pressed("action_interact") and _try_push(input_dir):
+		if Input.is_action_pressed("action_interact") and _try_crate_interaction(input_dir):
 			return
+		_resolve_8way_direction(input_dir)
 		current_state = State.WALK
 		velocity = input_dir * move_speed
 		_reset_push_state()
@@ -104,9 +105,20 @@ func _handle_movement() -> void:
 	move_and_slide()
 
 
+func _try_crate_interaction(input_dir: Vector2) -> bool:
+	var facing_vec: Vector2 = _direction_to_vector(current_direction)
+	var move_dot: float = input_dir.dot(facing_vec)
+	if move_dot > 0.3:
+		return _try_push(input_dir)
+	elif move_dot < -0.3:
+		return _try_pull(input_dir)
+	return false
+
+
 func _try_push(input_dir: Vector2) -> bool:
 	var target_crate: PushCrate = _find_pushable_target(input_dir)
 	if target_crate != null:
+		_resolve_8way_direction(input_dir)
 		_pushed_crate = target_crate
 		_push_buffer = 0.2
 	elif _push_buffer > 0.0 and _pushed_crate != null and is_instance_valid(_pushed_crate):
@@ -120,6 +132,25 @@ func _try_push(input_dir: Vector2) -> bool:
 	target_crate.push_by(input_dir, push_speed)
 	move_and_slide()
 	_play_push_animation(current_direction)
+	return true
+
+
+func _try_pull(input_dir: Vector2) -> bool:
+	var target_crate: PushCrate = _find_pullable_target()
+	if target_crate != null:
+		_pushed_crate = target_crate
+		_push_buffer = 0.2
+	elif _push_buffer > 0.0 and _pushed_crate != null and is_instance_valid(_pushed_crate):
+		target_crate = _pushed_crate
+	else:
+		_reset_push_state()
+		return false
+	
+	current_state = State.INTERACTING
+	velocity = input_dir * pull_speed
+	move_and_slide()
+	target_crate.pull_by(input_dir, pull_speed)
+	_play_pull_animation(current_direction)
 	return true
 
 
@@ -141,6 +172,28 @@ func _find_pushable_target(input_dir: Vector2) -> PushCrate:
 		var to_crate: Vector2 = _pushed_crate.global_position - global_position
 		if to_crate.length() <= 38.0 and to_crate.normalized().dot(input_dir) > 0.3:
 			return _pushed_crate
+	return null
+
+
+func _find_pullable_target() -> PushCrate:
+	var facing_vec: Vector2 = _direction_to_vector(current_direction)
+	if _pushed_crate != null and is_instance_valid(_pushed_crate):
+		var to_crate: Vector2 = _pushed_crate.global_position - global_position
+		if to_crate.length() <= 38.0 and to_crate.normalized().dot(facing_vec) > 0.3:
+			return _pushed_crate
+	
+	if interaction_ray != null and interaction_ray.is_colliding():
+		var ray_col: Object = interaction_ray.get_collider()
+		if ray_col is PushCrate:
+			var to_crate: Vector2 = (ray_col.global_position - global_position).normalized()
+			if to_crate.dot(facing_vec) > 0.3:
+				return ray_col as PushCrate
+	
+	for i: int in get_slide_collision_count():
+		var col: KinematicCollision2D = get_slide_collision(i)
+		var collider: Object = col.get_collider()
+		if collider is PushCrate and (-col.get_normal()).dot(facing_vec) > 0.3:
+			return collider as PushCrate
 	return null
 
 
@@ -246,6 +299,21 @@ func _play_push_animation(dir: Direction) -> void:
 		animated_sprite.play()
 
 
+func _play_pull_animation(dir: Direction) -> void:
+	if animated_sprite == null or animated_sprite.sprite_frames == null:
+		return
+	var target_anim: String = "pull_" + _direction_to_string(dir)
+	if not animated_sprite.sprite_frames.has_animation(target_anim):
+		if animated_sprite.sprite_frames.has_animation("pull_side") and (dir == Direction.LEFT or dir == Direction.RIGHT):
+			target_anim = "pull_side"
+		else:
+			return
+	if animated_sprite.animation != target_anim:
+		animated_sprite.play(target_anim)
+	elif not animated_sprite.is_playing():
+		animated_sprite.play()
+
+
 func _play_raw_animation(anim_name: String) -> void:
 	if animated_sprite == null or animated_sprite.sprite_frames == null:
 		return
@@ -281,3 +349,16 @@ func _direction_to_string(dir: Direction) -> String:
 		Direction.UP_RIGHT: return "up_right"
 		Direction.UP_LEFT: return "up_left"
 		_: return "down"
+
+
+func _direction_to_vector(dir: Direction) -> Vector2:
+	match dir:
+		Direction.DOWN: return Vector2.DOWN
+		Direction.UP: return Vector2.UP
+		Direction.LEFT: return Vector2.LEFT
+		Direction.RIGHT: return Vector2.RIGHT
+		Direction.DOWN_RIGHT: return Vector2(1, 1).normalized()
+		Direction.DOWN_LEFT: return Vector2(-1, 1).normalized()
+		Direction.UP_RIGHT: return Vector2(1, -1).normalized()
+		Direction.UP_LEFT: return Vector2(-1, -1).normalized()
+		_: return Vector2.DOWN

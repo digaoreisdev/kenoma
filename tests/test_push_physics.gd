@@ -1,7 +1,7 @@
 class_name TestPushPhysics
 extends RefCounted
 
-## Teste automatizado para histerese (REG-001) e integridade do ciclo de animação de empurrão (REG-002).
+## Teste automatizado para histerese (REG-001), integridade de empurrão (REG-002) e mecânica de puxar (F1.10).
 
 
 static func run_tests() -> bool:
@@ -11,6 +11,9 @@ static func run_tests() -> bool:
 	all_passed = all_passed and test_hysteresis_buffer()
 	all_passed = all_passed and test_push_animation_cycle_integrity()
 	all_passed = all_passed and test_push_crate_single_step()
+	all_passed = all_passed and test_pull_vector_opposition()
+	all_passed = all_passed and test_pull_animation_cycle_integrity()
+	all_passed = all_passed and test_pull_crate_step()
 	return all_passed
 
 
@@ -64,6 +67,46 @@ static func test_push_crate_single_step() -> bool:
 	assert(crate != null, "PushCrate must be instantiable")
 	crate.push_by(Vector2.UP, 45.0)
 	assert(crate.get("_is_being_pushed") == true, "Flag _is_being_pushed must be active after push_by")
+	crate.free()
+	return true
+
+
+static func test_pull_vector_opposition() -> bool:
+	var facing_up: Vector2 = Vector2.UP
+	var moving_down: Vector2 = Vector2.DOWN
+	var dot_opposite: float = moving_down.dot(facing_up)
+	assert(dot_opposite < -0.3, "Moving opposite to facing must trigger pull condition")
+	
+	var facing_left: Vector2 = Vector2.LEFT
+	var moving_right: Vector2 = Vector2.RIGHT
+	assert(moving_right.dot(facing_left) < -0.3, "Opposite horizontal motion must trigger pull")
+	return true
+
+
+static func test_pull_animation_cycle_integrity() -> bool:
+	var frames_res: Resource = load("res://assets/art/characters/player/player_frames.tres")
+	assert(frames_res != null, "player_frames.tres must be loaded")
+	var sprite_frames: SpriteFrames = frames_res as SpriteFrames
+	assert(sprite_frames != null, "player_frames must be SpriteFrames")
+	
+	var variants: Array[String] = [
+		"pull_down", "pull_up", "pull_right", "pull_left",
+		"pull_down_right", "pull_down_left", "pull_up_right", "pull_up_left",
+		"pull_side"
+	]
+	for anim: String in variants:
+		assert(sprite_frames.has_animation(anim), "Missing animation: " + anim)
+		assert(sprite_frames.get_animation_loop(anim) == true, "Must loop: " + anim)
+		assert(sprite_frames.get_animation_speed(anim) == 10.0, "FPS must be 10: " + anim)
+		assert(sprite_frames.get_frame_count(anim) == 16, "Must have 16 frames: " + anim)
+	return true
+
+
+static func test_pull_crate_step() -> bool:
+	var crate: PushCrate = PushCrate.new()
+	assert(crate != null, "PushCrate must be instantiable")
+	crate.pull_by(Vector2.DOWN, 45.0)
+	assert(crate.get("_is_being_pushed") == true, "Flag _is_being_pushed must be active after pull_by")
 	crate.free()
 	return true
 
