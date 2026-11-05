@@ -79,22 +79,22 @@ func _get_default_dialogue() -> Array[Dictionary]:
 	return [
 		{
 			"speaker": npc_name,
-			"text": "Greetings, traveler. Welcome to the forgotten borders of Kenoma.",
+			"text": "Saudações, viajante. Bem-vindo aos limites esquecidos de Kenoma.",
 			"portrait": null
 		},
 		{
 			"speaker": "Lucas",
-			"text": "Who are you? What is this place?",
+			"text": "Quem é você? Que lugar é este?",
 			"portrait": preload("res://assets/art/portraits/lucas/lucas_neutral.png")
 		},
 		{
 			"speaker": npc_name,
-			"text": "Beware the ruins ahead... ancient forces sleep beneath the stones.",
+			"text": "Cuidado ao explorar as ruínas adiante... há forças ancestrais adormecidas sob as pedras.",
 			"portrait": null
 		},
 		{
 			"speaker": "Lucas",
-			"text": "Ancient forces...? I must tread carefully, then.",
+			"text": "Forças ancestrais...? Preciso avançar com cautela, então.",
 			"expression": "serious"
 		}
 	]
