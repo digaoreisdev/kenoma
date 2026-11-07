@@ -11,7 +11,7 @@ extends Resource
 @export var current_mp: int = 45
 @export var max_mp: int = 45
 @export var portrait: Texture2D = null
-@export var equipped_primordial: String = ""
+@export var equipped_primordial: PrimordialData = null
 
 # Atributos de combate
 @export var strength: int = 14
@@ -22,6 +22,12 @@ extends Resource
 @export var luck: int = 8
 @export var current_exp: int = 0
 @export var next_level_exp: int = 100
+
+# Afinidades de arma (chave: EquipmentData.WeaponType, valor: float)
+@export var weapon_affinities: Dictionary = {}
+
+# Lista de habilidades conhecidas
+@export var skills: Array[SkillData] = []
 
 # Slots de equipamento
 @export var equipment: Dictionary = {
@@ -42,7 +48,7 @@ func _init(
 	p_mp: int = 45,
 	p_max_mp: int = 45,
 	p_portrait: Texture2D = null,
-	p_primordial: String = ""
+	p_primordial: PrimordialData = null
 ) -> void:
 	character_id = p_id
 	name = p_name
@@ -77,8 +83,30 @@ func get_equipment_bonus(stat_name: String) -> int:
 	return total
 
 
+func get_primordial_bonus(stat_name: String) -> int:
+	if equipped_primordial != null:
+		return int(equipped_primordial.stat_bonus.get(stat_name, 0))
+	return 0
+
+
 func get_total_stat(stat_name: String) -> int:
-	return get_base_stat(stat_name) + get_equipment_bonus(stat_name)
+	return get_base_stat(stat_name) + get_equipment_bonus(stat_name) + get_primordial_bonus(stat_name)
+
+
+func get_weapon_affinity(w_type: int) -> float:
+	return float(weapon_affinities.get(w_type, 1.0))
+
+
+func equip_primordial(primordial: PrimordialData) -> PrimordialData:
+	var prev: PrimordialData = equipped_primordial
+	equipped_primordial = primordial
+	return prev
+
+
+func unequip_primordial() -> PrimordialData:
+	var prev: PrimordialData = equipped_primordial
+	equipped_primordial = null
+	return prev
 
 
 func equip(item: EquipmentData, slot_name: String = "") -> EquipmentData:
@@ -103,23 +131,13 @@ static func create_default_lucas() -> CharacterData:
 	if ResourceLoader.exists(PORTRAIT_PATH):
 		portrait_tex = load(PORTRAIT_PATH) as Texture2D
 	var lucas: CharacterData = CharacterData.new(
-		"lucas",
-		"Lucas Reis",
-		1,
-		120,
-		120,
-		45,
-		45,
-		portrait_tex,
-		""
+		"lucas", "Lucas Reis", 1, 120, 120, 45, 45, portrait_tex, null
 	)
-	lucas.strength = 14
-	lucas.defense = 10
-	lucas.magic_power = 12
-	lucas.magic_defense = 9
-	lucas.agility = 11
-	lucas.luck = 8
-	lucas.current_exp = 0
-	lucas.next_level_exp = 100
-	lucas.equip(EquipmentData.create_short_sword(), "main_hand")
+	lucas.weapon_affinities = {
+		EquipmentData.WeaponType.HAMMER: 1.3,
+		EquipmentData.WeaponType.SWORD: 0.9,
+		EquipmentData.WeaponType.SHIELD: 0.8,
+	}
+	lucas.skills.append(SkillData.create_runic_impact())
+	lucas.equip(EquipmentData.create_forge_hammer(), "main_hand")
 	return lucas

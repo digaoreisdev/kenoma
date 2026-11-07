@@ -18,6 +18,8 @@ enum MenuState {
 	ITEM_TARGET,
 	STATUS_VIEW,
 	EQUIPMENT_VIEW,
+	SKILLS_VIEW,
+	PRIMORDIAL_VIEW,
 }
 
 const COMMAND_LABELS: Array[String] = [
@@ -39,6 +41,8 @@ var selected_command_index: int = 0
 var selected_slot_index: int = 0
 var selected_item_index: int = 0
 var selected_equip_slot_index: int = 0
+var selected_skill_index: int = 0
+var selected_primordial_index: int = 0
 var current_selected_item: ItemData = null
 var formation_first_slot: int = -1
 var target_system_name: String = ""
@@ -60,6 +64,17 @@ var target_system_name: String = ""
 @onready var equip_panel: Control = get_node_or_null("MenuRoot/BodyHBox/EquipmentPanel")
 @onready var equip_slots_vbox: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/SlotsVBox")
 @onready var equip_preview_label: Label = get_node_or_null("MenuRoot/BodyHBox/EquipmentPanel/Margin/EquipVBox/PreviewPanel/Margin/PreviewLabel")
+@onready var skills_panel: Control = get_node_or_null("MenuRoot/BodyHBox/SkillsPanel")
+@onready var skills_list: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/Scroll/SkillsList")
+@onready var empty_skill_label: Label = get_node_or_null("MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/EmptyLabel")
+@onready var skill_desc_label: Label = get_node_or_null("MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/DescPanel/DescMargin/DescLabel")
+@onready var primordials_panel: Control = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel")
+@onready var primordial_equipped_name: Label = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox/EquippedNameLabel")
+@onready var primordial_affinity_label: Label = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox/AffinityLabel")
+@onready var primordial_bonus_label: Label = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox/BonusLabel")
+@onready var primordial_supreme_label: Label = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox/SupremeLabel")
+@onready var primordial_list: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/Scroll/PrimordialList")
+@onready var empty_primordial_label: Label = get_node_or_null("MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EmptyLabel")
 @onready var slots_container: VBoxContainer = get_node_or_null("MenuRoot/BodyHBox/PartyPanel/Margin/SlotsVBox")
 @onready var map_label: Label = get_node_or_null("MenuRoot/FooterPanel/Margin/HBox/MapLabel")
 @onready var playtime_label: Label = get_node_or_null("MenuRoot/FooterPanel/Margin/HBox/PlaytimeLabel")
@@ -124,11 +139,15 @@ func open_menu() -> void:
 	selected_slot_index = 0
 	selected_item_index = 0
 	selected_equip_slot_index = 0
+	selected_skill_index = 0
+	selected_primordial_index = 0
 	current_selected_item = null
 	if command_panel != null: command_panel.visible = true
 	if item_panel != null: item_panel.visible = false
 	if status_panel != null: status_panel.visible = false
 	if equip_panel != null: equip_panel.visible = false
+	if skills_panel != null: skills_panel.visible = false
+	if primordials_panel != null: primordials_panel.visible = false
 	if panel_root != null: panel_root.visible = true
 	hide_banner()
 	_refresh_all()
@@ -144,6 +163,8 @@ func close_menu() -> void:
 	if item_panel != null: item_panel.visible = false
 	if status_panel != null: status_panel.visible = false
 	if equip_panel != null: equip_panel.visible = false
+	if skills_panel != null: skills_panel.visible = false
+	if primordials_panel != null: primordials_panel.visible = false
 	if command_panel != null: command_panel.visible = true
 	if panel_root != null: panel_root.visible = false
 	hide_banner()
@@ -157,10 +178,8 @@ func _handle_cancel() -> void:
 		MenuState.BANNER_DISPLAY:
 			hide_banner()
 			current_state = MenuState.COMMAND_SELECT
-		MenuState.STATUS_VIEW:
-			_close_status_menu()
-		MenuState.EQUIPMENT_VIEW:
-			_close_equipment_menu()
+		MenuState.STATUS_VIEW, MenuState.EQUIPMENT_VIEW, MenuState.SKILLS_VIEW, MenuState.PRIMORDIAL_VIEW:
+			_close_subview_menu()
 		MenuState.ITEM_TARGET:
 			current_state = MenuState.ITEM_SELECT
 			_update_character_selection()
@@ -170,10 +189,16 @@ func _handle_cancel() -> void:
 		MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND:
 			current_state = MenuState.COMMAND_SELECT
 			_update_character_selection()
-		MenuState.COMMAND_SELECT:
-			close_menu()
 		_:
 			close_menu()
+
+
+func _close_subview_menu() -> void:
+	match current_state:
+		MenuState.STATUS_VIEW: _close_status_menu()
+		MenuState.EQUIPMENT_VIEW: _close_equipment_menu()
+		MenuState.SKILLS_VIEW: _close_skills_menu()
+		MenuState.PRIMORDIAL_VIEW: _close_primordials_menu()
 
 
 func _handle_interact() -> void:
@@ -186,6 +211,8 @@ func _handle_interact() -> void:
 			_use_current_item_on_slot(selected_slot_index)
 		MenuState.CHARACTER_SELECT:
 			_on_character_chosen(selected_slot_index)
+		MenuState.PRIMORDIAL_VIEW:
+			_on_primordial_chosen(_get_party_member(selected_slot_index))
 		MenuState.FORMATION_FIRST:
 			_handle_formation_first(selected_slot_index)
 		MenuState.FORMATION_SECOND:
@@ -208,10 +235,10 @@ func _on_command_chosen(cmd_idx: int) -> void:
 			_open_status_menu(_get_party_member(selected_slot_index))
 		"Equipamento":
 			_open_equipment_menu(_get_party_member(selected_slot_index))
-		"Habilidades", "Primordiais":
-			current_state = MenuState.CHARACTER_SELECT
-			selected_slot_index = 0
-			_update_character_selection()
+		"Habilidades":
+			_open_skills_menu(_get_party_member(selected_slot_index))
+		"Primordiais":
+			_open_primordials_menu(_get_party_member(selected_slot_index))
 		"Formação":
 			current_state = MenuState.FORMATION_FIRST
 			selected_slot_index = 0
@@ -335,6 +362,10 @@ func _on_character_chosen(slot_idx: int) -> void:
 				_open_status_menu(member)
 			"Equipamento":
 				_open_equipment_menu(member)
+			"Habilidades":
+				_open_skills_menu(member)
+			"Primordiais":
+				_open_primordials_menu(member)
 			_:
 				show_banner("Sistema de " + target_system_name + " (" + member.name + ") em desenvolvimento")
 	else:
@@ -378,21 +409,23 @@ func _populate_stats_grid(member: CharacterData) -> void:
 		{"name": "Sorte", "key": "luck"},
 	]
 	for s: Dictionary in stats_to_show:
-		var stat_name: String = s["name"]
-		var key: String = s["key"]
-		var base_val: int = member.get_base_stat(key)
-		var bonus_val: int = member.get_equipment_bonus(key)
-		var total_val: int = member.get_total_stat(key)
-		var lbl_name: Label = Label.new()
-		lbl_name.text = stat_name
-		var lbl_val: Label = Label.new()
-		if bonus_val > 0:
-			lbl_val.text = "%d (+%d) = %d" % [base_val, bonus_val, total_val]
-			lbl_val.modulate = Color(0.6, 1.0, 0.6, 1.0)
-		else:
-			lbl_val.text = str(total_val)
-		status_stats_grid.add_child(lbl_name)
-		status_stats_grid.add_child(lbl_val)
+		_add_stat_row_to_grid(s["name"], s["key"], member)
+
+
+func _add_stat_row_to_grid(stat_name: String, key: String, member: CharacterData) -> void:
+	var base_val: int = member.get_base_stat(key)
+	var bonus_val: int = member.get_equipment_bonus(key) + member.get_primordial_bonus(key)
+	var total_val: int = member.get_total_stat(key)
+	var lbl_name: Label = Label.new()
+	lbl_name.text = stat_name
+	var lbl_val: Label = Label.new()
+	if bonus_val > 0:
+		lbl_val.text = "%d (+%d) = %d" % [base_val, bonus_val, total_val]
+		lbl_val.modulate = Color(0.6, 1.0, 0.6, 1.0)
+	else:
+		lbl_val.text = str(total_val)
+	status_stats_grid.add_child(lbl_name)
+	status_stats_grid.add_child(lbl_val)
 
 
 func _close_status_menu() -> void:
@@ -488,6 +521,16 @@ func _navigate(dir: int) -> void:
 	elif current_state == MenuState.EQUIPMENT_VIEW:
 		selected_equip_slot_index = posmod(selected_equip_slot_index + dir, EQUIP_SLOT_KEYS.size())
 		_update_equipment_selection(_get_party_member(selected_slot_index))
+	elif current_state == MenuState.SKILLS_VIEW:
+		var member: CharacterData = _get_party_member(selected_slot_index)
+		if member != null and not member.skills.is_empty():
+			selected_skill_index = posmod(selected_skill_index + dir, member.skills.size())
+			_update_skill_selection(member)
+	elif current_state == MenuState.PRIMORDIAL_VIEW:
+		var count: int = _get_primordial_action_count(_get_party_member(selected_slot_index))
+		if count > 0:
+			selected_primordial_index = posmod(selected_primordial_index + dir, count)
+			_update_primordial_selection(_get_party_member(selected_slot_index))
 	elif current_state in [MenuState.CHARACTER_SELECT, MenuState.FORMATION_FIRST, MenuState.FORMATION_SECOND, MenuState.ITEM_TARGET]:
 		selected_slot_index = posmod(selected_slot_index + dir, 4)
 		_update_character_selection()
@@ -556,7 +599,7 @@ func _populate_active_member_slot(box: Control, member: CharacterData) -> void:
 		mp_bar.max_value = member.max_mp
 		mp_bar.value = member.current_mp
 	if prim_lbl != null:
-		var p_name: String = member.equipped_primordial if not member.equipped_primordial.is_empty() else "Nenhum"
+		var p_name: String = member.equipped_primordial.name if member.equipped_primordial != null else "Nenhum"
 		prim_lbl.text = "Primordial: " + p_name
 	if port != null: port.texture = member.portrait
 
@@ -605,4 +648,195 @@ func _get_party_member(idx: int) -> CharacterData:
 		var pm: Node = get_node("/root/PartyManager")
 		return pm.call("get_member", idx) as CharacterData
 	return null
+
+
+func _open_skills_menu(member: CharacterData) -> void:
+	if member == null:
+		member = _get_party_member(0)
+	if member == null:
+		show_banner("Nenhum personagem disponível.")
+		return
+	current_state = MenuState.SKILLS_VIEW
+	selected_skill_index = 0
+	if command_panel != null: command_panel.visible = false
+	if item_panel != null: item_panel.visible = false
+	if status_panel != null: status_panel.visible = false
+	if equip_panel != null: equip_panel.visible = false
+	if primordials_panel != null: primordials_panel.visible = false
+	if skills_panel != null: skills_panel.visible = true
+	_refresh_skills_list(member)
+	_update_skill_selection(member)
+
+
+func _close_skills_menu() -> void:
+	current_state = MenuState.COMMAND_SELECT
+	if skills_panel != null: skills_panel.visible = false
+	if command_panel != null: command_panel.visible = true
+	_update_command_selection()
+	_update_character_selection()
+
+
+func _refresh_skills_list(member: CharacterData) -> void:
+	if skills_list == null or member == null:
+		return
+	for child in skills_list.get_children():
+		child.queue_free()
+	var has_skills: bool = not member.skills.is_empty()
+	if empty_skill_label != null:
+		empty_skill_label.visible = not has_skills
+	for i: int in range(member.skills.size()):
+		var sk: SkillData = member.skills[i]
+		var btn: Button = Button.new()
+		btn.custom_minimum_size = Vector2(0, 44)
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var t_name: String = sk.get_target_name() if sk != null else ""
+		btn.text = "%s   (%d PM)  [%s]" % [sk.name, sk.mp_cost, t_name]
+		skills_list.add_child(btn)
+
+
+func _update_skill_selection(member: CharacterData) -> void:
+	if member == null or member.skills.is_empty():
+		if skill_desc_label != null:
+			skill_desc_label.text = "Nenhuma habilidade aprendida."
+		return
+	selected_skill_index = clampi(selected_skill_index, 0, member.skills.size() - 1)
+	var sk: SkillData = member.skills[selected_skill_index]
+	if skill_desc_label != null:
+		skill_desc_label.text = sk.description if sk != null else ""
+	if skills_list != null:
+		var buttons: Array[Node] = skills_list.get_children()
+		for i: int in range(buttons.size()):
+			var btn: Button = buttons[i] as Button
+			if btn != null:
+				var is_sel: bool = (i == selected_skill_index and current_state == MenuState.SKILLS_VIEW)
+				btn.modulate = Color(1.2, 1.2, 0.6, 1.0) if is_sel else Color(1.0, 1.0, 1.0, 1.0)
+
+
+func _open_primordials_menu(member: CharacterData) -> void:
+	if member == null:
+		member = _get_party_member(0)
+	if member == null:
+		show_banner("Nenhum personagem disponível.")
+		return
+	current_state = MenuState.PRIMORDIAL_VIEW
+	selected_primordial_index = 0
+	if command_panel != null: command_panel.visible = false
+	if item_panel != null: item_panel.visible = false
+	if status_panel != null: status_panel.visible = false
+	if equip_panel != null: equip_panel.visible = false
+	if skills_panel != null: skills_panel.visible = false
+	if primordials_panel != null: primordials_panel.visible = true
+	_refresh_primordials_view(member)
+	_update_primordial_selection(member)
+
+
+func _close_primordials_menu() -> void:
+	current_state = MenuState.COMMAND_SELECT
+	if primordials_panel != null: primordials_panel.visible = false
+	if command_panel != null: command_panel.visible = true
+	_update_command_selection()
+	_update_character_selection()
+
+
+func _get_unassigned_primordials() -> Array[PrimordialData]:
+	if has_node("/root/PartyManager"):
+		var pm: Node = get_node("/root/PartyManager")
+		var prims: Variant = pm.call("get_unassigned_primordials")
+		if prims is Array:
+			var typed_prims: Array[PrimordialData] = []
+			for p in (prims as Array):
+				if p is PrimordialData:
+					typed_prims.append(p as PrimordialData)
+			return typed_prims
+	return []
+
+
+func _get_primordial_action_count(member: CharacterData) -> int:
+	var count: int = _get_unassigned_primordials().size()
+	if member != null and member.equipped_primordial != null:
+		count += 1
+	return count
+
+
+func _populate_primordial_info(member: CharacterData) -> void:
+	if member == null or primordial_equipped_name == null:
+		return
+	var prim: PrimordialData = member.equipped_primordial
+	if prim != null:
+		primordial_equipped_name.text = "Vinculado: %s" % prim.name
+		if primordial_affinity_label != null:
+			primordial_affinity_label.text = "Elemento: %s" % prim.get_element_name()
+		if primordial_bonus_label != null:
+			primordial_bonus_label.text = "Bônus: %s" % prim.get_bonus_text()
+		if primordial_supreme_label != null:
+			primordial_supreme_label.text = "Técnica Suprema: %s" % prim.supreme_spell_name
+	else:
+		primordial_equipped_name.text = "Vinculado: (Nenhum)"
+		if primordial_affinity_label != null: primordial_affinity_label.text = "Elemento: -"
+		if primordial_bonus_label != null: primordial_bonus_label.text = "Bônus: -"
+		if primordial_supreme_label != null: primordial_supreme_label.text = "Técnica Suprema: -"
+
+
+func _refresh_primordials_view(member: CharacterData) -> void:
+	_populate_primordial_info(member)
+	if primordial_list == null:
+		return
+	for child in primordial_list.get_children():
+		child.queue_free()
+	var unassigned: Array[PrimordialData] = _get_unassigned_primordials()
+	var has_equipped: bool = member != null and member.equipped_primordial != null
+	var total_actions: int = unassigned.size() + (1 if has_equipped else 0)
+	if empty_primordial_label != null:
+		empty_primordial_label.visible = (total_actions == 0)
+	if has_equipped:
+		var unequip_btn: Button = Button.new()
+		unequip_btn.custom_minimum_size = Vector2(0, 42)
+		unequip_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		unequip_btn.text = "[ Desvincular %s ]" % member.equipped_primordial.name
+		primordial_list.add_child(unequip_btn)
+	for prim in unassigned:
+		var btn: Button = Button.new()
+		btn.custom_minimum_size = Vector2(0, 42)
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.text = "%s (%s)" % [prim.name, prim.get_element_name()]
+		primordial_list.add_child(btn)
+
+
+func _update_primordial_selection(member: CharacterData) -> void:
+	if primordial_list == null:
+		return
+	var buttons: Array[Node] = primordial_list.get_children()
+	if buttons.is_empty():
+		return
+	selected_primordial_index = clampi(selected_primordial_index, 0, buttons.size() - 1)
+	for i: int in range(buttons.size()):
+		var btn: Button = buttons[i] as Button
+		if btn != null:
+			var is_sel: bool = (i == selected_primordial_index and current_state == MenuState.PRIMORDIAL_VIEW)
+			btn.modulate = Color(1.2, 1.2, 0.6, 1.0) if is_sel else Color(1.0, 1.0, 1.0, 1.0)
+
+
+func _on_primordial_chosen(member: CharacterData) -> void:
+	if member == null or not has_node("/root/PartyManager"):
+		return
+	var pm: Node = get_node("/root/PartyManager")
+	var unassigned: Array[PrimordialData] = _get_unassigned_primordials()
+	var has_equipped: bool = member.equipped_primordial != null
+	if has_equipped and selected_primordial_index == 0:
+		var removed: PrimordialData = member.unequip_primordial()
+		pm.call("add_unassigned_primordial", removed)
+		show_banner("Desvinculou %s de %s." % [removed.name, member.name])
+	else:
+		var unassigned_idx: int = selected_primordial_index - (1 if has_equipped else 0)
+		if unassigned_idx >= 0 and unassigned_idx < unassigned.size():
+			var chosen: PrimordialData = unassigned[unassigned_idx]
+			pm.call("remove_unassigned_primordial", chosen)
+			var old: PrimordialData = member.equip_primordial(chosen)
+			if old != null:
+				pm.call("add_unassigned_primordial", old)
+			show_banner("Vinculou %s a %s!" % [chosen.name, member.name])
+	_refresh_primordials_view(member)
+	_refresh_party_slots()
+	_update_primordial_selection(member)
+
 

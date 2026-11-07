@@ -8,6 +8,7 @@ signal inventory_updated
 
 var party_slots: Array[CharacterData] = [null, null, null, null]
 var inventory: Array[Dictionary] = []
+var unassigned_primordials: Array[PrimordialData] = []
 var gold: int = 0
 var playtime_seconds: float = 0.0
 var current_map_name: String = "Ruínas de Kenoma"
@@ -32,6 +33,8 @@ func reset_to_defaults() -> void:
 	gold = 0
 	playtime_seconds = 0.0
 	inventory.clear()
+	unassigned_primordials.clear()
+	unassigned_primordials.append(PrimordialData.create_ignis())
 	add_item(ItemData.create_potion(), 3)
 	party_updated.emit()
 	inventory_updated.emit()
@@ -140,3 +143,21 @@ func get_formatted_playtime() -> String:
 	var minutes: int = (total_sec % 3600) / 60
 	var seconds: int = total_sec % 60
 	return "%02d:%02d:%02d" % [hours, minutes, seconds]
+
+
+func get_unassigned_primordials() -> Array[PrimordialData]:
+	return unassigned_primordials
+
+
+func add_unassigned_primordial(primordial: PrimordialData) -> void:
+	if primordial != null and not unassigned_primordials.has(primordial):
+		unassigned_primordials.append(primordial)
+
+
+func remove_unassigned_primordial(primordial: PrimordialData) -> bool:
+	var idx: int = unassigned_primordials.find(primordial)
+	if idx != -1:
+		unassigned_primordials.remove_at(idx)
+		return true
+	return false
+

@@ -63,6 +63,7 @@
 * [x] **F2.9 (Passo 3):** Implementação de inventário e submenu funcional de itens: recurso `ItemData` com consumível Poção (+50 PV), lógica de armazenamento/consumo no `PartyManager` com cura limitada a `max_hp`, submenu `ItemPanel` navegável no `PauseMenu` com descrição de itens, fluxo de seleção de aliado para cura e testes automatizados em `test_pause_menu.gd`.
 * [x] **F2.10 (Passo 4):** Implementação dos submenus de Status e Equipamento: atributos de combate e cálculo de bônus em `CharacterData`, recurso `EquipmentData` com Espada Curta (+5 Força), submenus `StatusPanel` e `EquipmentPanel` navegáveis com prévia de equipamentos e testes automatizados em `test_pause_menu.gd`.
 * [x] **F2.11 (Bugfix):** Finalização limpa e retorno imediato ao terminal no test runner headless (`res://tests/test_runner.gd`) invocando `quit(0)` em aprovação total e `quit(1)` em falhas.
+* [x] **F2.12 (Passo 5):** Arquitetura de dados para armas, habilidades e 10 primordiais canônicos: recursos `SkillData` e `PrimordialData`, Martelo de Forja inicial com 2 fendas e afinidade de martelo 1.3 para Lucas, técnica Impacto Rúnico, Primordial Ignis com bônus de atributos, integração navegável dos submenus de Habilidades e Primordiais no `PauseMenu` e testes em `test_pause_menu.gd`.
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

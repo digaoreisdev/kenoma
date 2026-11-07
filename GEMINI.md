@@ -10,3 +10,4 @@
   FILES: [comma-separated list of modified/created files]
   ACTIONS: [1 to 2 technical sentences in English summarizing the code changes]
   COMO TESTAR: [1 to 2 direct sentences in PT-BR explaining the exact key to press or scene to run]
+

@@ -1327,6 +1327,214 @@ theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 text = "Selecione um slot de equipamento."
 autowrap_mode = 3
 
+[node name="SkillsPanel" type="ColorRect" parent="MenuRoot/BodyHBox"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/SkillsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 3.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/SkillsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="SkillsVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/SkillsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderLabel" type="Label" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "HABILIDADES & TÉCNICAS"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SkillsList" type="VBoxContainer" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="EmptyLabel" type="Label" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Nenhuma habilidade aprendida."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescPanel" type="ColorRect" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+color = Color(0.02, 0.03, 0.05, 0.9)
+
+[node name="DescBorder" type="ReferenceRect" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/DescPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="DescMargin" type="MarginContainer" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/DescPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="DescLabel" type="Label" parent="MenuRoot/BodyHBox/SkillsPanel/Margin/SkillsVBox/DescPanel/DescMargin"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+text = "Selecione uma habilidade."
+autowrap_mode = 3
+
+[node name="PrimordialsPanel" type="ColorRect" parent="MenuRoot/BodyHBox"]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+color = Color(0.05, 0.07, 0.1, 0.95)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PrimordialsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.8)
+border_width = 3.0
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/PrimordialsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="PrimordialVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "VÍNCULO PRIMORDIAL"
+horizontal_alignment = 1
+
+[node name="EquippedBox" type="ColorRect" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+color = Color(0.02, 0.03, 0.05, 0.9)
+
+[node name="Border" type="ReferenceRect" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.72, 0.45, 0.5)
+border_width = 1.5
+editor_only = false
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EquippedInfoVBox" type="VBoxContainer" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EquippedNameLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+text = "Vinculado: (Nenhum)"
+
+[node name="AffinityLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Afinidade: -"
+
+[node name="BonusLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.6, 1)
+text = "Bônus: -"
+
+[node name="SupremeLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/EquippedBox/Margin/EquippedInfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.6, 0.4, 1)
+text = "Técnica Suprema: -"
+
+[node name="StockHeaderLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.6, 1)
+text = "Primordiais Disponíveis"
+
+[node name="Scroll" type="ScrollContainer" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PrimordialList" type="VBoxContainer" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="EmptyLabel" type="Label" parent="MenuRoot/BodyHBox/PrimordialsPanel/Margin/PrimordialVBox"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Nenhum primordial em estoque."
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="FooterPanel" type="ColorRect" parent="MenuRoot"]
 layout_mode = 1
 anchors_preset = 12
