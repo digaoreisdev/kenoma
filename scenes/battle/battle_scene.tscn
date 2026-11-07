@@ -61,3 +61,132 @@ text = "Turno: Grupo do Jogador"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "Estado: Inicializando"
+
+[node name="CombatantHUD" type="Control" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AllyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 100.0
+offset_right = 400.0
+offset_bottom = 260.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+text = "Lucas Reis"
+
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+layout_mode = 2
+text = "PV: 120/120"
+
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+layout_mode = 2
+text = "Estabilidade: 100/100"
+
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
+text = "Fase: Espera"
+
+[node name="EnemyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
+layout_mode = 0
+offset_left = 880.0
+offset_top = 100.0
+offset_right = 1220.0
+offset_bottom = 260.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+text = "Soldado Corrompido"
+
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+layout_mode = 2
+text = "PV: 80/80"
+
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+layout_mode = 2
+text = "Estabilidade: 60/60"
+
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.5, 1)
+text = "Fase: Espera"
+
+[node name="ActionCommandPanel" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 0
+offset_left = 60.0
+offset_top = 540.0
+offset_right = 500.0
+offset_bottom = 680.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/ActionCommandPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="Grid" type="GridContainer" parent="CanvasLayer/UI/ActionCommandPanel/Margin"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="BtnAtacar" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
+custom_minimum_size = Vector2(190, 42)
+layout_mode = 2
+focus_neighbor_right = NodePath("../BtnDefender")
+focus_neighbor_bottom = NodePath("../BtnItens")
+text = "Atacar"
+
+[node name="BtnDefender" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
+custom_minimum_size = Vector2(190, 42)
+layout_mode = 2
+focus_neighbor_left = NodePath("../BtnAtacar")
+focus_neighbor_bottom = NodePath("../BtnFugir")
+text = "Defender"
+
+[node name="BtnItens" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
+custom_minimum_size = Vector2(190, 42)
+layout_mode = 2
+focus_neighbor_top = NodePath("../BtnAtacar")
+focus_neighbor_right = NodePath("../BtnFugir")
+text = "Itens"
+
+[node name="BtnFugir" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
+custom_minimum_size = Vector2(190, 42)
+layout_mode = 2
+focus_neighbor_top = NodePath("../BtnDefender")
+focus_neighbor_left = NodePath("../BtnItens")
+text = "Fugir"

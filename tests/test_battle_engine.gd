@@ -1,7 +1,7 @@
 class_name TestBattleEngine
 extends RefCounted
 
-## Testes automatizados para validação do BattleManager, máquina de estados e cena de combate.
+## Testes automatizados para validação do BattleManager, ações de combate e HUD da cena.
 
 
 static func run_tests(tree: SceneTree = null) -> bool:
@@ -13,6 +13,9 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_battle_timeline_progression()
 	passed = passed and test_battle_stability_ruptura()
 	passed = passed and test_battle_stability_irritacao()
+	passed = passed and test_battle_basic_attack_affinity_and_stability()
+	passed = passed and test_battle_defender_command()
+	passed = passed and test_battle_item_consumption()
 	return passed
 
 
@@ -91,6 +94,8 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	var state_lbl: Label = battle_scene.get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/StateLabel") as Label
 	assert(state_lbl != null, "StateLabel must exist")
 	assert(state_lbl.text.contains("Inicializando"), "State label must display PT-BR state")
+	var cmd_panel: Control = battle_scene.get_node_or_null("CanvasLayer/UI/ActionCommandPanel") as Control
+	assert(cmd_panel != null, "ActionCommandPanel must exist")
 	
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
@@ -149,15 +154,9 @@ static func test_battle_stability_irritacao() -> bool:
 	var bm: BattleManager = BattleManager.new()
 	var atacante: Dictionary = {"id": "lucas", "name": "Lucas Reis", "irritado": false}
 	var defensor: Dictionary = {
-		"id": "inimigo_1",
-		"name": "Soldado Corrompido",
-		"max_hp": 100,
-		"current_hp": 100,
-		"estabilidade_max": 50,
-		"estabilidade_atual": 50,
-		"fase_turno": BattleTimeline.FaseTurno.CONJURACAO,
-		"posicao_tempo": 100.0,
-		"progresso_conjuracao": 30.0,
+		"id": "inimigo_1", "name": "Soldado Corrompido", "max_hp": 100, "current_hp": 100,
+		"estabilidade_max": 50, "estabilidade_atual": 50,
+		"fase_turno": BattleTimeline.FaseTurno.CONJURACAO, "posicao_tempo": 100.0, "progresso_conjuracao": 30.0,
 		"irritado": false
 	}
 	var res: Dictionary = bm.aplicar_golpe(atacante, defensor, 15, 20)
@@ -168,5 +167,60 @@ static func test_battle_stability_irritacao() -> bool:
 	var target: Dictionary = {"max_hp": 100, "current_hp": 100}
 	var res_irritado: Dictionary = bm.aplicar_golpe(defensor, target, 20, 0)
 	assert(res_irritado["dano"] == 25, "Irritated combatant must deal +25% damage")
+	bm.free()
+	return true
+
+
+static func test_battle_basic_attack_affinity_and_stability() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var enemy: Dictionary = {
+		"id": "inimigo_1",
+		"name": "Soldado Corrompido",
+		"max_hp": 80,
+		"current_hp": 80,
+		"estabilidade_max": 60,
+		"estabilidade_atual": 60
+	}
+	var res: Dictionary = bm.executar_ataque_basico(lucas, enemy)
+	assert(res["dano_efetivo"] == 22, "Lucas with Forge Hammer must deal 22 effective damage (14 + 6*1.3)")
+	assert(res["dano"] == 22, "Damage dealt must match effective damage")
+	assert(enemy["current_hp"] == 58, "Enemy HP must decrease from 80 to 58")
+	assert(res["impacto_estabilidade"] == 35, "Hammer affinity must inflict 35 stability damage")
+	assert(enemy["estabilidade_atual"] == 25, "Enemy stability must decrease from 60 to 25")
+	bm.free()
+	return true
+
+
+static func test_battle_defender_command() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var combatente: Dictionary = {
+		"id": "defensor",
+		"name": "Guardião",
+		"max_hp": 100,
+		"current_hp": 100,
+		"posicao_tempo": 10.0,
+		"defendendo": false
+	}
+	var _def_res: Dictionary = bm.executar_defesa(combatente)
+	assert(combatente["defendendo"] == true, "Combatant must have defendendo flag true")
+	assert(combatente["posicao_tempo"] == 40.0, "Timeline position must advance by +30 points")
+	var atacante: Dictionary = {"id": "atk", "name": "Atacante"}
+	var golpe: Dictionary = bm.aplicar_golpe(atacante, combatente, 40, 0)
+	assert(golpe["dano"] == 20, "Damage must be reduced by 50% (40 -> 20)")
+	assert(combatente["current_hp"] == 80, "HP must reflect 50% reduced damage")
+	bm.free()
+	return true
+
+
+static func test_battle_item_consumption() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	lucas.current_hp = 50
+	var pocao: ItemData = ItemData.create_potion()
+	var res: Dictionary = bm.executar_item(lucas, pocao, lucas)
+	assert(res["sucesso"] == true, "Item execution must succeed")
+	assert(res["cura"] == 50, "Potion must restore 50 HP")
+	assert(lucas.current_hp == 100, "Lucas HP must be restored to 100")
 	bm.free()
 	return true
