@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://b2v8y5x3w0l1k"]
+
+[ext_resource type="Script" path="res://scripts/world/miasma_rift.gd" id="1_rift_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_trigger"]
+radius = 18.0
+
+[node name="MiasmaRift" type="Area2D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_rift_script")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="OuterGlow" type="ColorRect" parent="Visual"]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0.5, 0.1, 0.7, 0.45)
+
+[node name="Core" type="ColorRect" parent="Visual"]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(0.2, 0.05, 0.4, 0.9)
+
+[node name="Rune" type="Label" parent="Visual"]
+offset_left = -10.0
+offset_top = -13.0
+offset_right = 10.0
+offset_bottom = 13.0
+theme_override_colors/font_color = Color(0.9, 0.5, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "◈"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_trigger")

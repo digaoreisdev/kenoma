@@ -34,7 +34,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F3 - Combate por Turnos** (Passo 3 concluído).
+* **F3 - Combate por Turnos** (Passo 4 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -67,6 +67,8 @@
 * [x] **F3.1 (Passo 1):** Implementação do núcleo e máquina de estados do combate por turnos: criação de `BattleManager` com estados em PT-BR (`INICIALIZANDO`, `AGUARDANDO_TURNO`, `SELECIONANDO_ACAO`, `EXECUTANDO_ACAO`, `VITORIA`, `DERROTA`), cena wireframe `battle_scene.tscn`, suíte automatizada em `test_battle_engine.gd` e expansão do `test_runner.gd` para 5 suítes 100% verdes.
 * [x] **F3.2 (Passo 2):** Implementação da linha do tempo e mecânicas de estabilidade/irritação: criação do `BattleTimeline` para progressão de iniciativa (fases de ESPERA, DECISÃO, CONJURAÇÃO, EXECUÇÃO), controle de estabilidade no `BattleManager` com RUPTURA (quebra de postura, cancelamento de ação e reset de linha do tempo) e estado de IRRITAÇÃO (+25% de dano se a estabilidade absorver o golpe), e expansão dos testes automatizados em `test_battle_engine.gd`.
 * [x] **F3.3 (Passo 3):** Implementação de ações de combate, cálculo de afinidade de arma e UI de comandos: cálculo de dano com multiplicador de afinidade (1.3x para Martelo com dano aumentado de postura), comando Defender (-50% de dano e avanço de +30 na linha do tempo), uso de itens (Poção), HUD de combatentes e painel de comandos com navegação de foco em `battle_scene.tscn`, com testes em `test_battle_engine.gd`.
+* [x] **F3.4 (Passo 4):** Implementação de Fenda de Miasma e transição exploração-combate: criação do nó `MiasmaRift` (Area2D) para gatilhos de encontro no mapa com dados configuráveis de inimigos, pipeline `iniciar_batalha` e `finalizar_batalha` no `SceneManager` com retenção de coordenadas e destruição/desativação de fendas derrotadas, integração no `test_map.tscn` e testes automatizados em `test_scene_manager.gd`.
+
 
 
 

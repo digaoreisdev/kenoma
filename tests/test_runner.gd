@@ -12,7 +12,7 @@ func _run() -> void:
 	_setup_autoloads()
 	var all_ok: bool = true
 	all_ok = _run_test("1/5", "test_push_physics", TestPushPhysics.run_tests(self)) and all_ok
-	all_ok = _run_test("2/5", "test_scene_manager", TestSceneManager.run_tests()) and all_ok
+	all_ok = _run_test("2/5", "test_scene_manager", TestSceneManager.run_tests(self)) and all_ok
 	all_ok = _run_test("3/5", "test_dialogue_system", TestDialogueSystem.run_tests(self)) and all_ok
 	all_ok = _run_test("4/5", "test_pause_menu", TestPauseMenu.run_tests(self)) and all_ok
 	all_ok = _run_test("5/5", "test_battle_engine", TestBattleEngine.run_tests(self)) and all_ok
