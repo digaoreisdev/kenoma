@@ -11,27 +11,21 @@ func _run() -> void:
 	print("--- KENOMA AUTOMATED TEST SUITE ---")
 	_setup_autoloads()
 	var all_ok: bool = true
-	
-	print("[1/4] Running test_push_physics.gd...")
-	var t1: bool = TestPushPhysics.run_tests(self)
-	print("       test_push_physics: ", "PASS" if t1 else "FAIL")
-	all_ok = all_ok and t1
-	
-	print("[2/4] Running test_scene_manager.gd...")
-	var t2: bool = TestSceneManager.run_tests()
-	print("       test_scene_manager: ", "PASS" if t2 else "FAIL")
-	all_ok = all_ok and t2
-	
-	print("[3/4] Running test_dialogue_system.gd...")
-	var t3: bool = TestDialogueSystem.run_tests(self)
-	print("       test_dialogue_system: ", "PASS" if t3 else "FAIL")
-	all_ok = all_ok and t3
-	
-	print("[4/4] Running test_pause_menu.gd...")
-	var t4: bool = TestPauseMenu.run_tests(self)
-	print("       test_pause_menu: ", "PASS" if t4 else "FAIL")
-	all_ok = all_ok and t4
-	
+	all_ok = _run_test("1/5", "test_push_physics", TestPushPhysics.run_tests(self)) and all_ok
+	all_ok = _run_test("2/5", "test_scene_manager", TestSceneManager.run_tests()) and all_ok
+	all_ok = _run_test("3/5", "test_dialogue_system", TestDialogueSystem.run_tests(self)) and all_ok
+	all_ok = _run_test("4/5", "test_pause_menu", TestPauseMenu.run_tests(self)) and all_ok
+	all_ok = _run_test("5/5", "test_battle_engine", TestBattleEngine.run_tests(self)) and all_ok
+	_print_summary_and_exit(all_ok)
+
+
+func _run_test(num: String, test_name: String, result: bool) -> bool:
+	print("[%s] Running %s.gd..." % [num, test_name])
+	print("       %s: %s" % [test_name, "PASS" if result else "FAIL"])
+	return result
+
+
+func _print_summary_and_exit(all_ok: bool) -> void:
 	print("====================================")
 	print("SUITE OVERALL RESULT: ", "ALL PASS" if all_ok else "FAIL")
 	print("====================================")
