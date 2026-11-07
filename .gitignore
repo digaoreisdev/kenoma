@@ -17,5 +17,9 @@ exports/
 # Mono/C# cache (not using .NET, but prevents accidental files)
 .mono/
 
+# Local MCP and Editor Secrets
+.mcp.json
+.cursor/
+
 # Keep Godot import metadata tracked
 !*.import
