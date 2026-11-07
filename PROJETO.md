@@ -34,7 +34,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F3 - Combate por Turnos** (Passo 1 concluído).
+* **F3 - Combate por Turnos** (Passo 2 concluído).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -65,6 +65,8 @@
 * [x] **F2.11 (Bugfix):** Finalização limpa e retorno imediato ao terminal no test runner headless (`res://tests/test_runner.gd`) invocando `quit(0)` em aprovação total e `quit(1)` em falhas.
 * [x] **F2.12 (Passo 5):** Arquitetura de dados para armas, habilidades e 10 primordiais canônicos: recursos `SkillData` e `PrimordialData`, Martelo de Forja inicial com 2 fendas e afinidade de martelo 1.3 para Lucas, técnica Impacto Rúnico, Primordial Ignis com bônus de atributos, integração navegável dos submenus de Habilidades e Primordiais no `PauseMenu` e testes em `test_pause_menu.gd`.
 * [x] **F3.1 (Passo 1):** Implementação do núcleo e máquina de estados do combate por turnos: criação de `BattleManager` com estados em PT-BR (`INICIALIZANDO`, `AGUARDANDO_TURNO`, `SELECIONANDO_ACAO`, `EXECUTANDO_ACAO`, `VITORIA`, `DERROTA`), cena wireframe `battle_scene.tscn`, suíte automatizada em `test_battle_engine.gd` e expansão do `test_runner.gd` para 5 suítes 100% verdes.
+* [x] **F3.2 (Passo 2):** Implementação da linha do tempo e mecânicas de estabilidade/irritação: criação do `BattleTimeline` para progressão de iniciativa (fases de ESPERA, DECISÃO, CONJURAÇÃO, EXECUÇÃO), controle de estabilidade no `BattleManager` com RUPTURA (quebra de postura, cancelamento de ação e reset de linha do tempo) e estado de IRRITAÇÃO (+25% de dano se a estabilidade absorver o golpe), e expansão dos testes automatizados em `test_battle_engine.gd`.
+
 
 ## Backlog (Depois / Talvez)
 * **Depois:**

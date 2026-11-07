@@ -22,6 +22,7 @@ var party_members: Array[CharacterData] = []
 var enemies: Array[Dictionary] = []
 var active_actor_index: int = 0
 var is_player_turn: bool = true
+var timeline: BattleTimeline = BattleTimeline.new()
 
 
 func initialize_battle(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
@@ -39,13 +40,20 @@ func initialize_battle(allies: Array[CharacterData], enemy_list: Array[Dictionar
 func _sanitize_enemy_dict(raw: Dictionary) -> Dictionary:
 	var m_hp: int = int(raw.get("max_hp", 100))
 	var c_hp: int = int(raw.get("current_hp", m_hp))
-	var stab: int = int(raw.get("stability", 100))
-	var en_name: String = str(raw.get("name", "Inimigo"))
+	var est_max: int = int(raw.get("estabilidade_max", raw.get("stability", 100)))
+	var est_atual: int = int(raw.get("estabilidade_atual", est_max))
 	return {
-		"name": en_name,
+		"id": str(raw.get("id", "inimigo_" + str(enemies.size()))),
+		"name": str(raw.get("name", "Inimigo")),
 		"max_hp": m_hp,
 		"current_hp": clampi(c_hp, 0, m_hp),
-		"stability": stab
+		"estabilidade_max": est_max,
+		"estabilidade_atual": clampi(est_atual, 0, est_max),
+		"irritado": bool(raw.get("irritado", false)),
+		"dano_quebra_estabilidade": int(raw.get("dano_quebra_estabilidade", 0)),
+		"posicao_tempo": float(raw.get("posicao_tempo", 0.0)),
+		"fase_turno": int(raw.get("fase_turno", BattleTimeline.FaseTurno.ESPERA)),
+		"stability": est_atual
 	}
 
 
@@ -98,6 +106,43 @@ func apply_damage_to_enemy(enemy_index: int, damage: int) -> int:
 	enemies[enemy_index] = enemy
 	check_battle_end_conditions()
 	return damage
+
+
+func _calcular_dano_final(atacante: Dictionary, dano_base: int) -> int:
+	if bool(atacante.get("irritado", false)):
+		return int(float(dano_base) * 1.25)
+	return dano_base
+
+
+func _processar_estabilidade_golpe(defensor: Dictionary, impacto: int) -> Dictionary:
+	var fase: int = int(defensor.get("fase_turno", BattleTimeline.FaseTurno.ESPERA))
+	if fase != BattleTimeline.FaseTurno.CONJURACAO:
+		return {"ruptura": false, "irritado": bool(defensor.get("irritado", false))}
+	var est: int = maxi(0, int(defensor.get("estabilidade_atual", 100)) - impacto)
+	defensor["estabilidade_atual"] = est
+	defensor["stability"] = est
+	if est <= 0:
+		defensor["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+		defensor["posicao_tempo"] = 0.0
+		defensor["progresso_conjuracao"] = 0.0
+		defensor["irritado"] = false
+		return {"ruptura": true, "irritado": false}
+	defensor["irritado"] = true
+	return {"ruptura": false, "irritado": true}
+
+
+func aplicar_golpe(atacante: Dictionary, defensor: Dictionary, dano: int, impacto_estabilidade: int) -> Dictionary:
+	var dano_final: int = _calcular_dano_final(atacante, dano)
+	var hp_atual: int = int(defensor.get("current_hp", defensor.get("max_hp", 100)))
+	defensor["current_hp"] = maxi(0, hp_atual - dano_final)
+	var res_est: Dictionary = _processar_estabilidade_golpe(defensor, impacto_estabilidade)
+	return {
+		"dano": dano_final,
+		"ruptura": bool(res_est.get("ruptura", false)),
+		"irritado": bool(res_est.get("irritado", false)),
+		"vida_restante": int(defensor["current_hp"]),
+		"estabilidade_restante": int(defensor.get("estabilidade_atual", 0))
+	}
 
 
 func is_all_enemies_defeated() -> bool:

@@ -10,6 +10,9 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_battle_state_machine_flow()
 	passed = passed and test_battle_victory_condition()
 	passed = passed and test_battle_scene_instantiation(tree)
+	passed = passed and test_battle_timeline_progression()
+	passed = passed and test_battle_stability_ruptura()
+	passed = passed and test_battle_stability_irritacao()
 	return passed
 
 
@@ -92,4 +95,78 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
+	return true
+
+
+static func test_battle_timeline_progression() -> bool:
+	var timeline: BattleTimeline = BattleTimeline.new()
+	var combatant: Dictionary = {
+		"id": "lucas",
+		"nome": "Lucas Reis",
+		"velocidade": 50.0,
+		"posicao_tempo": 0.0
+	}
+	timeline.adicionar_combatente(combatant)
+	var ev1: Array[Dictionary] = timeline.avancar_tempo(1.0)
+	var c: Dictionary = timeline.obter_combatente("lucas")
+	assert(c["posicao_tempo"] == 50.0, "Position should be 50.0 after 1s at 50 speed")
+	assert(ev1.is_empty(), "No events should trigger before 100.0")
+	var ev2: Array[Dictionary] = timeline.avancar_tempo(1.0)
+	c = timeline.obter_combatente("lucas")
+	assert(c["posicao_tempo"] == 100.0, "Position should reach 100.0")
+	assert(c["fase_turno"] == BattleTimeline.FaseTurno.DECISAO, "Combatant should enter DECISAO")
+	assert(ev2.size() == 1, "One event should trigger")
+	assert(ev2[0]["evento"] == "DECISAO", "Event must be DECISAO")
+	return true
+
+
+static func test_battle_stability_ruptura() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var atacante: Dictionary = {"id": "lucas", "name": "Lucas Reis", "irritado": false}
+	var defensor: Dictionary = {
+		"id": "inimigo_1",
+		"name": "Soldado Corrompido",
+		"max_hp": 100,
+		"current_hp": 100,
+		"estabilidade_max": 50,
+		"estabilidade_atual": 50,
+		"fase_turno": BattleTimeline.FaseTurno.CONJURACAO,
+		"posicao_tempo": 100.0,
+		"progresso_conjuracao": 40.0,
+		"irritado": false
+	}
+	var res: Dictionary = bm.aplicar_golpe(atacante, defensor, 20, 50)
+	assert(res["ruptura"] == true, "Strike must trigger RUPTURA when stability reaches 0")
+	assert(res["irritado"] == false, "Irritado must be false on RUPTURA")
+	assert(defensor["fase_turno"] == BattleTimeline.FaseTurno.ESPERA, "Casting must be cancelled back to ESPERA")
+	assert(defensor["posicao_tempo"] == 0.0, "posicao_tempo must reset to 0.0")
+	assert(defensor["estabilidade_atual"] == 0, "estabilidade_atual must be 0")
+	bm.free()
+	return true
+
+
+static func test_battle_stability_irritacao() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var atacante: Dictionary = {"id": "lucas", "name": "Lucas Reis", "irritado": false}
+	var defensor: Dictionary = {
+		"id": "inimigo_1",
+		"name": "Soldado Corrompido",
+		"max_hp": 100,
+		"current_hp": 100,
+		"estabilidade_max": 50,
+		"estabilidade_atual": 50,
+		"fase_turno": BattleTimeline.FaseTurno.CONJURACAO,
+		"posicao_tempo": 100.0,
+		"progresso_conjuracao": 30.0,
+		"irritado": false
+	}
+	var res: Dictionary = bm.aplicar_golpe(atacante, defensor, 15, 20)
+	assert(res["ruptura"] == false, "Strike must NOT trigger RUPTURA if stability remains")
+	assert(res["irritado"] == true, "Strike must trigger IRRITACAO when stability > 0")
+	assert(defensor["irritado"] == true, "Defensor must be flagged irritado")
+	assert(defensor["estabilidade_atual"] == 30, "Stability must decrease by 20 to 30")
+	var target: Dictionary = {"max_hp": 100, "current_hp": 100}
+	var res_irritado: Dictionary = bm.aplicar_golpe(defensor, target, 20, 0)
+	assert(res_irritado["dano"] == 25, "Irritated combatant must deal +25% damage")
+	bm.free()
 	return true
