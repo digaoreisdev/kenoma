@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://jdcx074fovvg"]
+
+[ext_resource type="SpriteFrames" uid="uid://dkwi5s0jotucf" path="res://assets/sprites/characters/cassian/General_Cassian_frames.tres" id="1_gp75l"]
+
+[node name="General_Cassian" type="AnimatedSprite2D" unique_id=1638976311]
+texture_filter = 1
+sprite_frames = ExtResource("1_gp75l")
+animation = &"iso_walk_up_right"
+autoplay = "iso_walk_up_right"
