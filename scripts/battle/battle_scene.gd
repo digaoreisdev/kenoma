@@ -120,42 +120,43 @@ func _obter_nome_fase(c_id: String) -> String:
 func _on_atacar_pressed() -> void:
 	if battle_manager == null or battle_manager.enemies.is_empty():
 		return
+	if command_panel != null:
+		command_panel.visible = false
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
 	var hero: CharacterData = battle_manager.party_members[0] if not battle_manager.party_members.is_empty() else null
 	var enemy: Dictionary = battle_manager.enemies[0]
 	battle_manager.executar_ataque_basico(hero, enemy)
-	if hero != null:
-		battle_manager.timeline.concluir_execucao(hero.character_id)
 	_update_hud()
-	if not battle_manager.check_battle_end_conditions():
-		battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
 
 
 func _on_defender_pressed() -> void:
 	if battle_manager == null:
 		return
+	if command_panel != null:
+		command_panel.visible = false
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
 	var hero: CharacterData = battle_manager.party_members[0] if not battle_manager.party_members.is_empty() else null
 	battle_manager.executar_defesa(hero)
 	_update_hud()
-	battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
 
 
 func _on_itens_pressed() -> void:
 	if battle_manager == null or battle_manager.party_members.is_empty():
 		return
+	if command_panel != null:
+		command_panel.visible = false
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
 	var hero: CharacterData = battle_manager.party_members[0]
 	battle_manager.executar_item(hero, ItemData.create_potion(), hero)
-	if hero != null:
-		battle_manager.timeline.concluir_execucao(hero.character_id)
 	_update_hud()
-	battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
 
 
 func _on_fugir_pressed() -> void:
-	if battle_manager != null:
-		battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
+	if battle_manager == null:
+		return
+	if command_panel != null:
+		command_panel.visible = false
+	battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
 
 
 func _unhandled_input(event: InputEvent) -> void:

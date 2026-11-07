@@ -91,10 +91,7 @@ func _executar_ataque_inimigo(c_id: String) -> void:
 	var c: Dictionary = timeline.obter_combatente(c_id)
 	var dano_final: int = _calcular_dano_final(c, 15)
 	alvo.current_hp = maxi(0, alvo.current_hp - dano_final)
-	timeline.concluir_execucao(c_id)
-	check_battle_end_conditions()
-	if current_state == BattleState.EXECUTANDO_ACAO:
-		change_state(BattleState.AGUARDANDO_TURNO)
+	concluir_turno_combatente(c, 0.0)
 
 
 func initialize_battle(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
@@ -145,7 +142,9 @@ func _sanitize_enemy_dict(raw: Dictionary) -> Dictionary:
 		"posicao_tempo": float(raw.get("posicao_tempo", 0.0)),
 		"fase_turno": int(raw.get("fase_turno", BattleTimeline.FaseTurno.ESPERA)),
 		"defendendo": bool(raw.get("defendendo", false)),
-		"stability": est_atual
+		"stability": est_atual,
+		"exp_recompensa": int(raw.get("exp_recompensa", raw.get("exp", 45))),
+		"ouro_recompensa": int(raw.get("ouro_recompensa", raw.get("gold", 30)))
 	}
 
 
@@ -287,6 +286,7 @@ func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
 		(defensor as CharacterData).current_hp = int(def_dict.get("current_hp", 0))
 	res["dano_efetivo"] = dano_efetivo
 	res["impacto_estabilidade"] = impacto
+	concluir_turno_combatente(atacante, 0.0)
 	return res
 
 
@@ -295,17 +295,15 @@ func executar_defesa(combatente: Variant) -> Dictionary:
 		var c: Dictionary = combatente as Dictionary
 		c["defendendo"] = true
 		c["status"] = "DEFENDENDO"
-		var pos: float = float(c.get("posicao_tempo", 0.0)) + 30.0
-		c["posicao_tempo"] = minf(100.0, pos)
-		return {"defendendo": true, "posicao_tempo": c["posicao_tempo"]}
+		concluir_turno_combatente(c, 30.0)
+		return {"defendendo": true, "posicao_tempo": float(c.get("posicao_tempo", 30.0))}
 	elif combatente is CharacterData:
 		var cd: CharacterData = combatente as CharacterData
 		var t_comb: Dictionary = timeline.obter_combatente(cd.character_id)
 		if not t_comb.is_empty():
 			t_comb["defendendo"] = true
 			t_comb["status"] = "DEFENDENDO"
-			t_comb["posicao_tempo"] = minf(100.0, float(t_comb.get("posicao_tempo", 0.0)) + 30.0)
-			return {"defendendo": true, "posicao_tempo": t_comb["posicao_tempo"]}
+		concluir_turno_combatente(cd, 30.0)
 		return {"defendendo": true, "posicao_tempo": 30.0}
 	return {}
 
@@ -326,7 +324,37 @@ func executar_item(combatente: Variant, item_data: ItemData, alvo: Variant) -> D
 		var novo_hp: int = mini(m_hp, c_hp + item_data.effect_value)
 		d["current_hp"] = novo_hp
 		cura = novo_hp - c_hp
+	concluir_turno_combatente(combatente, 0.0)
 	return {"sucesso": true, "cura": cura, "item": item_data.name}
+
+
+func _resetar_combatente_timeline(c_id: String, posicao: float) -> void:
+	var t_comb: Dictionary = timeline.obter_combatente(c_id)
+	if not t_comb.is_empty():
+		t_comb["posicao_tempo"] = posicao
+		t_comb["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+		t_comb["progresso_conjuracao"] = 0.0
+		if posicao == 0.0:
+			t_comb["defendendo"] = false
+
+
+func concluir_turno_combatente(combatente: Variant, posicao_inicial: float = 0.0) -> void:
+	if combatente is Dictionary:
+		var d: Dictionary = combatente as Dictionary
+		d["posicao_tempo"] = posicao_inicial
+		d["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+		d["progresso_conjuracao"] = 0.0
+		if posicao_inicial == 0.0:
+			d["defendendo"] = false
+		var c_id: String = str(d.get("id", ""))
+		if not c_id.is_empty():
+			_resetar_combatente_timeline(c_id, posicao_inicial)
+	elif combatente is CharacterData:
+		var cd: CharacterData = combatente as CharacterData
+		_resetar_combatente_timeline(cd.character_id, posicao_inicial)
+	check_battle_end_conditions()
+	if current_state != BattleState.VITORIA and current_state != BattleState.DERROTA:
+		change_state(BattleState.AGUARDANDO_TURNO)
 
 
 func is_all_enemies_defeated() -> bool:
@@ -357,3 +385,27 @@ func check_battle_end_conditions() -> bool:
 			change_state(BattleState.DERROTA)
 		return true
 	return false
+
+
+func obter_recompensas_batalha() -> Dictionary:
+	var total_exp: int = 0
+	var total_ouro: int = 0
+	for e: Dictionary in enemies:
+		total_exp += int(e.get("exp_recompensa", 45))
+		total_ouro += int(e.get("ouro_recompensa", 30))
+	return {"exp": total_exp, "ouro": total_ouro}
+
+
+func aplicar_recompensas_vitoria() -> Dictionary:
+	var recompensas: Dictionary = obter_recompensas_batalha()
+	var exp_ganha: int = int(recompensas.get("exp", 0))
+	var ouro_ganho: int = int(recompensas.get("ouro", 0))
+	for ally: CharacterData in party_members:
+		if ally != null:
+			ally.current_exp += exp_ganha
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		var pm: Node = tree.root.get_node_or_null("PartyManager")
+		if pm != null and pm.has_method("add_gold"):
+			pm.call("add_gold", ouro_ganho)
+	return recompensas

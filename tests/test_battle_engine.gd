@@ -15,6 +15,7 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_battle_stability_irritacao()
 	passed = passed and test_battle_basic_attack_affinity_and_stability()
 	passed = passed and test_battle_defender_command()
+	passed = passed and test_battle_defender_resets_timeline()
 	passed = passed and test_battle_item_consumption()
 	passed = passed and test_battle_realtime_process_loop()
 	return passed
@@ -200,16 +201,35 @@ static func test_battle_defender_command() -> bool:
 		"name": "Guardião",
 		"max_hp": 100,
 		"current_hp": 100,
-		"posicao_tempo": 10.0,
+		"posicao_tempo": 100.0,
+		"fase_turno": BattleTimeline.FaseTurno.DECISAO,
 		"defendendo": false
 	}
 	var _def_res: Dictionary = bm.executar_defesa(combatente)
 	assert(combatente["defendendo"] == true, "Combatant must have defendendo flag true")
-	assert(combatente["posicao_tempo"] == 40.0, "Timeline position must advance by +30 points")
+	assert(combatente["posicao_tempo"] == 30.0, "Timeline position must restart at 30.0")
 	var atacante: Dictionary = {"id": "atk", "name": "Atacante"}
 	var golpe: Dictionary = bm.aplicar_golpe(atacante, combatente, 40, 0)
 	assert(golpe["dano"] == 20, "Damage must be reduced by 50% (40 -> 20)")
 	assert(combatente["current_hp"] == 80, "HP must reflect 50% reduced damage")
+	bm.free()
+	return true
+
+
+static func test_battle_defender_resets_timeline() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var enemy: Dictionary = {"name": "Inimigo", "max_hp": 50, "current_hp": 50}
+	bm.initialize_battle([lucas], [enemy])
+	bm.change_state(BattleManager.BattleState.SELECIONANDO_ACAO)
+	bm.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
+	var c_comb: Dictionary = bm.timeline.obter_combatente(lucas.character_id)
+	c_comb["posicao_tempo"] = 100.0
+	c_comb["fase_turno"] = BattleTimeline.FaseTurno.DECISAO
+	bm.executar_defesa(lucas)
+	assert(c_comb["posicao_tempo"] == 30.0, "posicao_tempo must reset to 30.0 on defend")
+	assert(c_comb["fase_turno"] == BattleTimeline.FaseTurno.ESPERA, "fase_turno must reset to ESPERA on defend")
+	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "State must return to AGUARDANDO_TURNO")
 	bm.free()
 	return true
 
