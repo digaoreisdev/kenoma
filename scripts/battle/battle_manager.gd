@@ -15,6 +15,8 @@ enum BattleState {
 signal battle_state_changed(old_state: BattleState, new_state: BattleState)
 signal battle_initialized(allies: Array[CharacterData], enemies: Array[Dictionary])
 signal battle_finished(is_victory: bool)
+signal timeline_updated
+signal combatant_ready_for_action(combatant_id: String, is_player: bool)
 
 @export var current_state: BattleState = BattleState.INICIALIZANDO
 
@@ -23,6 +25,76 @@ var enemies: Array[Dictionary] = []
 var active_actor_index: int = 0
 var is_player_turn: bool = true
 var timeline: BattleTimeline = BattleTimeline.new()
+
+
+func _process(delta: float) -> void:
+	if current_state != BattleState.AGUARDANDO_TURNO:
+		return
+	var eventos: Array[Dictionary] = timeline.avancar_tempo(delta)
+	timeline_updated.emit()
+	if not eventos.is_empty():
+		_processar_eventos_timeline(eventos)
+
+
+func _processar_eventos_timeline(eventos: Array[Dictionary]) -> void:
+	for ev: Dictionary in eventos:
+		var tipo: String = str(ev.get("evento", ""))
+		var c_id: String = str(ev.get("id", ""))
+		var c: Dictionary = ev.get("combatente", {})
+		if tipo == "DECISAO":
+			_processar_evento_decisao(c_id, c)
+		elif tipo == "CONJURACAO_CONCLUIDA":
+			_processar_conjuracao_concluida(c_id)
+
+
+func _processar_evento_decisao(c_id: String, combatente: Dictionary) -> void:
+	if _eh_combatente_jogador(c_id, combatente):
+		is_player_turn = true
+		change_state(BattleState.SELECIONANDO_ACAO)
+		combatant_ready_for_action.emit(c_id, true)
+	else:
+		_processar_acao_inimigo(c_id, combatente)
+
+
+func _eh_combatente_jogador(c_id: String, combatente: Dictionary) -> bool:
+	if bool(combatente.get("eh_jogador", false)):
+		return true
+	for ally: CharacterData in party_members:
+		if ally != null and ally.character_id == c_id:
+			return true
+	return false
+
+
+func _processar_acao_inimigo(c_id: String, _combatente: Dictionary) -> void:
+	is_player_turn = false
+	timeline.iniciar_conjuracao(c_id, 30.0)
+	combatant_ready_for_action.emit(c_id, false)
+
+
+func _processar_conjuracao_concluida(c_id: String) -> void:
+	if not _eh_combatente_jogador_por_id(c_id):
+		_executar_ataque_inimigo(c_id)
+
+
+func _eh_combatente_jogador_por_id(c_id: String) -> bool:
+	for ally: CharacterData in party_members:
+		if ally != null and ally.character_id == c_id:
+			return true
+	return false
+
+
+func _executar_ataque_inimigo(c_id: String) -> void:
+	if party_members.is_empty():
+		return
+	change_state(BattleState.EXECUTANDO_ACAO)
+	var alvo: CharacterData = party_members[0]
+	var c: Dictionary = timeline.obter_combatente(c_id)
+	var dano_final: int = _calcular_dano_final(c, 15)
+	alvo.current_hp = maxi(0, alvo.current_hp - dano_final)
+	timeline.concluir_execucao(c_id)
+	check_battle_end_conditions()
+	if current_state == BattleState.EXECUTANDO_ACAO:
+		change_state(BattleState.AGUARDANDO_TURNO)
 
 
 func initialize_battle(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:

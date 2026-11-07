@@ -16,6 +16,7 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_battle_basic_attack_affinity_and_stability()
 	passed = passed and test_battle_defender_command()
 	passed = passed and test_battle_item_consumption()
+	passed = passed and test_battle_realtime_process_loop()
 	return passed
 
 
@@ -224,3 +225,20 @@ static func test_battle_item_consumption() -> bool:
 	assert(lucas.current_hp == 100, "Lucas HP must be restored to 100")
 	bm.free()
 	return true
+
+
+static func test_battle_realtime_process_loop() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var enemy: Dictionary = {"name": "Soldado", "max_hp": 80, "current_hp": 80, "velocidade": 10.0}
+	bm.initialize_battle([lucas], [enemy])
+	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "Initial state must be AGUARDANDO_TURNO")
+	
+	bm._process(10.0)
+	
+	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "State must advance to SELECIONANDO_ACAO")
+	var c: Dictionary = bm.timeline.obter_combatente(lucas.character_id)
+	assert(c["fase_turno"] == BattleTimeline.FaseTurno.DECISAO, "Lucas must reach DECISAO")
+	bm.free()
+	return true
+

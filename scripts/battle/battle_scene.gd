@@ -24,6 +24,7 @@ extends Node2D
 func _ready() -> void:
 	if battle_manager != null:
 		battle_manager.battle_state_changed.connect(_on_state_changed)
+		battle_manager.timeline_updated.connect(_update_hud)
 		_update_labels(battle_manager.current_state)
 		_update_hud()
 		_update_command_panel(battle_manager.current_state)
@@ -54,6 +55,7 @@ func _update_command_panel(state: BattleManager.BattleState) -> void:
 	command_panel.visible = is_selecting
 	if is_selecting and btn_atacar != null:
 		btn_atacar.grab_focus()
+		btn_atacar.call_deferred("grab_focus")
 
 
 func _update_labels(state: BattleManager.BattleState) -> void:
@@ -82,7 +84,9 @@ func _update_ally_hud() -> void:
 		var est: int = int(c_comb.get("estabilidade_atual", 100))
 		ally_est_lbl.text = "Estabilidade: %d/100" % est
 	if ally_fase_lbl != null:
-		ally_fase_lbl.text = "Fase: %s" % _obter_nome_fase(hero.character_id)
+		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id)
+		var pos: float = float(c_comb.get("posicao_tempo", 0.0))
+		ally_fase_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(hero.character_id), pos]
 
 
 func _update_enemy_hud() -> void:
@@ -95,7 +99,9 @@ func _update_enemy_hud() -> void:
 	if enemy_est_lbl != null:
 		enemy_est_lbl.text = "Estabilidade: %d/%d" % [int(en.get("estabilidade_atual", 100)), int(en.get("estabilidade_max", 100))]
 	if enemy_fase_lbl != null:
-		enemy_fase_lbl.text = "Fase: %s" % _obter_nome_fase(str(en.get("id", "")))
+		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(str(en.get("id", "")))
+		var pos: float = float(c_comb.get("posicao_tempo", 0.0))
+		enemy_fase_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(str(en.get("id", ""))), pos]
 
 
 func _obter_nome_fase(c_id: String) -> String:
@@ -118,6 +124,8 @@ func _on_atacar_pressed() -> void:
 	var hero: CharacterData = battle_manager.party_members[0] if not battle_manager.party_members.is_empty() else null
 	var enemy: Dictionary = battle_manager.enemies[0]
 	battle_manager.executar_ataque_basico(hero, enemy)
+	if hero != null:
+		battle_manager.timeline.concluir_execucao(hero.character_id)
 	_update_hud()
 	if not battle_manager.check_battle_end_conditions():
 		battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
@@ -139,6 +147,8 @@ func _on_itens_pressed() -> void:
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
 	var hero: CharacterData = battle_manager.party_members[0]
 	battle_manager.executar_item(hero, ItemData.create_potion(), hero)
+	if hero != null:
+		battle_manager.timeline.concluir_execucao(hero.character_id)
 	_update_hud()
 	battle_manager.change_state(BattleManager.BattleState.AGUARDANDO_TURNO)
 
