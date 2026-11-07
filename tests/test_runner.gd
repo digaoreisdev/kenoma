@@ -35,7 +35,10 @@ func _run() -> void:
 	print("====================================")
 	print("SUITE OVERALL RESULT: ", "ALL PASS" if all_ok else "FAIL")
 	print("====================================")
-	quit(0 if all_ok else 1)
+	if all_ok:
+		quit(0)
+	else:
+		quit(1)
 
 
 func _setup_autoloads() -> void:

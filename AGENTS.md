@@ -27,3 +27,10 @@ Este documento define regras obrigatórias para qualquer agente de IA que atue n
 * **Atenção ao Android:** Avisar imediatamente quando uma decisão, shader, textura ou processamento contínuo puder prejudicar o desempenho no Android.
 * **Commits:** Um passo concluído = um commit com mensagem curta e clara em inglês.
 
+## 6. Fluxo Autônomo para Ordens de Tarefa (TASK ORDER)
+* **Execução Autônoma de Ciclo Completo:** Ao receber uma "TASK ORDER", executar o ciclo completo de ponta a ponta autonomamente: alterações de código, validação de testes headless, commit e push remoto (`git push`).
+* **Sem Interrupções para Aprovação:** Não pausar para pedir autorização ou aprovação antes de executar passos técnicos ou enviar commits ao remoto em uma TASK ORDER.
+* **Diagnóstico e Correção Autônoma:** Em caso de falha nos testes, diagnosticar e corrigir o código autonomamente até obter 100% de sucesso.
+* **Critério de Interrupção:** Formular perguntas apenas mediante conflito técnico bloqueante ou ambiguidade que não possa ser resolvida programaticamente.
+* **Protocolo de Saída:** Responder estritamente através do formato de 4 linhas padronizado no `Engines.md` v0.25 (STATUS, FILES, ACTIONS, COMO TESTAR).
+
