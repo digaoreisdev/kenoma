@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://ci1v7b8w0m3qk"]
+[gd_scene load_steps=9 format=3 uid="uid://ci1v7b8w0m3qk"]
 
 [ext_resource type="Script" path="res://scripts/core/test_map.gd" id="1_map_script"]
 [ext_resource type="PackedScene" path="res://scenes/characters/player.tscn" id="2_player_scene"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/doorway.tscn" id="4_doorway_scene"]
 [ext_resource type="PackedScene" path="res://scenes/objects/spawn_point.tscn" id="5_spawn_scene"]
 [ext_resource type="PackedScene" path="res://scenes/world/miasma_rift.tscn" id="6_rift_scene"]
+[ext_resource type="Resource" path="res://resources/enemies/general_cassian.tres" id="7_cassian_res"]
 
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_top"]
@@ -77,6 +78,7 @@ exit_direction = 1
 [node name="MiasmaRift" parent="." instance=ExtResource("6_rift_scene")]
 position = Vector2(180, -120)
 rift_id = "fenda_test_map"
+inimigo_recurso = ExtResource("7_cassian_res")
 
 [node name="Player" parent="." instance=ExtResource("2_player_scene")]
 position = Vector2(0, 0)

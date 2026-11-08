@@ -71,6 +71,7 @@
 * [x] **F3.5 (Bugfix):** Resolução de consumo de turno e reinício da linha do tempo após ações de combate: criação do helper `concluir_turno_combatente` no `BattleManager` resetando a fase para `ESPERA`, posição de tempo (0.0 para ações gerais e 30.0 para Defesa) e retorno a `AGUARDANDO_TURNO`, fechamento imediato do menu de ações na `BattleScene` e testes automatizados em `test_battle_engine.gd`.
 * [x] **F3.6 (Assets):** Localização, filtragem isométrica vs lateral e organização de assets de Davi e General Cassian em `res://assets/sprites/characters/`: isolamento de sprites laterais em `cassian/archive_lateral/`, retenção exclusiva de 16 animações isométricas no `General_Cassian_frames.tres` e 96 animações em 8 direções no `Davi_Reis_frames.tres`.
 * [x] **F3.7 (Passo 5):** Integração de Davi Reis (Party Data) e General Cassian (Boss Data) com arena visual de batalha: criação dos recursos `davi.tres` e `general_cassian.tres`, classe `EnemyData`, suporte a 2 membros iniciais na equipe (Lucas e Davi) no `PartyManager`, arena visual com `PartyContainer` e `EnemyContainer` na `battle_scene.tscn`, instanciamento dinâmico de `AnimatedSprite2D` com animações isométricas em loop e feedback de ataque/dano, e testes em `test_battle_engine.gd`.
+* [x] **F3.8 (Bugfix Multi-Hero & Cassian):** Resolução de HUD de múltiplos heróis (Lucas e Davi), turnos independentes na timeline, hook de General Cassian na Fenda de Miasma e execução de animações de ataque conectadas a animation_finished com retorno a idle, com testes automatizados em `test_battle_engine.gd`.
 
 
 

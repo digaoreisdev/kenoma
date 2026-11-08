@@ -11,10 +11,16 @@ extends Node2D
 @onready var btn_defender: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnDefender")
 @onready var btn_itens: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnItens")
 @onready var btn_fugir: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnFugir")
+@onready var ally_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel")
 @onready var ally_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/NameLabel")
 @onready var ally_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/HPLabel")
 @onready var ally_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/EstLabel")
 @onready var ally_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/FaseLabel")
+@onready var ally2_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2")
+@onready var ally2_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/NameLabel")
+@onready var ally2_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/HPLabel")
+@onready var ally2_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/EstLabel")
+@onready var ally2_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/FaseLabel")
 @onready var enemy_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/NameLabel")
 @onready var enemy_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/HPLabel")
 @onready var enemy_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/EstLabel")
@@ -163,29 +169,54 @@ func _tocar_animacao_acao(actor_id: String, action_type: String) -> void:
 
 func _executar_animacao_com_movimento(sprite: AnimatedSprite2D, actor_id: String, action_type: String, is_ally: bool) -> void:
 	var anim: String = _obter_nome_anim_acao(sprite.sprite_frames, actor_id, action_type)
-	if not anim.is_empty():
-		sprite.play(anim)
-	var t: Tween = create_tween()
 	var orig: Vector2 = sprite.position
 	var dx: float = 30.0 if is_ally else -30.0
+	var t: Tween = create_tween()
 	t.tween_property(sprite, "position", orig + Vector2(dx, 0.0), 0.1)
 	t.tween_property(sprite, "position", orig, 0.15)
-	t.tween_callback(func(): _restaurar_idle(sprite, actor_id, is_ally))
+	if not anim.is_empty() and sprite.sprite_frames.has_animation(anim):
+		sprite.sprite_frames.set_animation_loop(anim, false)
+		var cb: Callable
+		cb = func():
+			if sprite.animation_finished.is_connected(cb):
+				sprite.animation_finished.disconnect(cb)
+			_restaurar_idle(sprite, actor_id, is_ally)
+		sprite.animation_finished.connect(cb, CONNECT_ONE_SHOT)
+		sprite.play(anim)
+	else:
+		t.tween_callback(func(): _restaurar_idle(sprite, actor_id, is_ally))
 
 
 func _obter_nome_anim_acao(frames: SpriteFrames, actor_id: String, action_type: String) -> String:
 	if action_type == "ataque":
-		if actor_id == "lucas" and frames.has_animation("attack_axe_right"):
-			return "attack_axe_right"
-		if frames.has_animation("Cast Right_right"):
-			return "Cast Right_right"
-		if frames.has_animation("iso_walk_down_right"):
-			return "iso_walk_down_right"
+		return _obter_nome_anim_ataque(frames, actor_id)
 	elif action_type == "defesa":
-		if frames.has_animation("Block Right_right"):
-			return "Block Right_right"
-		if frames.has_animation("crouch_down_right"):
-			return "crouch_down_right"
+		return _obter_nome_anim_defesa(frames)
+	return ""
+
+
+func _obter_nome_anim_ataque(frames: SpriteFrames, actor_id: String) -> String:
+	if actor_id == "lucas" and frames.has_animation("attack_axe_down_right"):
+		return "attack_axe_down_right"
+	if frames.has_animation("Cast Right_right"):
+		return "Cast Right_right"
+	for n: String in frames.get_animation_names():
+		var lower: String = n.to_lower()
+		if lower.contains("attack") or lower.contains("hit"):
+			return n
+	for n: String in frames.get_animation_names():
+		var lower: String = n.to_lower()
+		if lower.contains("cast") or lower.contains("throw") or lower.contains("walk"):
+			return n
+	var all_names: PackedStringArray = frames.get_animation_names()
+	return all_names[0] if all_names.size() > 0 else ""
+
+
+func _obter_nome_anim_defesa(frames: SpriteFrames) -> String:
+	for n: String in frames.get_animation_names():
+		var lower: String = n.to_lower()
+		if lower.contains("block") or lower.contains("crouch") or lower.contains("defense"):
+			return n
 	return ""
 
 
@@ -238,20 +269,29 @@ func _update_hud() -> void:
 
 
 func _update_ally_hud() -> void:
-	if battle_manager.party_members.is_empty() or ally_name_lbl == null:
+	if battle_manager.party_members.is_empty():
 		return
-	var hero: CharacterData = battle_manager.get_active_actor()
-	ally_name_lbl.text = hero.name
-	if ally_hp_lbl != null:
-		ally_hp_lbl.text = "PV: %d/%d" % [hero.current_hp, hero.max_hp]
-	if ally_est_lbl != null:
-		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id)
-		var est: int = int(c_comb.get("estabilidade_atual", 100))
-		ally_est_lbl.text = "Estabilidade: %d/100" % est
-	if ally_fase_lbl != null:
-		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id)
+	if battle_manager.party_members.size() > 0:
+		_atualizar_painel_aliado(battle_manager.party_members[0], ally_panel, ally_name_lbl, ally_hp_lbl, ally_est_lbl, ally_fase_lbl, 0)
+	if battle_manager.party_members.size() > 1 and ally2_panel != null:
+		ally2_panel.visible = true
+		_atualizar_painel_aliado(battle_manager.party_members[1], ally2_panel, ally2_name_lbl, ally2_hp_lbl, ally2_est_lbl, ally2_fase_lbl, 1)
+	elif ally2_panel != null:
+		ally2_panel.visible = false
+
+
+func _atualizar_painel_aliado(hero: CharacterData, panel: Control, n_lbl: Label, hp_lbl: Label, est_lbl: Label, f_lbl: Label, idx: int) -> void:
+	if hero == null or panel == null:
+		return
+	if n_lbl != null: n_lbl.text = hero.name
+	if hp_lbl != null: hp_lbl.text = "PV: %d/%d" % [hero.current_hp, hero.max_hp]
+	var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id) if battle_manager.timeline != null else {}
+	if est_lbl != null: est_lbl.text = "Estabilidade: %d/100" % int(c_comb.get("estabilidade_atual", 100))
+	if f_lbl != null:
 		var pos: float = float(c_comb.get("posicao_tempo", 0.0))
-		ally_fase_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(hero.character_id), pos]
+		f_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(hero.character_id), pos]
+	var is_acting: bool = (battle_manager.current_state == BattleManager.BattleState.SELECIONANDO_ACAO and battle_manager.active_actor_index == idx)
+	panel.modulate = Color(1.2, 1.2, 0.7, 1.0) if is_acting else Color.WHITE
 
 
 func _update_enemy_hud() -> void:

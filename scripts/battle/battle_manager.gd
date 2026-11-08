@@ -31,10 +31,23 @@ var timeline: BattleTimeline = BattleTimeline.new()
 func _process(delta: float) -> void:
 	if current_state != BattleState.AGUARDANDO_TURNO:
 		return
+	if _verificar_proximo_turno():
+		return
 	var eventos: Array[Dictionary] = timeline.avancar_tempo(delta)
 	timeline_updated.emit()
 	if not eventos.is_empty():
 		_processar_eventos_timeline(eventos)
+
+
+func _verificar_proximo_turno() -> bool:
+	if timeline == null:
+		return false
+	for c: Dictionary in timeline.combatentes:
+		if int(c.get("fase_turno", BattleTimeline.FaseTurno.ESPERA)) == BattleTimeline.FaseTurno.DECISAO:
+			var c_id: String = str(c.get("id", ""))
+			_processar_evento_decisao(c_id, c)
+			return true
+	return false
 
 
 func _processar_eventos_timeline(eventos: Array[Dictionary]) -> void:
@@ -42,7 +55,7 @@ func _processar_eventos_timeline(eventos: Array[Dictionary]) -> void:
 		var tipo: String = str(ev.get("evento", ""))
 		var c_id: String = str(ev.get("id", ""))
 		var c: Dictionary = ev.get("combatente", {})
-		if tipo == "DECISAO":
+		if tipo == "DECISAO" and current_state == BattleState.AGUARDANDO_TURNO:
 			_processar_evento_decisao(c_id, c)
 		elif tipo == "CONJURACAO_CONCLUIDA":
 			_processar_conjuracao_concluida(c_id)
@@ -105,13 +118,21 @@ func _eh_combatente_jogador_por_id(c_id: String) -> bool:
 	return false
 
 
+func _obter_dados_inimigo(c_id: String) -> Dictionary:
+	for e: Dictionary in enemies:
+		if str(e.get("id", "")) == c_id:
+			return e
+	return enemies[0] if not enemies.is_empty() else {}
+
+
 func _executar_ataque_inimigo(c_id: String) -> void:
 	if party_members.is_empty():
 		return
 	change_state(BattleState.EXECUTANDO_ACAO)
 	var alvo: CharacterData = _obter_alvo_aliado_vivo()
 	var c: Dictionary = timeline.obter_combatente(c_id)
-	var dano_base: int = int(c.get("strength", 15))
+	var e_data: Dictionary = _obter_dados_inimigo(c_id)
+	var dano_base: int = int(e_data.get("strength", 20))
 	var dano_final: int = _calcular_dano_final(c, dano_base)
 	alvo.current_hp = maxi(0, alvo.current_hp - dano_final)
 	action_executed.emit(c_id, alvo.character_id, "ataque")

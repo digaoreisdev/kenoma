@@ -139,6 +139,9 @@ static func create_default_lucas() -> CharacterData:
 	const FRAMES_PATH: String = "res://assets/art/characters/player/player_frames.tres"
 	if ResourceLoader.exists(FRAMES_PATH):
 		lucas.sprite_frames = load(FRAMES_PATH) as SpriteFrames
+	lucas.strength = 14
+	lucas.defense = 10
+	lucas.agility = 14
 	lucas.weapon_affinities = {
 		EquipmentData.WeaponType.HAMMER: 1.3,
 		EquipmentData.WeaponType.SWORD: 0.9,

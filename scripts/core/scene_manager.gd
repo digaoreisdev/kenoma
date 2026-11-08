@@ -172,15 +172,22 @@ func _configurar_encontro_batalha(scene: Node) -> void:
 		return
 	var allies: Array[CharacterData] = _obter_aliados_para_batalha()
 	var raw_enemies: Array = batalha_dados_retorno.get("grupo_inimigo", [])
-	var inimigos: Array[Dictionary] = []
-	for e in raw_enemies:
+	var inimigos: Array = []
+	for e: Variant in raw_enemies:
 		if e is Dictionary:
 			inimigos.append(e)
+		elif e is Object and (e as Object).has_method("to_dictionary"):
+			inimigos.append((e as Object).call("to_dictionary"))
 	if inimigos.is_empty():
-		inimigos.append({
-			"name": "Soldado Corrompido", "max_hp": 80, "current_hp": 80,
-			"estabilidade_max": 60, "estabilidade_atual": 60
-		})
+		var cassian_res: Resource = load("res://resources/enemies/general_cassian.tres")
+		if cassian_res != null and cassian_res.has_method("to_dictionary"):
+			inimigos.append((cassian_res as Object).call("to_dictionary"))
+		else:
+			inimigos.append({
+				"id": "general_cassian", "name": "General Cassian",
+				"max_hp": 240, "current_hp": 240,
+				"estabilidade_max": 120, "estabilidade_atual": 120, "velocidade": 12.0
+			})
 	bm.initialize_battle(allies, inimigos)
 
 

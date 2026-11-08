@@ -24,6 +24,8 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_party_manager_starts_with_lucas_and_davi()
 	passed = passed and test_davi_weapon_affinities()
 	passed = passed and test_battle_initialization_with_davi_and_general_cassian()
+	passed = passed and test_lucas_and_davi_independent_turns_progression()
+	passed = passed and test_general_cassian_resource_loading()
 	return passed
 
 
@@ -100,8 +102,8 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	assert(state_lbl.text.contains("Inicializando"), "State label must display PT-BR state")
 	var party_cont: Node2D = battle_scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
 	assert(party_cont != null, "PartyContainer must exist in arena")
-	var enemy_cont: Node2D = battle_scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
-	assert(enemy_cont != null, "EnemyContainer must exist in arena")
+	var ally2_p: Control = battle_scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2") as Control
+	assert(ally2_p != null, "AllyPanel2 must exist for Davi HUD")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -305,6 +307,37 @@ static func test_battle_initialization_with_davi_and_general_cassian() -> bool:
 	assert(int(bm.enemies[0]["max_hp"]) == 240, "General Cassian max HP must be 240")
 	assert(int(bm.enemies[0]["estabilidade_max"]) == 120, "General Cassian max stability must be 120")
 	bm.free()
+	return true
+
+
+static func test_lucas_and_davi_independent_turns_progression() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var davi: CharacterData = CharacterData.create_default_davi()
+	var cassian: Resource = EnemyDataScript.create_general_cassian()
+	bm.initialize_battle([lucas, davi], [cassian])
+	bm._process(7.5)
+	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Must enter SELECIONANDO_ACAO")
+	assert(bm.get_active_actor().character_id == "lucas", "Lucas must act first")
+	bm.executar_defesa(lucas)
+	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "State returns to AGUARDANDO_TURNO")
+	bm._process(2.0)
+	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Davi must reach SELECIONANDO_ACAO")
+	assert(bm.get_active_actor().character_id == "davi", "Davi must be active actor")
+	bm.executar_ataque_basico(davi, bm.enemies[0])
+	bm.free()
+	return true
+
+
+static func test_general_cassian_resource_loading() -> bool:
+	var cassian_res: Resource = load("res://resources/enemies/general_cassian.tres")
+	assert(cassian_res != null, "general_cassian.tres must exist and load")
+	assert(cassian_res.get("name") == "General Cassian", "Name must match General Cassian")
+	assert(int(cassian_res.get("max_hp")) == 240, "HP must be 240")
+	assert(int(cassian_res.get("estabilidade_max")) == 120, "Estabilidade max must be 120")
+	assert(int(cassian_res.get("strength")) == 20, "Força must be 20")
+	assert(int(cassian_res.get("defense")) == 14, "Defesa must be 14")
+	assert(cassian_res.get("sprite_frames") != null, "SpriteFrames must be attached")
 	return true
 
 

@@ -8,6 +8,7 @@ signal rift_triggered(rift: MiasmaRift)
 @export var rift_id: String = "fenda_01"
 @export var disabled_on_victory: bool = true
 @export var grupo_inimigo: Array[Dictionary] = []
+@export var inimigo_recurso: Resource = null
 
 var foi_ativada: bool = false
 
@@ -26,18 +27,24 @@ func _verificar_estado_salvo() -> void:
 
 
 func _inicializar_grupo_padrao() -> void:
-	if grupo_inimigo.is_empty():
-		grupo_inimigo = [
-			{
-				"id": "soldado_corrompido",
-				"name": "Soldado Corrompido",
-				"max_hp": 80,
-				"current_hp": 80,
-				"estabilidade_max": 60,
-				"estabilidade_atual": 60,
-				"velocidade": 20.0
-			}
-		]
+	if inimigo_recurso != null and inimigo_recurso.has_method("to_dictionary"):
+		grupo_inimigo = [(inimigo_recurso as Object).call("to_dictionary")]
+	elif grupo_inimigo.is_empty():
+		var cassian_res: Resource = load("res://resources/enemies/general_cassian.tres")
+		if cassian_res != null and cassian_res.has_method("to_dictionary"):
+			grupo_inimigo = [(cassian_res as Object).call("to_dictionary")]
+		else:
+			grupo_inimigo = [
+				{
+					"id": "general_cassian",
+					"name": "General Cassian",
+					"max_hp": 240,
+					"current_hp": 240,
+					"estabilidade_max": 120,
+					"estabilidade_atual": 120,
+					"velocidade": 12.0
+				}
+			]
 
 
 func _on_body_entered(body: Node2D) -> void:
