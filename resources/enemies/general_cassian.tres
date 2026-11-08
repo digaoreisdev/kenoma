@@ -17,3 +17,4 @@ agility = 12
 sprite_frames = ExtResource("2_wv0a4")
 exp_recompensa = 350
 ouro_recompensa = 200
+is_boss = true

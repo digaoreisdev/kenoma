@@ -104,7 +104,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	sprite.sprite_frames = frames
 	sprite.scale = Vector2(0.45, 0.45)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(60.0 * idx, 60.0 * idx)
+	sprite.position = Vector2(55.0 * idx, 40.0 * idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite
@@ -204,15 +204,18 @@ func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:
 	if atk_sprite == null:
 		return
 	var orig_pos: Vector2 = atk_sprite.position
-	var dash_vec: Vector2 = Vector2(-120.0, 0.0) if _eh_aliado(actor_id) else Vector2(120.0, 0.0)
-	if tgt_sprite != null and atk_sprite.global_position.distance_to(tgt_sprite.global_position) > 10.0:
-		dash_vec = (tgt_sprite.global_position - atk_sprite.global_position).normalized() * 120.0
+	var dash_vec: Vector2 = Vector2(-250.0, 0.0) if _eh_aliado(actor_id) else Vector2(250.0, 0.0)
+	if tgt_sprite != null:
+		var diff: Vector2 = tgt_sprite.global_position - atk_sprite.global_position
+		var dist: float = diff.length()
+		if dist > 60.0:
+			dash_vec = diff.normalized() * (dist - 50.0)
 	var anim: String = _obter_nome_anim_ataque(atk_sprite.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
-	tw.tween_property(atk_sprite, "position", orig_pos + dash_vec, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(atk_sprite, "position", orig_pos + dash_vec, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_callback(func(): _no_contato_golpe(atk_sprite, anim, target_id))
-	tw.tween_interval(0.18)
-	tw.tween_property(atk_sprite, "position", orig_pos, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_interval(0.25)
+	tw.tween_property(atk_sprite, "position", orig_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func(): _restaurar_idle(atk_sprite, actor_id, _eh_aliado(actor_id)))
 
 

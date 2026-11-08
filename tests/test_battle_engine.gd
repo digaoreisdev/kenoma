@@ -8,28 +8,22 @@ const EnemyDataScript: GDScript = preload("res://scripts/core/enemy_data.gd")
 
 
 static func run_tests(tree: SceneTree = null) -> bool:
-	var passed: bool = true
-	passed = passed and test_battle_initialization_with_lucas()
-	passed = passed and test_battle_state_machine_flow()
-	passed = passed and test_battle_victory_condition()
-	passed = passed and test_battle_scene_instantiation(tree)
-	passed = passed and test_battle_timeline_progression()
-	passed = passed and test_battle_stability_ruptura()
-	passed = passed and test_battle_stability_irritacao()
-	passed = passed and test_battle_basic_attack_affinity_and_stability()
-	passed = passed and test_battle_defender_command()
-	passed = passed and test_battle_defender_resets_timeline()
-	passed = passed and test_battle_item_consumption()
-	passed = passed and test_battle_realtime_process_loop()
-	passed = passed and test_party_manager_starts_with_lucas_and_davi()
-	passed = passed and test_davi_weapon_affinities()
-	passed = passed and test_battle_initialization_with_davi_and_general_cassian()
-	passed = passed and test_lucas_and_davi_independent_turns_progression()
-	passed = passed and test_general_cassian_resource_loading()
-	passed = passed and test_zero_enemy_hp_triggers_victory_and_scene_manager_exit()
-	passed = passed and test_breaking_enemy_stability_applies_rupture_stun_penalty()
-	passed = passed and test_battle_hud_portraits_hook()
-	return passed
+	var p: bool = test_battle_initialization_with_lucas() and test_battle_state_machine_flow()
+	p = p and test_battle_victory_condition() and test_battle_scene_instantiation(tree)
+	p = p and test_battle_timeline_progression() and test_battle_stability_ruptura()
+	p = p and test_battle_stability_irritacao() and test_battle_basic_attack_affinity_and_stability()
+	p = p and test_battle_defender_command() and test_battle_defender_resets_timeline()
+	p = p and test_battle_item_consumption() and test_battle_realtime_process_loop()
+	p = p and test_party_manager_starts_with_lucas_and_davi() and test_davi_weapon_affinities()
+	p = p and test_battle_initialization_with_davi_and_general_cassian()
+	p = p and test_lucas_and_davi_independent_turns_progression()
+	p = p and test_general_cassian_resource_loading()
+	p = p and test_zero_enemy_hp_triggers_victory_and_scene_manager_exit()
+	p = p and test_breaking_enemy_stability_applies_rupture_stun_penalty()
+	p = p and test_battle_hud_portraits_hook()
+	p = p and test_cassian_stability_withstands_multiple_hits()
+	p = p and test_boss_action_opportunity_and_grace_period()
+	return p
 
 
 static func test_battle_initialization_with_lucas() -> bool:
@@ -104,7 +98,8 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	var banner: Control = battle_scene.get_node_or_null("CanvasLayer/UI/VictoryBanner") as Control
 	assert(party_cont != null and enemy_cont != null, "Containers must exist in arena")
 	assert(banner != null, "VictoryBanner must exist in battle scene UI")
-	assert(enemy_cont.position.x < party_cont.position.x, "Enemy must be left of party")
+	assert(is_equal_approx(enemy_cont.position.x, 440.0), "EnemyContainer must be at X=440")
+	assert(is_equal_approx(party_cont.position.x, 840.0), "PartyContainer must be at X=840")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -260,7 +255,7 @@ static func test_battle_realtime_process_loop() -> bool:
 	bm.initialize_battle([lucas], [enemy])
 	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "Initial state must be AGUARDANDO_TURNO")
 	
-	bm._process(12.0)
+	bm._process(15.0)
 	
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "State must advance to SELECIONANDO_ACAO")
 	var c: Dictionary = bm.timeline.obter_combatente(lucas.character_id)
@@ -317,12 +312,12 @@ static func test_lucas_and_davi_independent_turns_progression() -> bool:
 	var davi: CharacterData = CharacterData.create_default_davi()
 	var cassian: Resource = EnemyDataScript.create_general_cassian()
 	bm.initialize_battle([lucas, davi], [cassian])
-	bm._process(11.5)
+	bm._process(15.0)
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Must enter SELECIONANDO_ACAO")
 	assert(bm.get_active_actor().character_id == "lucas", "Lucas must act first")
 	bm.executar_defesa(lucas)
 	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "State returns to AGUARDANDO_TURNO")
-	bm._process(3.0)
+	bm._process(4.0)
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Davi must reach SELECIONANDO_ACAO")
 	assert(bm.get_active_actor().character_id == "davi", "Davi must be active actor")
 	bm.executar_ataque_basico(davi, bm.enemies[0])
@@ -401,6 +396,43 @@ static func test_battle_hud_portraits_hook() -> bool:
 	if tree != null and tree.root != null:
 		tree.root.remove_child(scene)
 	scene.free()
+	return true
+
+
+static func test_cassian_stability_withstands_multiple_hits() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var cassian_res: Resource = EnemyDataScript.create_general_cassian()
+	bm.initialize_battle([lucas], [cassian_res])
+	var cassian: Dictionary = bm.enemies[0]
+	var res1: Dictionary = bm.executar_ataque_basico(lucas, cassian)
+	assert(res1["ruptura"] == false, "Cassian must NOT trigger Ruptura on 1st hit")
+	assert(cassian["estabilidade_atual"] == 96, "Stability must reduce by 24 (120 -> 96)")
+	var res2: Dictionary = bm.executar_ataque_basico(lucas, cassian)
+	assert(res2["ruptura"] == false, "Cassian must NOT trigger Ruptura on 2nd hit")
+	assert(cassian["estabilidade_atual"] == 72, "Stability must reduce by 24 (96 -> 72)")
+	bm.free()
+	return true
+
+
+static func test_boss_action_opportunity_and_grace_period() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var cassian_res: Resource = EnemyDataScript.create_general_cassian()
+	bm.initialize_battle([lucas], [cassian_res])
+	var cassian: Dictionary = bm.enemies[0]
+	bm.aplicar_golpe({"id": "lucas"}, cassian, 20, 120)
+	assert(cassian["estabilidade_atual"] == 0, "Stability reached 0 on rupture")
+	assert(cassian["em_recuperacao_ruptura"] == true, "Must flag recovery needed")
+	var t_c: Dictionary = bm.timeline.obter_combatente(cassian["id"])
+	t_c["posicao_tempo"] = 100.0
+	t_c["fase_turno"] = BattleTimeline.FaseTurno.DECISAO
+	bm._processar_evento_decisao(cassian["id"], t_c)
+	assert(cassian["estabilidade_atual"] == 120, "Stability restored to 120 after rupture recovery")
+	assert(cassian["imunidade_interrupcao"] == true, "Must have interrupt immunity")
+	var golpe_imune: Dictionary = bm.aplicar_golpe({"id": "lucas"}, cassian, 20, 50)
+	assert(golpe_imune["ruptura"] == false, "Must not trigger rupture during immunity")
+	bm.free()
 	return true
 
 

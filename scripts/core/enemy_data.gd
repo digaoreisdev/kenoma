@@ -15,6 +15,7 @@ extends Resource
 @export var sprite_frames: SpriteFrames = null
 @export var exp_recompensa: int = 45
 @export var ouro_recompensa: int = 30
+@export var is_boss: bool = false
 
 
 func _init(
@@ -54,7 +55,8 @@ func to_dictionary() -> Dictionary:
 		"sprite_frames": sprite_frames,
 		"exp_recompensa": exp_recompensa,
 		"ouro_recompensa": ouro_recompensa,
-		"stability": estabilidade_atual
+		"stability": estabilidade_atual,
+		"is_boss": is_boss
 	}
 
 
@@ -67,6 +69,7 @@ static func create_general_cassian() -> Resource:
 	var boss: Resource = script.new(
 		"general_cassian", "General Cassian", 240, 120, 20, 14, 12, frames
 	)
+	boss.set("is_boss", true)
 	boss.set("exp_recompensa", 350)
 	boss.set("ouro_recompensa", 200)
 	return boss

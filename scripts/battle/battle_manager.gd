@@ -21,7 +21,7 @@ signal action_executed(actor_id: String, target_id: String, action_type: String)
 signal rupture_triggered(target_id: String)
 
 @export var current_state: BattleState = BattleState.INICIALIZANDO
-@export var timeline_speed_scale: float = 0.65
+@export var timeline_speed_scale: float = 0.49
 
 var party_members: Array[CharacterData] = []
 var enemies: Array[Dictionary] = []
@@ -64,6 +64,7 @@ func _processar_eventos_timeline(eventos: Array[Dictionary]) -> void:
 
 
 func _processar_evento_decisao(c_id: String, combatente: Dictionary) -> void:
+	_recuperar_de_ruptura(c_id, combatente)
 	if _eh_combatente_jogador(c_id, combatente):
 		is_player_turn = true
 		_atualizar_ator_ativo(c_id)
@@ -71,6 +72,22 @@ func _processar_evento_decisao(c_id: String, combatente: Dictionary) -> void:
 		combatant_ready_for_action.emit(c_id, true)
 	else:
 		_processar_acao_inimigo(c_id, combatente)
+
+
+func _recuperar_de_ruptura(c_id: String, combatente: Dictionary) -> void:
+	if not bool(combatente.get("em_recuperacao_ruptura", false)):
+		return
+	combatente["em_recuperacao_ruptura"] = false
+	combatente["imunidade_interrupcao"] = true
+	var est_max: int = int(combatente.get("estabilidade_max", 100))
+	combatente["estabilidade_atual"] = est_max
+	combatente["stability"] = est_max
+	for e: Dictionary in enemies:
+		if str(e.get("id", "")) == c_id:
+			e["estabilidade_atual"] = est_max
+			e["stability"] = est_max
+			e["imunidade_interrupcao"] = true
+			e["em_recuperacao_ruptura"] = false
 
 
 func _atualizar_ator_ativo(c_id: String) -> void:
@@ -261,28 +278,36 @@ func _calcular_dano_final(atacante: Dictionary, dano_base: int) -> int:
 
 
 func _processar_estabilidade_golpe(defensor: Dictionary, impacto: int) -> Dictionary:
+	if bool(defensor.get("imunidade_interrupcao", false)):
+		return {"ruptura": false, "irritado": false}
 	var est: int = maxi(0, int(defensor.get("estabilidade_atual", 100)) - impacto)
 	defensor["estabilidade_atual"] = est
 	defensor["stability"] = est
 	var def_id: String = str(defensor.get("id", ""))
 	if est <= 0:
-		defensor["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
-		defensor["posicao_tempo"] = 0.0
-		defensor["progresso_conjuracao"] = 0.0
-		defensor["irritado"] = false
-		if timeline != null and not def_id.is_empty():
-			var t_c: Dictionary = timeline.obter_combatente(def_id)
-			if not t_c.is_empty():
-				t_c["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
-				t_c["posicao_tempo"] = 0.0
-				t_c["progresso_conjuracao"] = 0.0
-				t_c["estabilidade_atual"] = 0
+		_aplicar_ruptura_combatente(defensor, def_id)
 		return {"ruptura": true, "irritado": false}
 	var fase: int = int(defensor.get("fase_turno", BattleTimeline.FaseTurno.ESPERA))
 	if fase == BattleTimeline.FaseTurno.CONJURACAO:
 		defensor["irritado"] = true
 		return {"ruptura": false, "irritado": true}
 	return {"ruptura": false, "irritado": bool(defensor.get("irritado", false))}
+
+
+func _aplicar_ruptura_combatente(defensor: Dictionary, def_id: String) -> void:
+	defensor["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+	defensor["posicao_tempo"] = 0.0
+	defensor["progresso_conjuracao"] = 0.0
+	defensor["irritado"] = false
+	defensor["em_recuperacao_ruptura"] = true
+	if timeline != null and not def_id.is_empty():
+		var t_c: Dictionary = timeline.obter_combatente(def_id)
+		if not t_c.is_empty():
+			t_c["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+			t_c["posicao_tempo"] = 0.0
+			t_c["progresso_conjuracao"] = 0.0
+			t_c["estabilidade_atual"] = 0
+			t_c["em_recuperacao_ruptura"] = true
 
 
 func aplicar_golpe(atacante: Dictionary, defensor: Dictionary, dano: int, impacto_estabilidade: int) -> Dictionary:
@@ -333,10 +358,12 @@ func _calcular_dano_ataque_basico(dados: Dictionary) -> int:
 	return int(round(dano_efetivo))
 
 
-func _calcular_impacto_estabilidade(dados: Dictionary) -> int:
-	if bool(dados.get("is_hammer", false)):
-		return 35
-	return 15
+func _calcular_impacto_estabilidade(dados: Dictionary, def_dict: Dictionary = {}) -> int:
+	var is_hammer: bool = bool(dados.get("is_hammer", false))
+	var is_boss: bool = bool(def_dict.get("is_boss", false)) or str(def_dict.get("id", "")) == "general_cassian" or int(def_dict.get("estabilidade_max", 0)) > 100
+	if is_boss:
+		return 24 if is_hammer else 12
+	return 35 if is_hammer else 15
 
 
 func _obter_id_combatente(c: Variant) -> String:
@@ -350,10 +377,10 @@ func _obter_id_combatente(c: Variant) -> String:
 func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
 	var dados_atk: Dictionary = _extrair_dados_ataque(atacante)
 	var dano_efetivo: int = _calcular_dano_ataque_basico(dados_atk)
-	var impacto: int = _calcular_impacto_estabilidade(dados_atk)
 	var def_dict: Dictionary = defensor if defensor is Dictionary else {}
 	if defensor is CharacterData:
 		def_dict = {"name": defensor.name, "current_hp": defensor.current_hp, "max_hp": defensor.max_hp}
+	var impacto: int = _calcular_impacto_estabilidade(dados_atk, def_dict)
 	var res: Dictionary = aplicar_golpe({"id": "atacante"}, def_dict, dano_efetivo, impacto)
 	if defensor is CharacterData:
 		(defensor as CharacterData).current_hp = int(def_dict.get("current_hp", 0))
@@ -412,6 +439,7 @@ func _resetar_combatente_timeline(c_id: String, posicao: float) -> void:
 		t_comb["posicao_tempo"] = posicao
 		t_comb["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
 		t_comb["progresso_conjuracao"] = 0.0
+		t_comb["imunidade_interrupcao"] = false
 		if posicao == 0.0:
 			t_comb["defendendo"] = false
 
@@ -422,6 +450,7 @@ func concluir_turno_combatente(combatente: Variant, posicao_inicial: float = 0.0
 		d["posicao_tempo"] = posicao_inicial
 		d["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
 		d["progresso_conjuracao"] = 0.0
+		d["imunidade_interrupcao"] = false
 		if posicao_inicial == 0.0:
 			d["defendendo"] = false
 		var c_id: String = str(d.get("id", ""))
