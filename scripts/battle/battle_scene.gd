@@ -279,6 +279,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int, total_aliados: int = 2)
 	var f: String = ally.fileira if ("fileira" in ally) else "VANGUARDA"
 	sprite.position = _obter_posicao_base_aliado(ally.character_id, idx, total_aliados, f)
 	_tocar_idle_aliado(sprite, ally.character_id)
+	_adicionar_sombra_pe(sprite)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite
 
@@ -317,8 +318,20 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = Vector2(-50.0 * idx, 50.0 * idx)
 	_tocar_idle_inimigo(sprite)
+	_adicionar_sombra_pe(sprite)
 	enemy_container.add_child(sprite)
 	enemy_sprites[e_id] = sprite
+
+
+func _adicionar_sombra_pe(sprite: AnimatedSprite2D) -> void:
+	var sombra: ColorRect = ColorRect.new()
+	sombra.name = "Sombra"
+	sombra.size = Vector2(26.0, 10.0)
+	sombra.position = Vector2(-13.0, 24.0)
+	sombra.color = Color(0.02, 0.02, 0.04, 0.38)
+	sombra.z_index = -1
+	sombra.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sprite.add_child(sombra)
 
 
 func _tocar_idle_aliado(sprite: AnimatedSprite2D, c_id: String) -> void:

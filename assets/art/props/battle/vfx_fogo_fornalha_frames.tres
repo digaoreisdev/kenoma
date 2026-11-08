@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/props/battle/vfx_fogo_fornalha.png" id="1_sm7e4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_khy7e"]
+atlas = ExtResource("1_sm7e4")
+region = Rect2(0, 0, 170, 168)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_flq3w"]
+atlas = ExtResource("1_sm7e4")
+region = Rect2(170, 0, 171, 168)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w48rq"]
+atlas = ExtResource("1_sm7e4")
+region = Rect2(341, 0, 170, 168)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ioxn7"]
+atlas = ExtResource("1_sm7e4")
+region = Rect2(511, 0, 171, 168)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4nc8w"]
+atlas = ExtResource("1_sm7e4")
+region = Rect2(682, 0, 171, 168)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p2dbh"]
+atlas = ExtResource("1_sm7e4")
+region = Rect2(853, 0, 171, 168)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_khy7e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_flq3w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w48rq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ioxn7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4nc8w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p2dbh")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 8.0
+}]
