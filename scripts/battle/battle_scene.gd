@@ -12,15 +12,17 @@ extends Node2D
 @onready var btn_itens: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnItens")
 @onready var btn_fugir: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnFugir")
 @onready var ally_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel")
-@onready var ally_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/NameLabel")
-@onready var ally_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/HPLabel")
-@onready var ally_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/EstLabel")
-@onready var ally_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox/FaseLabel")
+@onready var ally_portrait_rect: TextureRect = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/PortraitRect")
+@onready var ally_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/NameLabel")
+@onready var ally_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/HPLabel")
+@onready var ally_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/EstLabel")
+@onready var ally_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/FaseLabel")
 @onready var ally2_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2")
-@onready var ally2_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/NameLabel")
-@onready var ally2_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/HPLabel")
-@onready var ally2_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/EstLabel")
-@onready var ally2_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox/FaseLabel")
+@onready var ally2_portrait_rect: TextureRect = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/PortraitRect")
+@onready var ally2_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/NameLabel")
+@onready var ally2_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/HPLabel")
+@onready var ally2_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/EstLabel")
+@onready var ally2_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/FaseLabel")
 @onready var enemy_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/NameLabel")
 @onready var enemy_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/HPLabel")
 @onready var enemy_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/EstLabel")
@@ -34,6 +36,7 @@ var enemy_sprites: Dictionary = {}
 
 
 func _ready() -> void:
+	_inicializar_referencias_hud()
 	if battle_manager != null:
 		battle_manager.battle_state_changed.connect(_on_state_changed)
 		battle_manager.timeline_updated.connect(_update_hud)
@@ -46,6 +49,22 @@ func _ready() -> void:
 		if not battle_manager.party_members.is_empty():
 			_setup_arena_combatants(battle_manager.party_members, battle_manager.enemies)
 	_connect_buttons()
+
+
+func _inicializar_referencias_hud() -> void:
+	if ally_panel != null and ally_name_lbl == null:
+		ally_name_lbl = ally_panel.find_child("NameLabel", true, false) as Label
+		ally_hp_lbl = ally_panel.find_child("HPLabel", true, false) as Label
+		ally_est_lbl = ally_panel.find_child("EstLabel", true, false) as Label
+		ally_fase_lbl = ally_panel.find_child("FaseLabel", true, false) as Label
+		ally_portrait_rect = ally_panel.find_child("PortraitRect", true, false) as TextureRect
+	if ally2_panel != null and ally2_name_lbl == null:
+		ally2_name_lbl = ally2_panel.find_child("NameLabel", true, false) as Label
+		ally2_hp_lbl = ally2_panel.find_child("HPLabel", true, false) as Label
+		ally2_est_lbl = ally2_panel.find_child("EstLabel", true, false) as Label
+		ally2_fase_lbl = ally2_panel.find_child("FaseLabel", true, false) as Label
+		ally2_portrait_rect = ally2_panel.find_child("PortraitRect", true, false) as TextureRect
+
 
 
 func _connect_buttons() -> void:
@@ -340,17 +359,21 @@ func _update_ally_hud() -> void:
 	if battle_manager.party_members.is_empty():
 		return
 	if battle_manager.party_members.size() > 0:
-		_atualizar_painel_aliado(battle_manager.party_members[0], ally_panel, ally_name_lbl, ally_hp_lbl, ally_est_lbl, ally_fase_lbl, 0)
+		_atualizar_painel_aliado(battle_manager.party_members[0], ally_panel, ally_portrait_rect, ally_name_lbl, ally_hp_lbl, ally_est_lbl, ally_fase_lbl, 0)
 	if battle_manager.party_members.size() > 1 and ally2_panel != null:
 		ally2_panel.visible = true
-		_atualizar_painel_aliado(battle_manager.party_members[1], ally2_panel, ally2_name_lbl, ally2_hp_lbl, ally2_est_lbl, ally2_fase_lbl, 1)
+		_atualizar_painel_aliado(battle_manager.party_members[1], ally2_panel, ally2_portrait_rect, ally2_name_lbl, ally2_hp_lbl, ally2_est_lbl, ally2_fase_lbl, 1)
 	elif ally2_panel != null:
 		ally2_panel.visible = false
 
 
-func _atualizar_painel_aliado(hero: CharacterData, panel: Control, n_lbl: Label, hp_lbl: Label, est_lbl: Label, f_lbl: Label, idx: int) -> void:
+func _atualizar_painel_aliado(hero: CharacterData, panel: Control, p_rect: TextureRect, n_lbl: Label, hp_lbl: Label, est_lbl: Label, f_lbl: Label, idx: int) -> void:
 	if hero == null or panel == null:
 		return
+	if p_rect != null:
+		var tex: Texture2D = _obter_textura_retrato(hero)
+		if tex != null and p_rect.texture != tex:
+			p_rect.texture = tex
 	if n_lbl != null: n_lbl.text = hero.name
 	if hp_lbl != null: hp_lbl.text = "PV: %d/%d" % [hero.current_hp, hero.max_hp]
 	var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id) if battle_manager.timeline != null else {}
@@ -360,6 +383,23 @@ func _atualizar_painel_aliado(hero: CharacterData, panel: Control, n_lbl: Label,
 		f_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(hero.character_id), pos]
 	var is_acting: bool = (battle_manager.current_state == BattleManager.BattleState.SELECIONANDO_ACAO and battle_manager.active_actor_index == idx)
 	panel.modulate = Color(1.2, 1.2, 0.7, 1.0) if is_acting else Color.WHITE
+
+
+func _obter_textura_retrato(hero: CharacterData) -> Texture2D:
+	if hero == null:
+		return null
+	var path: String = ""
+	if hero.character_id == "lucas":
+		path = "res://assets/art/portraits/lucas/lucas_confident.png"
+		if hero.current_hp < int(hero.max_hp * 0.3):
+			path = "res://assets/art/portraits/lucas/lucas_serious.png"
+	elif hero.character_id == "davi":
+		path = "res://assets/art/portraits/davi/davi_neutral.png"
+		if hero.current_hp < int(hero.max_hp * 0.3):
+			path = "res://assets/art/portraits/davi/davi_hurt.png"
+	if not path.is_empty() and ResourceLoader.exists(path):
+		return load(path) as Texture2D
+	return hero.portrait
 
 
 func _update_enemy_hud() -> void:

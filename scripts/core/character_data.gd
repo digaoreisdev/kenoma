@@ -153,13 +153,9 @@ static func create_default_lucas() -> CharacterData:
 
 
 static func create_default_davi() -> CharacterData:
-	var frames: SpriteFrames = null
-	const FRAMES_PATH: String = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
-	if ResourceLoader.exists(FRAMES_PATH):
-		frames = load(FRAMES_PATH) as SpriteFrames
-	var davi: CharacterData = CharacterData.new(
-		"davi", "Davi Reis", 1, 90, 90, 60, 60, null, null
-	)
+	var frames: SpriteFrames = load("res://assets/sprites/characters/davi/Davi_Reis_frames.tres") if ResourceLoader.exists("res://assets/sprites/characters/davi/Davi_Reis_frames.tres") else null
+	var portrait_tex: Texture2D = load("res://assets/art/portraits/davi/davi_neutral.png") if ResourceLoader.exists("res://assets/art/portraits/davi/davi_neutral.png") else null
+	var davi: CharacterData = CharacterData.new("davi", "Davi Reis", 1, 90, 90, 60, 60, portrait_tex, null)
 	davi.strength = 8
 	davi.defense = 16
 	davi.agility = 11

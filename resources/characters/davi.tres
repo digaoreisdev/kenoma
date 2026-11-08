@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="CharacterData" format=3]
 
 [ext_resource type="Script" path="res://scripts/core/character_data.gd" id="1_vatih"]
+[ext_resource type="Texture2D" path="res://assets/art/portraits/davi/davi_neutral.png" id="2_port"]
 [ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="2_xog6a"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/characters/davi/Davi_Reis_frames.tres" id="3_e42oc"]
 
@@ -12,6 +13,7 @@ current_hp = 90
 max_hp = 90
 current_mp = 60
 max_mp = 60
+portrait = ExtResource("2_port")
 strength = 8
 defense = 16
 magic_defense = 15

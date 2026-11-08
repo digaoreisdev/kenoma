@@ -28,6 +28,7 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_general_cassian_resource_loading()
 	passed = passed and test_zero_enemy_hp_triggers_victory_and_scene_manager_exit()
 	passed = passed and test_breaking_enemy_stability_applies_rupture_stun_penalty()
+	passed = passed and test_battle_hud_portraits_hook()
 	return passed
 
 
@@ -381,6 +382,27 @@ static func test_breaking_enemy_stability_applies_rupture_stun_penalty() -> bool
 	assert(defensor["irritado"] == false, "Irritado must be cleared on rupture")
 	bm.free()
 	return true
+
+
+static func test_battle_hud_portraits_hook() -> bool:
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var davi: CharacterData = CharacterData.create_default_davi()
+	assert(lucas.portrait != null, "Lucas portrait must not be null")
+	assert(davi.portrait != null, "Davi portrait must not be null")
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(scene)
+	var p1: TextureRect = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/PortraitRect") as TextureRect
+	var p2: TextureRect = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/PortraitRect") as TextureRect
+	assert(p1 != null, "AllyPanel PortraitRect must exist")
+	assert(p2 != null, "AllyPanel2 PortraitRect must exist")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(scene)
+	scene.free()
+	return true
+
 
 
 

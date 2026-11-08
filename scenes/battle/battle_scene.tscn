@@ -117,35 +117,47 @@ text = "Fase: Espera"
 [node name="AllyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
 offset_left = 900.0
-offset_top = 85.0
+offset_top = 80.0
 offset_right = 1220.0
 offset_bottom = 215.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin"]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+[node name="PortraitRect" type="TextureRect" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
 text = "Lucas Reis"
 
-[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 text = "PV: 120/120"
 
-[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 text = "Estabilidade: 100/100"
 
-[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/VBox"]
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
 text = "Fase: Espera"
@@ -155,33 +167,45 @@ layout_mode = 0
 offset_left = 900.0
 offset_top = 225.0
 offset_right = 1220.0
-offset_bottom = 355.0
+offset_bottom = 360.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin"]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox"]
+[node name="PortraitRect" type="TextureRect" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
 text = "Davi Reis"
 
-[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox"]
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox"]
 layout_mode = 2
 text = "PV: 90/90"
 
-[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox"]
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox"]
 layout_mode = 2
 text = "Estabilidade: 100/100"
 
-[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/VBox"]
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
 text = "Fase: Espera"
