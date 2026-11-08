@@ -62,6 +62,9 @@ func avancar_tempo(delta: float) -> Array[Dictionary]:
 		elif fase == FaseTurno.CONJURACAO:
 			_avancar_fase_conjuracao(c, delta, eventos)
 		combatentes[i] = c
+	eventos.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("excesso", 0.0)) > float(b.get("excesso", 0.0))
+	)
 	return eventos
 
 
@@ -71,7 +74,10 @@ func _avancar_fase_espera(c: Dictionary, delta: float, eventos: Array[Dictionary
 	if pos >= 100.0:
 		c["posicao_tempo"] = 100.0
 		c["fase_turno"] = FaseTurno.DECISAO
-		eventos.append({"id": str(c.get("id", "")), "evento": "DECISAO", "combatente": c})
+		eventos.append({
+			"id": str(c.get("id", "")), "evento": "DECISAO",
+			"combatente": c, "excesso": pos - 100.0
+		})
 	else:
 		c["posicao_tempo"] = pos
 

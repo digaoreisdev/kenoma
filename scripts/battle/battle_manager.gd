@@ -28,37 +28,58 @@ var enemies: Array[Dictionary] = []
 var active_actor_index: int = 0
 var is_player_turn: bool = true
 var timeline: BattleTimeline = BattleTimeline.new()
+var fila_de_acoes: Array[String] = []
 
 
 func _process(delta: float) -> void:
-	if current_state != BattleState.AGUARDANDO_TURNO:
-		return
-	if _verificar_proximo_turno():
+	if current_state == BattleState.VITORIA or current_state == BattleState.DERROTA or current_state == BattleState.INICIALIZANDO:
 		return
 	var eventos: Array[Dictionary] = timeline.avancar_tempo(delta * timeline_speed_scale)
 	timeline_updated.emit()
 	if not eventos.is_empty():
 		_processar_eventos_timeline(eventos)
+	_verificar_proximo_turno()
 
 
 func _verificar_proximo_turno() -> bool:
-	if timeline == null:
+	if current_state != BattleState.AGUARDANDO_TURNO:
 		return false
+	_sincronizar_combatentes_prontos()
+	while not fila_de_acoes.is_empty():
+		var c_id: String = fila_de_acoes.pop_front()
+		var c: Dictionary = timeline.obter_combatente(c_id)
+		if c.is_empty():
+			continue
+		_processar_evento_decisao(c_id, c)
+		return true
+	return false
+
+
+func _sincronizar_combatentes_prontos() -> void:
+	if timeline == null:
+		return
+	var prontos: Array[Dictionary] = []
 	for c: Dictionary in timeline.combatentes:
 		if int(c.get("fase_turno", BattleTimeline.FaseTurno.ESPERA)) == BattleTimeline.FaseTurno.DECISAO:
-			var c_id: String = str(c.get("id", ""))
-			_processar_evento_decisao(c_id, c)
-			return true
-	return false
+			prontos.append(c)
+	prontos.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("velocidade", 0.0)) > float(b.get("velocidade", 0.0))
+	)
+	for c: Dictionary in prontos:
+		_enfileirar_combatente_pronto(str(c.get("id", "")))
+
+
+func _enfileirar_combatente_pronto(c_id: String) -> void:
+	if not c_id.is_empty() and not fila_de_acoes.has(c_id):
+		fila_de_acoes.append(c_id)
 
 
 func _processar_eventos_timeline(eventos: Array[Dictionary]) -> void:
 	for ev: Dictionary in eventos:
 		var tipo: String = str(ev.get("evento", ""))
 		var c_id: String = str(ev.get("id", ""))
-		var c: Dictionary = ev.get("combatente", {})
-		if tipo == "DECISAO" and current_state == BattleState.AGUARDANDO_TURNO:
-			_processar_evento_decisao(c_id, c)
+		if tipo == "DECISAO":
+			_enfileirar_combatente_pronto(c_id)
 		elif tipo == "CONJURACAO_CONCLUIDA":
 			_processar_conjuracao_concluida(c_id)
 
@@ -121,8 +142,8 @@ func _eh_combatente_jogador(c_id: String, combatente: Dictionary) -> bool:
 
 func _processar_acao_inimigo(c_id: String, _combatente: Dictionary) -> void:
 	is_player_turn = false
-	timeline.iniciar_conjuracao(c_id, 30.0)
 	combatant_ready_for_action.emit(c_id, false)
+	_executar_ataque_inimigo(c_id)
 
 
 func _processar_conjuracao_concluida(c_id: String) -> void:
@@ -162,6 +183,7 @@ func initialize_battle(allies: Array[CharacterData], enemy_list: Array) -> void:
 	current_state = BattleState.INICIALIZANDO
 	party_members = allies.duplicate()
 	enemies = []
+	fila_de_acoes.clear()
 	for e: Variant in enemy_list:
 		enemies.append(_sanitize_enemy_dict(e))
 	active_actor_index = 0
@@ -300,6 +322,8 @@ func _aplicar_ruptura_combatente(defensor: Dictionary, def_id: String) -> void:
 	defensor["progresso_conjuracao"] = 0.0
 	defensor["irritado"] = false
 	defensor["em_recuperacao_ruptura"] = true
+	if not def_id.is_empty():
+		fila_de_acoes.erase(def_id)
 	if timeline != null and not def_id.is_empty():
 		var t_c: Dictionary = timeline.obter_combatente(def_id)
 		if not t_c.is_empty():
@@ -442,6 +466,10 @@ func _resetar_combatente_timeline(c_id: String, posicao: float) -> void:
 		t_comb["imunidade_interrupcao"] = false
 		if posicao == 0.0:
 			t_comb["defendendo"] = false
+	for e: Dictionary in enemies:
+		if str(e.get("id", "")) == c_id:
+			e["posicao_tempo"] = posicao
+			e["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
 
 
 func concluir_turno_combatente(combatente: Variant, posicao_inicial: float = 0.0) -> void:
@@ -462,6 +490,7 @@ func concluir_turno_combatente(combatente: Variant, posicao_inicial: float = 0.0
 	check_battle_end_conditions()
 	if current_state != BattleState.VITORIA and current_state != BattleState.DERROTA:
 		change_state(BattleState.AGUARDANDO_TURNO)
+		_verificar_proximo_turno()
 
 
 func is_all_enemies_defeated() -> bool:

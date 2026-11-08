@@ -81,35 +81,47 @@ grow_vertical = 2
 [node name="EnemyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
 offset_left = 60.0
-offset_top = 85.0
+offset_top = 80.0
 offset_right = 380.0
-offset_bottom = 245.0
+offset_bottom = 215.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin"]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+[node name="PortraitRect" type="TextureRect" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 text = "General Cassian"
 
-[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 text = "PV: 240/240"
 
-[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 text = "Estabilidade: 120/120"
 
-[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox"]
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.5, 1)
 text = "Fase: Espera"

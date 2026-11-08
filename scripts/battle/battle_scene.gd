@@ -23,10 +23,12 @@ extends Node2D
 @onready var ally2_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/HPLabel")
 @onready var ally2_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/EstLabel")
 @onready var ally2_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/FaseLabel")
-@onready var enemy_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/NameLabel")
-@onready var enemy_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/HPLabel")
-@onready var enemy_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/EstLabel")
-@onready var enemy_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/FaseLabel")
+@onready var enemy_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel")
+@onready var enemy_portrait_rect: TextureRect = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/PortraitRect")
+@onready var enemy_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/NameLabel")
+@onready var enemy_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/HPLabel")
+@onready var enemy_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/EstLabel")
+@onready var enemy_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/FaseLabel")
 @onready var party_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PartyContainer")
 @onready var enemy_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer")
 @onready var victory_banner: Control = get_node_or_null("CanvasLayer/UI/VictoryBanner")
@@ -64,6 +66,16 @@ func _inicializar_referencias_hud() -> void:
 		ally2_est_lbl = ally2_panel.find_child("EstLabel", true, false) as Label
 		ally2_fase_lbl = ally2_panel.find_child("FaseLabel", true, false) as Label
 		ally2_portrait_rect = ally2_panel.find_child("PortraitRect", true, false) as TextureRect
+	_inicializar_referencias_inimigo()
+
+
+func _inicializar_referencias_inimigo() -> void:
+	if enemy_panel != null and enemy_name_lbl == null:
+		enemy_name_lbl = enemy_panel.find_child("NameLabel", true, false) as Label
+		enemy_hp_lbl = enemy_panel.find_child("HPLabel", true, false) as Label
+		enemy_est_lbl = enemy_panel.find_child("EstLabel", true, false) as Label
+		enemy_fase_lbl = enemy_panel.find_child("FaseLabel", true, false) as Label
+		enemy_portrait_rect = enemy_panel.find_child("PortraitRect", true, false) as TextureRect
 
 
 
@@ -102,7 +114,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	if frames == null:
 		frames = _obter_fallback_frames_aliado(ally.character_id)
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(0.45, 0.45)
+	sprite.scale = Vector2(1.25, 1.25)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = Vector2(55.0 * idx, 40.0 * idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
@@ -139,7 +151,7 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 		if ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(0.45, 0.45)
+	sprite.scale = Vector2(1.25, 1.25)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = Vector2(-60.0 * idx, 60.0 * idx)
 	_tocar_idle_inimigo(sprite)
@@ -193,30 +205,84 @@ func _eh_aliado(c_id: String) -> bool:
 
 func _on_action_executed(actor_id: String, target_id: String, action_type: String) -> void:
 	if action_type == "ataque":
-		_executar_passo_ataque_tween(actor_id, target_id)
+		if actor_id == "lucas":
+			_executar_ataque_melee_lucas(actor_id, target_id)
+		elif actor_id == "davi":
+			_executar_ataque_aura_davi(actor_id, target_id)
+		else:
+			_executar_ataque_melee_boss(actor_id, target_id)
 	else:
 		_tocar_animacao_estacionaria(actor_id, action_type)
 
 
-func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:
-	var atk_sprite: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
-	var tgt_sprite: AnimatedSprite2D = _obter_sprite_combatente(target_id)
-	if atk_sprite == null:
-		return
-	var orig_pos: Vector2 = atk_sprite.position
-	var dash_vec: Vector2 = Vector2(-250.0, 0.0) if _eh_aliado(actor_id) else Vector2(250.0, 0.0)
-	if tgt_sprite != null:
-		var diff: Vector2 = tgt_sprite.global_position - atk_sprite.global_position
-		var dist: float = diff.length()
-		if dist > 60.0:
-			dash_vec = diff.normalized() * (dist - 50.0)
-	var anim: String = _obter_nome_anim_ataque(atk_sprite.sprite_frames, actor_id)
+func _executar_ataque_melee_lucas(actor_id: String, target_id: String) -> void:
+	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
+	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
+	if atk == null: return
+	var orig: Vector2 = atk.position
+	var dash: Vector2 = Vector2(-220.0, 0.0)
+	if tgt != null:
+		var diff: Vector2 = tgt.global_position - atk.global_position
+		if diff.length() > 60.0: dash = diff.normalized() * (diff.length() - 50.0)
+	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
-	tw.tween_property(atk_sprite, "position", orig_pos + dash_vec, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_callback(func(): _no_contato_golpe(atk_sprite, anim, target_id))
-	tw.tween_interval(0.25)
-	tw.tween_property(atk_sprite, "position", orig_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func(): _restaurar_idle(atk_sprite, actor_id, _eh_aliado(actor_id)))
+	tw.tween_property(atk, "position", orig + dash, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func(): _no_contato_golpe(atk, anim, target_id))
+	tw.tween_interval(0.35)
+	tw.tween_property(atk, "position", orig, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func(): _restaurar_idle(atk, actor_id, true))
+
+
+func _executar_ataque_aura_davi(actor_id: String, target_id: String) -> void:
+	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
+	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
+	if atk == null: return
+	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
+	if not anim.is_empty() and atk.sprite_frames != null and atk.sprite_frames.has_animation(anim):
+		atk.sprite_frames.set_animation_loop(anim, false)
+		atk.play(anim)
+	_criar_projetil_aura(atk, tgt, target_id)
+	var tw: Tween = create_tween()
+	tw.tween_interval(0.5)
+	tw.tween_callback(func(): _restaurar_idle(atk, actor_id, true))
+
+
+func _criar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, target_id: String) -> void:
+	var aura: ColorRect = ColorRect.new()
+	aura.custom_minimum_size = Vector2(28.0, 28.0)
+	aura.size = Vector2(28.0, 28.0)
+	aura.color = Color(0.3, 0.9, 2.5, 0.9)
+	aura.position = atk.global_position - Vector2(14.0, 14.0)
+	get_parent().add_child(aura)
+	var tgt_pos: Vector2 = tgt.global_position - Vector2(14.0, 14.0) if tgt != null else aura.position + Vector2(-300.0, 0.0)
+	var tw: Tween = create_tween()
+	tw.tween_property(aura, "position", tgt_pos, 0.35).set_trans(Tween.TRANS_SINE)
+	tw.tween_callback(func():
+		_tocar_reacao_alvo(target_id)
+		aura.queue_free()
+	)
+
+
+func _executar_ataque_melee_boss(actor_id: String, target_id: String) -> void:
+	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
+	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
+	if atk == null: return
+	var orig: Vector2 = atk.position
+	var dash: Vector2 = Vector2(160.0, 0.0)
+	if tgt != null:
+		var diff: Vector2 = tgt.global_position - atk.global_position
+		if diff.length() > 60.0: dash = diff.normalized() * (diff.length() - 50.0)
+	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
+	var tw: Tween = create_tween()
+	tw.tween_property(atk, "position", orig + dash, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func(): _no_contato_golpe(atk, anim, target_id))
+	tw.tween_interval(0.3)
+	tw.tween_property(atk, "position", orig, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func(): _restaurar_idle(atk, actor_id, false))
+
+
+func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:
+	_on_action_executed(actor_id, target_id, "ataque")
 
 
 func _no_contato_golpe(atk_sprite: AnimatedSprite2D, anim: String, target_id: String) -> void:
@@ -406,18 +472,34 @@ func _obter_textura_retrato(hero: CharacterData) -> Texture2D:
 
 
 func _update_enemy_hud() -> void:
-	if battle_manager.enemies.is_empty() or enemy_name_lbl == null:
+	if battle_manager.enemies.is_empty():
 		return
 	var en: Dictionary = battle_manager.enemies[0]
-	enemy_name_lbl.text = str(en.get("name", "Inimigo"))
-	if enemy_hp_lbl != null:
-		enemy_hp_lbl.text = "PV: %d/%d" % [int(en.get("current_hp", 0)), int(en.get("max_hp", 100))]
-	if enemy_est_lbl != null:
-		enemy_est_lbl.text = "Estabilidade: %d/%d" % [int(en.get("estabilidade_atual", 100)), int(en.get("estabilidade_max", 100))]
+	if enemy_portrait_rect != null:
+		var tex: Texture2D = _obter_textura_retrato_inimigo(en)
+		if tex != null and enemy_portrait_rect.texture != tex:
+			enemy_portrait_rect.texture = tex
+	if enemy_name_lbl != null: enemy_name_lbl.text = str(en.get("name", "Inimigo"))
+	if enemy_hp_lbl != null: enemy_hp_lbl.text = "PV: %d/%d" % [int(en.get("current_hp", 0)), int(en.get("max_hp", 100))]
+	if enemy_est_lbl != null: enemy_est_lbl.text = "Estabilidade: %d/%d" % [int(en.get("estabilidade_atual", 100)), int(en.get("estabilidade_max", 100))]
 	if enemy_fase_lbl != null:
-		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(str(en.get("id", "")))
+		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(str(en.get("id", ""))) if battle_manager.timeline != null else {}
 		var pos: float = float(c_comb.get("posicao_tempo", 0.0))
 		enemy_fase_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(str(en.get("id", ""))), pos]
+
+
+func _obter_textura_retrato_inimigo(en: Dictionary) -> Texture2D:
+	var path: String = "res://assets/art/portraits/cassian/cassian_neutral.png"
+	var hp: int = int(en.get("current_hp", 100))
+	var m_hp: int = int(en.get("max_hp", 100))
+	var est: int = int(en.get("estabilidade_atual", 100))
+	if est <= 0 or hp < int(m_hp * 0.3):
+		path = "res://assets/art/portraits/cassian/cassian_hurt.png"
+	elif bool(en.get("irritado", false)):
+		path = "res://assets/art/portraits/cassian/cassian_angry.png"
+	if ResourceLoader.exists(path):
+		return load(path) as Texture2D
+	return null
 
 
 func _obter_nome_fase(c_id: String) -> String:

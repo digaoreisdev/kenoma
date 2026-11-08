@@ -67,7 +67,7 @@ static func create_general_cassian() -> Resource:
 		frames = load(FRAMES_PATH) as SpriteFrames
 	var script: GDScript = load("res://scripts/core/enemy_data.gd")
 	var boss: Resource = script.new(
-		"general_cassian", "General Cassian", 240, 120, 20, 14, 12, frames
+		"general_cassian", "General Cassian", 240, 120, 20, 14, 13, frames
 	)
 	boss.set("is_boss", true)
 	boss.set("exp_recompensa", 350)

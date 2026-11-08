@@ -23,6 +23,9 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	p = p and test_battle_hud_portraits_hook()
 	p = p and test_cassian_stability_withstands_multiple_hits()
 	p = p and test_boss_action_opportunity_and_grace_period()
+	p = p and test_parallel_timeline_and_action_queue_ordering()
+	p = p and test_distinct_melee_vs_ranged_attack_paths()
+	p = p and test_boss_turn_frequency_in_multiparty_encounter()
 	return p
 
 
@@ -434,6 +437,66 @@ static func test_boss_action_opportunity_and_grace_period() -> bool:
 	assert(golpe_imune["ruptura"] == false, "Must not trigger rupture during immunity")
 	bm.free()
 	return true
+
+
+static func test_parallel_timeline_and_action_queue_ordering() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var davi: CharacterData = CharacterData.create_default_davi()
+	var cassian: Resource = EnemyDataScript.create_general_cassian()
+	bm.initialize_battle([lucas, davi], [cassian])
+	bm._process(15.0)
+	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Lucas at 100 enters SELECIONANDO_ACAO")
+	bm._process(5.0)
+	var t_c: Dictionary = bm.timeline.obter_combatente("general_cassian")
+	var t_d: Dictionary = bm.timeline.obter_combatente("davi")
+	assert(t_c["posicao_tempo"] >= 100.0, "Cassian timeline must progress in parallel to 100")
+	assert(t_d["posicao_tempo"] >= 100.0, "Davi timeline must progress in parallel to 100")
+	assert(bm.fila_de_acoes.has("general_cassian"), "Cassian must be queued in fila_de_acoes")
+	bm.free()
+	return true
+
+
+static func test_distinct_melee_vs_ranged_attack_paths() -> bool:
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	assert(scene != null, "BattleScene must instantiate")
+	assert(scene.has_method("_executar_ataque_melee_lucas"), "Must implement Lucas melee attack path")
+	assert(scene.has_method("_executar_ataque_aura_davi"), "Must implement Davi aura/cast attack path")
+	assert(scene.has_method("_executar_ataque_melee_boss"), "Must implement Boss melee attack path")
+	assert(scene.has_method("_criar_projetil_aura"), "Must implement projectile tween creator")
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(scene)
+	var cassian_port: TextureRect = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/PortraitRect") as TextureRect
+	assert(cassian_port != null, "EnemyPanel PortraitRect must exist for Cassian")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(scene)
+	scene.free()
+	return true
+
+
+static func test_boss_turn_frequency_in_multiparty_encounter() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var davi: CharacterData = CharacterData.create_default_davi()
+	var cassian: Resource = EnemyDataScript.create_general_cassian()
+	bm.initialize_battle([lucas, davi], [cassian])
+	var order: Array[String] = []
+	bm.action_executed.connect(func(atk: String, _def: String, _tipo: String) -> void:
+		order.append(atk)
+	)
+	bm._process(15.0)
+	bm.executar_ataque_basico(lucas, bm.enemies[0])
+	bm._process(4.0)
+	assert(order.size() >= 2, "Both Lucas and Cassian must have executed actions")
+	assert(order[0] == "lucas", "Lucas acts 1st")
+	assert(order[1] == "general_cassian", "Cassian acts 2nd between Lucas and Davi")
+	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Davi ready for action")
+	assert(bm.get_active_actor().character_id == "davi", "Davi acts 3rd")
+	bm.free()
+	return true
+
 
 
 
