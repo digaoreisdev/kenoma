@@ -3,6 +3,8 @@ extends Node2D
 
 ## Cena de combate com arena visual de combatentes, HUD e comandos de ação.
 
+const LayoutScript = preload("res://scripts/battle/battle_scene_layout.gd")
+
 @onready var battle_manager: BattleManager = get_node_or_null("BattleManager")
 @onready var state_label: Label = get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/StateLabel")
 @onready var turn_label: Label = get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/TurnLabel")
@@ -55,9 +57,13 @@ extends Node2D
 var ally_sprites: Dictionary = {}
 var enemy_sprites: Dictionary = {}
 var timeline_badges: Dictionary = {}
+var layout_cenario: Resource = null
+var modo_encontro: String = "PADRAO"
+var modo_encontro_override: String = ""
 
 
 func _ready() -> void:
+	_carregar_layout_cenario()
 	_inicializar_referencias_hud()
 	_configurar_texturas_cenario()
 	_iniciar_pulsacao_cristal()
@@ -167,9 +173,34 @@ func _connect_buttons() -> void:
 
 
 func _setup_arena_combatants(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
+	var is_boss: bool = _verificar_se_grupo_eh_chefe(enemy_list)
+	_determinar_modo_encontro(is_boss)
 	_spawn_allies(allies)
 	_spawn_enemies(enemy_list)
 	_setup_timeline_badges(allies, enemy_list)
+
+
+func _verificar_se_grupo_eh_chefe(enemy_list: Array[Dictionary]) -> bool:
+	for e: Dictionary in enemy_list:
+		if str(e.get("name", "")).contains("Cassian") or e.get("is_boss", false):
+			return true
+	return false
+
+
+func _determinar_modo_encontro(is_boss: bool) -> void:
+	if not modo_encontro_override.is_empty():
+		modo_encontro = modo_encontro_override
+		return
+	if is_boss:
+		modo_encontro = "PADRAO"
+		return
+	var roll: float = randf()
+	if roll < 0.20:
+		modo_encontro = "HEROIS_ENCURRALAM"
+	elif roll < 0.40:
+		modo_encontro = "MONSTROS_ENCURRALAM"
+	else:
+		modo_encontro = "PADRAO"
 
 
 func _setup_timeline_badges(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
@@ -296,20 +327,29 @@ func _iniciar_pulsacao_cristal() -> void:
 	tw.tween_property(miasma_crystal_prop, "modulate:a", 1.0, 1.2).set_trans(Tween.TRANS_SINE)
 
 
-func _obter_posicao_base_aliado(c_id: String, idx: int, total_aliados: int = 2, fileira: String = "VANGUARDA") -> Vector2:
-	var em_retaguarda: bool = (fileira == "RETAGUARDA") or (total_aliados >= 4 and idx >= 2)
-	var x_offset: float = 100.0 if em_retaguarda else 0.0
-	if total_aliados <= 1:
-		return Vector2(x_offset, -35.0)
-	if total_aliados == 2:
-		var y_pos: float = 0.0 if (idx == 0 or c_id == "lucas") else -70.0
-		var x_iso: float = 0.0 if (idx == 0 or c_id == "lucas") else 10.0
-		return Vector2(x_offset + x_iso, y_pos)
-	if total_aliados == 3:
-		var y_pos3: float = -80.0 if idx == 0 else (-20.0 if idx == 1 else 40.0)
-		return Vector2(x_offset + (10.0 if idx != 1 else 0.0), y_pos3)
-	var y_pos4: float = -70.0 if (idx % 2 == 1) else 0.0
-	return Vector2(x_offset + (10.0 if idx % 2 == 1 else 0.0), y_pos4)
+func _carregar_layout_cenario() -> void:
+	if layout_cenario != null:
+		return
+	const PATH_VILA: String = "res://resources/battle_layouts/layout_vila_forja.tres"
+	if ResourceLoader.exists(PATH_VILA):
+		layout_cenario = load(PATH_VILA)
+	if layout_cenario == null:
+		layout_cenario = LayoutScript.new()
+
+
+func _obter_posicao_base_aliado(_c_id: String, idx: int, _total_aliados: int = 2, _fileira: String = "VANGUARDA") -> Vector2:
+	if layout_cenario == null:
+		_carregar_layout_cenario()
+	var tatica: String = "LINHA_2X2"
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null and tree.root.has_node("PartyManager"):
+		var pm: Node = tree.root.get_node("PartyManager")
+		if pm.has_method("obter_tatica"):
+			tatica = pm.obter_tatica()
+	var modo: String = modo_encontro_override if not modo_encontro_override.is_empty() else modo_encontro
+	var pos_global: Vector2 = layout_cenario.obter_posicao_aliado(idx, tatica, modo)
+	var base_container: Vector2 = party_container.position if party_container != null else Vector2(940.0, 510.0)
+	return pos_global - base_container
 
 
 func _criar_sprite_aliado(ally: CharacterData, idx: int, total_aliados: int = 2) -> void:
@@ -354,7 +394,8 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	var e_id: String = str(e.get("id", "inimigo_%d" % idx))
 	sprite.name = e_id
 	var frames: SpriteFrames = e.get("sprite_frames") as SpriteFrames
-	if frames == null and str(e.get("name", "")).contains("Cassian"):
+	var is_boss: bool = str(e.get("name", "")).contains("Cassian") or e.get("is_boss", false)
+	if frames == null and is_boss:
 		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
 		if ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
@@ -362,11 +403,23 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	sprite.scale = Vector2(0.9, 0.9)
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(-50.0 * idx, 50.0 * idx)
+	var total_inimigos: int = 1
+	if battle_manager != null and not battle_manager.enemies.is_empty():
+		total_inimigos = battle_manager.enemies.size()
+	sprite.position = _obter_posicao_base_inimigo(idx, total_inimigos, is_boss)
 	_tocar_idle_inimigo(sprite)
 	_adicionar_sombra_pe(sprite)
 	enemy_container.add_child(sprite)
 	enemy_sprites[e_id] = sprite
+
+
+func _obter_posicao_base_inimigo(idx: int, total_inimigos: int, is_boss: bool) -> Vector2:
+	if layout_cenario == null:
+		_carregar_layout_cenario()
+	var modo: String = modo_encontro_override if not modo_encontro_override.is_empty() else modo_encontro
+	var pos_global: Vector2 = layout_cenario.obter_posicao_inimigo(idx, total_inimigos, is_boss, modo)
+	var base_container: Vector2 = enemy_container.position if enemy_container != null else Vector2(420.0, 470.0)
+	return pos_global - base_container
 
 
 func _adicionar_sombra_pe(sprite: AnimatedSprite2D) -> void:

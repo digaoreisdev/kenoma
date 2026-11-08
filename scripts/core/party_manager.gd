@@ -12,6 +12,15 @@ var unassigned_primordials: Array[PrimordialData] = []
 var gold: int = 0
 var playtime_seconds: float = 0.0
 var current_map_name: String = "Ruínas de Kenoma"
+var tatica_formacao: String = "LINHA_2X2"
+
+const TATICAS_VALIDAS: Array[String] = [
+	"LINHA_2X2",
+	"LOSANGO",
+	"VANGUARDA_3X1",
+	"RETAGUARDA_1X3",
+	"MEIA_LUA"
+]
 
 
 func _ready() -> void:
@@ -36,8 +45,21 @@ func reset_to_defaults() -> void:
 	unassigned_primordials.clear()
 	unassigned_primordials.append(PrimordialData.create_ignis())
 	add_item(ItemData.create_potion(), 3)
+	tatica_formacao = "LINHA_2X2"
 	party_updated.emit()
 	inventory_updated.emit()
+
+
+func definir_tatica(nova_tatica: String) -> bool:
+	if nova_tatica in TATICAS_VALIDAS:
+		tatica_formacao = nova_tatica
+		party_updated.emit()
+		return true
+	return false
+
+
+func obter_tatica() -> String:
+	return tatica_formacao
 
 
 func get_inventory() -> Array[Dictionary]:

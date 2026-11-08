@@ -43,6 +43,7 @@ static func _run_group_b() -> bool:
 	p = p and test_eiyuden_ui_dock_and_banner_instantiation()
 	p = p and test_village_arena_layers_and_z_indexing()
 	p = p and test_flat_plaza_party_and_enemy_positioning()
+	p = p and test_tactical_encirclement_modes()
 	p = p and test_melee_dash_straight_horizontal_and_return()
 	p = p and test_attack_aligns_to_target_line_before_advancing()
 	return p
@@ -683,16 +684,32 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
 	assert(enemy_cont.position == Vector2(420.0, 470.0), "EnemyContainer must be at (420, 470)")
 	assert(party_cont.position == Vector2(940.0, 510.0), "PartyContainer must be at (940, 510)")
+	var boss_pos: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 1, true)
+	assert(boss_pos == Vector2(640.0, 465.0), "Single boss must be at central top of plaza floor")
 	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("lucas", 0, 2)
 	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1, 2)
 	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2, 4)
 	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3, 4)
-	assert(p0 == Vector2(940.0, 510.0) and p1 == Vector2(950.0, 440.0), "Lucas and Davi side by side")
-	assert(p2 == Vector2(1040.0, 510.0) and p3 == Vector2(1050.0, 440.0), "Slots 3 and 4 back rank")
-	assert(abs(p0.x - p1.x) <= 15.0, "2-hero party stands side-by-side along rank")
-	assert(p0.y - p1.y >= 60.0, "Lucas and Davi have clear vertical separation")
-	for p: Vector2 in [enemy_cont.position, p0, p1, p2, p3]:
-		assert(p.y >= 350.0 and p.y <= 550.0, "Combatant Y within visible viewport bounds")
+	assert(p0 == Vector2(820.0, 530.0), "Hero 1 is at central plaza floor position")
+	assert(p1 == Vector2(970.0, 480.0), "Hero 2 is clearly separated and not overlapping")
+	assert(p0 != p1 and p1 != p2 and p2 != p3, "No two hero slots share the same position")
+	scene.free()
+	return true
+
+
+static func test_tactical_encirclement_modes() -> bool:
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var enemy_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
+	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
+	scene.modo_encontro_override = "HEROIS_ENCURRALAM"
+	var cerco_h0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 0, 4)
+	var cerco_h1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 1, 4)
+	assert(cerco_h0.x > 800.0 and cerco_h1.x < 500.0, "Heroes surround monsters from East and West")
+	scene.modo_encontro_override = "MONSTROS_ENCURRALAM"
+	var cerco_m0: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 4, false)
+	var cerco_m1: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(1, 4, false)
+	assert(cerco_m0.x > 800.0 and cerco_m1.x < 500.0, "Monsters surround heroes from East and West")
 	scene.free()
 	return true
 
