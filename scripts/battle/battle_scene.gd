@@ -247,7 +247,9 @@ func _spawn_allies(allies: Array[CharacterData]) -> void:
 
 static func obter_caminho_ceu() -> String:
 	const P: String = "res://assets/art/battle_backgrounds/baltazar_village/layer_01_ceu.png"
-	return P if ResourceLoader.exists(P) else ""
+	if ResourceLoader.exists(P):
+		return P
+	return obter_caminho_background()
 
 
 static func obter_caminho_casas() -> String:
@@ -266,9 +268,9 @@ static func obter_caminho_background() -> String:
 		var p: String = BASE_DIR + "battle_bg_forge_village." + ext
 		if ResourceLoader.exists(p):
 			return p
-	var p_ceu: String = obter_caminho_ceu()
-	if not p_ceu.is_empty():
-		return p_ceu
+	var p_sign: String = BASE_DIR + "battle_fg_signpost_village.png"
+	if ResourceLoader.exists(p_sign):
+		return p_sign
 	const P_FALLBACK: String = "res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png"
 	if ResourceLoader.exists(P_FALLBACK):
 		return P_FALLBACK
@@ -276,6 +278,9 @@ static func obter_caminho_background() -> String:
 
 
 static func obter_caminho_foreground() -> String:
+	const FG_MOLDURA: String = "res://assets/art/battle_backgrounds/baltazar_village/battle_fg_praca_moldura.png"
+	if ResourceLoader.exists(FG_MOLDURA):
+		return FG_MOLDURA
 	const FG_PATH: String = "res://assets/art/props/battle/battle_fg_signpost_village.png"
 	if ResourceLoader.exists(FG_PATH):
 		return FG_PATH
@@ -303,10 +308,7 @@ static func _carregar_textura_layer(rect: TextureRect, path: String) -> void:
 
 
 func _configurar_texturas_cenario() -> void:
-	var ceu_path: String = obter_caminho_ceu()
-	if not ceu_path.is_empty() and arena_background != null:
-		arena_background.texture = load(ceu_path) as Texture2D
-	elif arena_background != null:
+	if arena_background != null:
 		var bg_path: String = obter_caminho_background()
 		if not bg_path.is_empty():
 			arena_background.texture = load(bg_path) as Texture2D

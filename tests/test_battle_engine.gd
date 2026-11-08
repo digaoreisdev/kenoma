@@ -665,20 +665,17 @@ static func test_village_arena_layers_and_z_indexing() -> bool:
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var bg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaBackground") as TextureRect
 	var fg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaForeground") as TextureRect
-	var casas: TextureRect = scene.get_node_or_null("CanvasLayer/UI/LayerCasas") as TextureRect
-	var chao: TextureRect = scene.get_node_or_null("CanvasLayer/UI/LayerChao") as TextureRect
-	var bigorna: TextureRect = scene.get_node_or_null("CanvasLayer/UI/PropBigorna") as TextureRect
-	var fire: AnimatedSprite2D = scene.get_node_or_null("CanvasLayer/UI/ForgeFurnaceFire") as AnimatedSprite2D
+	var birds: Node2D = scene.get_node_or_null("CanvasLayer/UI/DistantBirds") as Node2D
+	var ally_panel: PanelContainer = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel") as PanelContainer
+	var action_panel: PanelContainer = scene.get_node_or_null("CanvasLayer/UI/ActionCommandPanel") as PanelContainer
 	assert(bg != null and fg != null, "ArenaBackground and ArenaForeground must exist")
-	assert(casas != null and chao != null and bigorna != null, "Layered arena nodes must exist")
 	assert(bg.z_index == -10, "Background z_index must be -10")
-	assert(casas.z_index == -8 and chao.z_index == -5, "Casas and Chao z_index check")
-	assert(bigorna.z_index == 5 and fg.z_index == 10, "Bigorna and Foreground z_index check")
-	assert(fire != null and fire.sprite_frames != null, "Furnace fire must exist with frames")
-	assert(fire.sprite_frames.get_animation_speed("default") <= 4.0, "Fire speed must be slow")
-	assert(not BattleScene.obter_caminho_ceu().is_empty(), "Ceu path must resolve")
-	assert(not BattleScene.obter_caminho_casas().is_empty(), "Casas path must resolve")
-	assert(not BattleScene.obter_caminho_chao().is_empty(), "Chao path must resolve")
+	assert(fg.z_index == 10, "Foreground z_index must be 10")
+	assert(birds != null and birds.z_index == -9, "DistantBirds sky ambiance must exist at z=-9")
+	assert(ally_panel != null and ally_panel.offset_top < 400.0, "AllyPanel must be placed in the upper right dock (Y < 400)")
+	assert(action_panel != null and action_panel.offset_top < 800.0, "ActionCommandPanel must be raised comfortably above screen edge (Y < 800)")
+	assert(not BattleScene.obter_caminho_background().is_empty(), "Background path must resolve")
+	assert(not BattleScene.obter_caminho_foreground().is_empty(), "Foreground path must resolve")
 	scene.free()
 	return true
 
@@ -704,8 +701,8 @@ static func test_tactical_formations_clear_of_anvil_and_action_menu() -> bool:
 		for slot: int in range(4):
 			var pos: Vector2 = layout.obter_posicao_aliado(slot, f, "PADRAO", vp)
 			assert(pos.x <= 0.75 * vp.x, "Slot %d in %s must stay clear of the anvil (X <= 0.75*W)" % [slot, f])
-			assert(pos.y < 910.0, "Slot %d in %s must stay above the action menu (Y < 910)" % [slot, f])
-			assert(pos.y >= 0.60 * vp.y, "Slot %d in %s must stay on the earthen road" % [slot, f])
+			assert(pos.y < 750.0, "Slot %d in %s must stay above the action menu (Y < 750)" % [slot, f])
+			assert(pos.y >= 0.50 * vp.y, "Slot %d in %s must stay on the plaza area" % [slot, f])
 	return true
 
 
@@ -719,8 +716,8 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(0)
 	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(1)
 	var e0: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 1, false)
-	assert(p0.x > 1000.0 and p0.y > 700.0, "Hero Slot 1 in LINHA_2X2 scaled to 1920x1080")
-	assert(e0.x < 500.0 and e0.y > 700.0, "Enemy Slot 1 on left road at 1920x1080")
+	assert(p0.x > 1000.0 and p0.y >= 540.0 and p0.y <= 700.0, "Hero Slot 1 in LINHA_2X2 raised to plaza Y 540..700")
+	assert(e0.x < 500.0 and e0.y >= 540.0 and e0.y <= 700.0, "Enemy Slot 1 on left road at Y 540..700")
 	assert(p0 != p1, "Hero slots 1 and 2 must not overlap")
 	scene.free()
 	return true

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://w15rabbu4kds"
-path="res://.godot/imported/layer_03_chao.png-f1e9f602119cc0829340547d2c5a3675.ctex"
+uid="uid://do2uq00gotwrq"
+path="res://.godot/imported/battle_fg_praca_moldura.png-2b86505ce32aa5052020e9bd3bf46376.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/battle_backgrounds/baltazar_village/layer_03_chao.png"
-dest_files=["res://.godot/imported/layer_03_chao.png-f1e9f602119cc0829340547d2c5a3675.ctex"]
+source_file="res://assets/art/battle_backgrounds/baltazar_village/battle_fg_praca_moldura.png"
+dest_files=["res://.godot/imported/battle_fg_praca_moldura.png-2b86505ce32aa5052020e9bd3bf46376.ctex"]
 
 [params]
 

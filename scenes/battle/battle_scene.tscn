@@ -3,12 +3,8 @@
 [ext_resource type="Script" path="res://scripts/battle/battle_scene.gd" id="1_scene_script"]
 [ext_resource type="Script" path="res://scripts/battle/battle_manager.gd" id="2_mgr_script"]
 [ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.png" id="3_bg_village"]
-[ext_resource type="Texture2D" path="res://assets/art/props/battle/battle_fg_signpost_village.png" id="4_fg_signpost"]
-[ext_resource type="SpriteFrames" path="res://assets/art/props/battle/vfx_fogo_fornalha_frames.tres" id="5_fire_frames"]
-[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/layer_01_ceu.png" id="6_ceu"]
-[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/layer_02_casas.png" id="7_casas"]
-[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/layer_03_chao.png" id="8_chao"]
-[ext_resource type="Texture2D" path="res://assets/art/props/battle/prop_bigorna_forja.png" id="9_bigorna"]
+[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/battle_fg_praca_moldura.png" id="4_fg_moldura"]
+[ext_resource type="Script" path="res://scripts/battle/distant_birds.gd" id="5_birds_script"]
 
 [node name="BattleScene" type="Node2D"]
 script = ExtResource("1_scene_script")
@@ -34,56 +30,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("6_ceu")
+texture = ExtResource("3_bg_village")
 expand_mode = 1
 stretch_mode = 0
 
-[node name="LayerCasas" type="TextureRect" parent="CanvasLayer/UI"]
-z_index = -8
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("7_casas")
-expand_mode = 1
-stretch_mode = 0
-
-[node name="ForgeFurnaceFire" type="AnimatedSprite2D" parent="CanvasLayer/UI"]
-z_index = -7
-position = Vector2(1026, 342)
-scale = Vector2(0.45, 0.45)
-sprite_frames = ExtResource("5_fire_frames")
-autoplay = "default"
-
-[node name="ForgeEmbers" type="CPUParticles2D" parent="CanvasLayer/UI"]
-z_index = -6
-position = Vector2(1026, 330)
-amount = 16
-lifetime = 2.8
-direction = Vector2(-0.4, -1)
-spread = 25.0
-gravity = Vector2(0, -10)
-initial_velocity_min = 15.0
-initial_velocity_max = 30.0
-scale_amount_min = 1.5
-scale_amount_max = 2.8
-color = Color(1, 0.65, 0.1, 0.9)
-
-[node name="LayerChao" type="TextureRect" parent="CanvasLayer/UI"]
-z_index = -5
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("8_chao")
-expand_mode = 1
-stretch_mode = 0
+[node name="DistantBirds" type="Node2D" parent="CanvasLayer/UI"]
+z_index = -9
+script = ExtResource("5_birds_script")
 
 [node name="Arena" type="Node2D" parent="CanvasLayer/UI"]
 y_sort_enabled = true
@@ -96,19 +49,6 @@ position = Vector2(420, 470)
 y_sort_enabled = true
 position = Vector2(940, 510)
 
-[node name="PropBigorna" type="TextureRect" parent="CanvasLayer/UI"]
-z_index = 5
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("9_bigorna")
-expand_mode = 1
-stretch_mode = 0
-
 [node name="ArenaForeground" type="TextureRect" parent="CanvasLayer/UI"]
 z_index = 10
 layout_mode = 1
@@ -118,7 +58,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("4_fg_signpost")
+texture = ExtResource("4_fg_moldura")
 expand_mode = 1
 stretch_mode = 0
 
@@ -287,10 +227,10 @@ text = "Fase: Espera"
 
 [node name="AllyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
-offset_left = 1540.0
-offset_top = 770.0
+offset_left = 1520.0
+offset_top = 80.0
 offset_right = 1880.0
-offset_bottom = 900.0
+offset_bottom = 205.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel"]
 layout_mode = 2
@@ -365,10 +305,10 @@ text = "Fase: Espera"
 
 [node name="AllyPanel2" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
-offset_left = 1540.0
-offset_top = 915.0
+offset_left = 1520.0
+offset_top = 215.0
 offset_right = 1880.0
-offset_bottom = 1045.0
+offset_bottom = 340.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2"]
 layout_mode = 2
@@ -445,9 +385,9 @@ text = "Fase: Espera"
 visible = false
 layout_mode = 0
 offset_left = 720.0
-offset_top = 915.0
+offset_top = 750.0
 offset_right = 1200.0
-offset_bottom = 1050.0
+offset_bottom = 885.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/ActionCommandPanel"]
 layout_mode = 2
@@ -502,9 +442,9 @@ text = "Fugir"
 visible = false
 layout_mode = 0
 offset_left = 720.0
-offset_top = 870.0
+offset_top = 705.0
 offset_right = 1200.0
-offset_bottom = 1050.0
+offset_bottom = 885.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/SkillsPanel"]
 layout_mode = 2
