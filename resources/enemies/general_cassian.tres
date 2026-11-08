@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1_nwl0i"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/characters/cassian/General_Cassian_frames.tres" id="2_wv0a4"]
+
+[resource]
+script = ExtResource("1_nwl0i")
+id = "general_cassian"
+name = "General Cassian"
+max_hp = 240
+current_hp = 240
+estabilidade_max = 120
+estabilidade_atual = 120
+strength = 20
+defense = 14
+agility = 12
+sprite_frames = ExtResource("2_wv0a4")
+exp_recompensa = 350
+ouro_recompensa = 200

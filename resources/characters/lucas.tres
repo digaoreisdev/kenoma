@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/equipment_data.gd" id="1_vop3q"]
+[ext_resource type="Texture2D" path="res://assets/art/portraits/lucas/lucas_neutral.png" id="2_o74bp"]
+[ext_resource type="Script" path="res://scripts/core/character_data.gd" id="3_t4tox"]
+[ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="4_euep2"]
+[ext_resource type="SpriteFrames" path="res://assets/art/characters/player/player_frames.tres" id="5_i7upt"]
+
+[sub_resource type="Resource" id="Resource_1367e"]
+script = ExtResource("1_vop3q")
+id = "forge_hammer"
+name = "Martelo de Forja"
+weapon_type = 1
+stat_bonuses = {
+"strength": 6
+}
+sockets = Array[Dictionary]([{
+"gem": null,
+"unlocked": true
+}, {
+"gem": null,
+"unlocked": true
+}])
+
+[sub_resource type="Resource" id="Resource_vtfpt"]
+script = ExtResource("4_euep2")
+id = "runic_impact"
+name = "Impacto Rúnico"
+description = "Golpe pesado de marreta que abala a postura inimiga."
+mp_cost = 6
+
+[resource]
+script = ExtResource("3_t4tox")
+character_id = "lucas"
+name = "Lucas Reis"
+portrait = ExtResource("2_o74bp")
+sprite_frames = ExtResource("5_i7upt")
+weapon_affinities = {
+1: 1.3,
+2: 0.9,
+5: 0.8
+}
+skills = Array[ExtResource("4_euep2")]([SubResource("Resource_vtfpt")])
+equipment = {
+"accessory": null,
+"body": null,
+"head": null,
+"main_hand": SubResource("Resource_1367e"),
+"off_hand": null
+}

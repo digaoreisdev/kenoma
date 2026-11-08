@@ -20,8 +20,10 @@ extends Resource
 @export var magic_defense: int = 9
 @export var agility: int = 11
 @export var luck: int = 8
+@export var willpower: int = 10
 @export var current_exp: int = 0
 @export var next_level_exp: int = 100
+@export var sprite_frames: SpriteFrames = null
 
 # Afinidades de arma (chave: EquipmentData.WeaponType, valor: float)
 @export var weapon_affinities: Dictionary = {}
@@ -63,12 +65,13 @@ func _init(
 
 func get_base_stat(stat_name: String) -> int:
 	match stat_name:
-		"strength": return strength
-		"defense": return defense
-		"magic_power": return magic_power
-		"magic_defense": return magic_defense
-		"agility": return agility
-		"luck": return luck
+		"strength", "forca": return strength
+		"defense", "defesa": return defense
+		"magic_power", "poder_magico": return magic_power
+		"magic_defense", "defesa_magica": return magic_defense
+		"agility", "agilidade": return agility
+		"luck", "sorte": return luck
+		"willpower", "vontade": return willpower
 		"max_hp": return max_hp
 		"max_mp": return max_mp
 		_: return 0
@@ -133,6 +136,9 @@ static func create_default_lucas() -> CharacterData:
 	var lucas: CharacterData = CharacterData.new(
 		"lucas", "Lucas Reis", 1, 120, 120, 45, 45, portrait_tex, null
 	)
+	const FRAMES_PATH: String = "res://assets/art/characters/player/player_frames.tres"
+	if ResourceLoader.exists(FRAMES_PATH):
+		lucas.sprite_frames = load(FRAMES_PATH) as SpriteFrames
 	lucas.weapon_affinities = {
 		EquipmentData.WeaponType.HAMMER: 1.3,
 		EquipmentData.WeaponType.SWORD: 0.9,
@@ -141,3 +147,27 @@ static func create_default_lucas() -> CharacterData:
 	lucas.skills.append(SkillData.create_runic_impact())
 	lucas.equip(EquipmentData.create_forge_hammer(), "main_hand")
 	return lucas
+
+
+static func create_default_davi() -> CharacterData:
+	var frames: SpriteFrames = null
+	const FRAMES_PATH: String = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
+	if ResourceLoader.exists(FRAMES_PATH):
+		frames = load(FRAMES_PATH) as SpriteFrames
+	var davi: CharacterData = CharacterData.new(
+		"davi", "Davi Reis", 1, 90, 90, 60, 60, null, null
+	)
+	davi.strength = 8
+	davi.defense = 16
+	davi.agility = 11
+	davi.willpower = 15
+	davi.magic_defense = 15
+	davi.sprite_frames = frames
+	davi.weapon_affinities = {
+		EquipmentData.WeaponType.SHIELD: 1.3,
+		EquipmentData.WeaponType.CATALYST: 1.3,
+		EquipmentData.WeaponType.SWORD: 0.5,
+		EquipmentData.WeaponType.AXE: 0.5,
+		EquipmentData.WeaponType.HAMMER: 1.0,
+	}
+	return davi

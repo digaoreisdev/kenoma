@@ -26,7 +26,7 @@ func _process(delta: float) -> void:
 func reset_to_defaults() -> void:
 	party_slots = [
 		CharacterData.create_default_lucas(),
-		null,
+		CharacterData.create_default_davi(),
 		null,
 		null
 	]

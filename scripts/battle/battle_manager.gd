@@ -17,6 +17,7 @@ signal battle_initialized(allies: Array[CharacterData], enemies: Array[Dictionar
 signal battle_finished(is_victory: bool)
 signal timeline_updated
 signal combatant_ready_for_action(combatant_id: String, is_player: bool)
+signal action_executed(actor_id: String, target_id: String, action_type: String)
 
 @export var current_state: BattleState = BattleState.INICIALIZANDO
 
@@ -50,10 +51,31 @@ func _processar_eventos_timeline(eventos: Array[Dictionary]) -> void:
 func _processar_evento_decisao(c_id: String, combatente: Dictionary) -> void:
 	if _eh_combatente_jogador(c_id, combatente):
 		is_player_turn = true
+		_atualizar_ator_ativo(c_id)
 		change_state(BattleState.SELECIONANDO_ACAO)
 		combatant_ready_for_action.emit(c_id, true)
 	else:
 		_processar_acao_inimigo(c_id, combatente)
+
+
+func _atualizar_ator_ativo(c_id: String) -> void:
+	for i: int in range(party_members.size()):
+		if party_members[i] != null and party_members[i].character_id == c_id:
+			active_actor_index = i
+			return
+
+
+func get_active_actor() -> CharacterData:
+	if active_actor_index >= 0 and active_actor_index < party_members.size():
+		return party_members[active_actor_index]
+	return party_members[0] if not party_members.is_empty() else null
+
+
+func _obter_alvo_aliado_vivo() -> CharacterData:
+	for ally: CharacterData in party_members:
+		if ally != null and ally.current_hp > 0:
+			return ally
+	return party_members[0] if not party_members.is_empty() else null
 
 
 func _eh_combatente_jogador(c_id: String, combatente: Dictionary) -> bool:
@@ -87,18 +109,20 @@ func _executar_ataque_inimigo(c_id: String) -> void:
 	if party_members.is_empty():
 		return
 	change_state(BattleState.EXECUTANDO_ACAO)
-	var alvo: CharacterData = party_members[0]
+	var alvo: CharacterData = _obter_alvo_aliado_vivo()
 	var c: Dictionary = timeline.obter_combatente(c_id)
-	var dano_final: int = _calcular_dano_final(c, 15)
+	var dano_base: int = int(c.get("strength", 15))
+	var dano_final: int = _calcular_dano_final(c, dano_base)
 	alvo.current_hp = maxi(0, alvo.current_hp - dano_final)
+	action_executed.emit(c_id, alvo.character_id, "ataque")
 	concluir_turno_combatente(c, 0.0)
 
 
-func initialize_battle(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
+func initialize_battle(allies: Array[CharacterData], enemy_list: Array) -> void:
 	current_state = BattleState.INICIALIZANDO
 	party_members = allies.duplicate()
 	enemies = []
-	for e: Dictionary in enemy_list:
+	for e: Variant in enemy_list:
 		enemies.append(_sanitize_enemy_dict(e))
 	active_actor_index = 0
 	is_player_turn = true
@@ -119,32 +143,40 @@ func _inicializar_timeline() -> void:
 	for e: Dictionary in enemies:
 		timeline.adicionar_combatente({
 			"id": str(e.get("id")), "nome": str(e.get("name")),
-			"velocidade": float(e.get("velocidade", 20.0)),
+			"velocidade": float(e.get("velocidade", e.get("agility", 20.0))),
 			"estabilidade_max": int(e.get("estabilidade_max", 100)),
 			"estabilidade_atual": int(e.get("estabilidade_atual", 100)), "eh_jogador": false
 		})
 
 
-func _sanitize_enemy_dict(raw: Dictionary) -> Dictionary:
-	var m_hp: int = int(raw.get("max_hp", 100))
-	var c_hp: int = int(raw.get("current_hp", m_hp))
-	var est_max: int = int(raw.get("estabilidade_max", raw.get("stability", 100)))
-	var est_atual: int = int(raw.get("estabilidade_atual", est_max))
+func _extrair_dict_inimigo(raw: Variant) -> Dictionary:
+	if raw is Dictionary:
+		return raw as Dictionary
+	if raw is Object and (raw as Object).has_method("to_dictionary"):
+		return (raw as Object).to_dictionary() as Dictionary
+	return {}
+
+
+func _sanitize_enemy_dict(raw: Variant) -> Dictionary:
+	var d: Dictionary = _extrair_dict_inimigo(raw)
+	var m_hp: int = int(d.get("max_hp", 100))
+	var est_max: int = int(d.get("estabilidade_max", d.get("stability", 100)))
+	var est_atual: int = clampi(int(d.get("estabilidade_atual", est_max)), 0, est_max)
 	return {
-		"id": str(raw.get("id", "inimigo_" + str(enemies.size()))),
-		"name": str(raw.get("name", "Inimigo")),
-		"max_hp": m_hp,
-		"current_hp": clampi(c_hp, 0, m_hp),
-		"estabilidade_max": est_max,
-		"estabilidade_atual": clampi(est_atual, 0, est_max),
-		"irritado": bool(raw.get("irritado", false)),
-		"dano_quebra_estabilidade": int(raw.get("dano_quebra_estabilidade", 0)),
-		"posicao_tempo": float(raw.get("posicao_tempo", 0.0)),
-		"fase_turno": int(raw.get("fase_turno", BattleTimeline.FaseTurno.ESPERA)),
-		"defendendo": bool(raw.get("defendendo", false)),
-		"stability": est_atual,
-		"exp_recompensa": int(raw.get("exp_recompensa", raw.get("exp", 45))),
-		"ouro_recompensa": int(raw.get("ouro_recompensa", raw.get("gold", 30)))
+		"id": str(d.get("id", "inimigo_" + str(enemies.size()))),
+		"name": str(d.get("name", "Inimigo")),
+		"max_hp": m_hp, "current_hp": clampi(int(d.get("current_hp", m_hp)), 0, m_hp),
+		"estabilidade_max": est_max, "estabilidade_atual": est_atual,
+		"irritado": bool(d.get("irritado", false)), "defendendo": bool(d.get("defendendo", false)),
+		"dano_quebra_estabilidade": int(d.get("dano_quebra_estabilidade", 0)),
+		"posicao_tempo": float(d.get("posicao_tempo", 0.0)),
+		"fase_turno": int(d.get("fase_turno", BattleTimeline.FaseTurno.ESPERA)),
+		"stability": est_atual, "velocidade": float(d.get("velocidade", d.get("agility", 20.0))),
+		"strength": int(d.get("strength", d.get("forca", 15))),
+		"defense": int(d.get("defense", d.get("defesa", 10))),
+		"sprite_frames": d.get("sprite_frames"),
+		"exp_recompensa": int(d.get("exp_recompensa", d.get("exp", 45))),
+		"ouro_recompensa": int(d.get("ouro_recompensa", d.get("gold", 30)))
 	}
 
 
@@ -274,6 +306,14 @@ func _calcular_impacto_estabilidade(dados: Dictionary) -> int:
 	return 15
 
 
+func _obter_id_combatente(c: Variant) -> String:
+	if c is CharacterData:
+		return (c as CharacterData).character_id
+	if c is Dictionary:
+		return str((c as Dictionary).get("id", ""))
+	return ""
+
+
 func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
 	var dados_atk: Dictionary = _extrair_dados_ataque(atacante)
 	var dano_efetivo: int = _calcular_dano_ataque_basico(dados_atk)
@@ -286,16 +326,19 @@ func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
 		(defensor as CharacterData).current_hp = int(def_dict.get("current_hp", 0))
 	res["dano_efetivo"] = dano_efetivo
 	res["impacto_estabilidade"] = impacto
+	action_executed.emit(_obter_id_combatente(atacante), _obter_id_combatente(defensor), "ataque")
 	concluir_turno_combatente(atacante, 0.0)
 	return res
 
 
 func executar_defesa(combatente: Variant) -> Dictionary:
+	var c_id: String = _obter_id_combatente(combatente)
 	if combatente is Dictionary:
 		var c: Dictionary = combatente as Dictionary
 		c["defendendo"] = true
 		c["status"] = "DEFENDENDO"
 		concluir_turno_combatente(c, 30.0)
+		action_executed.emit(c_id, c_id, "defesa")
 		return {"defendendo": true, "posicao_tempo": float(c.get("posicao_tempo", 30.0))}
 	elif combatente is CharacterData:
 		var cd: CharacterData = combatente as CharacterData
@@ -304,6 +347,7 @@ func executar_defesa(combatente: Variant) -> Dictionary:
 			t_comb["defendendo"] = true
 			t_comb["status"] = "DEFENDENDO"
 		concluir_turno_combatente(cd, 30.0)
+		action_executed.emit(c_id, c_id, "defesa")
 		return {"defendendo": true, "posicao_tempo": 30.0}
 	return {}
 
@@ -324,6 +368,7 @@ func executar_item(combatente: Variant, item_data: ItemData, alvo: Variant) -> D
 		var novo_hp: int = mini(m_hp, c_hp + item_data.effect_value)
 		d["current_hp"] = novo_hp
 		cura = novo_hp - c_hp
+	action_executed.emit(_obter_id_combatente(combatente), _obter_id_combatente(alvo), "item")
 	concluir_turno_combatente(combatente, 0.0)
 	return {"sucesso": true, "cura": cura, "item": item_data.name}
 

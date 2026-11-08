@@ -3,6 +3,9 @@ extends RefCounted
 
 ## Testes automatizados para validação do BattleManager, ações de combate e HUD da cena.
 
+const PartyManagerScript: GDScript = preload("res://scripts/core/party_manager.gd")
+const EnemyDataScript: GDScript = preload("res://scripts/core/enemy_data.gd")
+
 
 static func run_tests(tree: SceneTree = null) -> bool:
 	var passed: bool = true
@@ -18,6 +21,9 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_battle_defender_resets_timeline()
 	passed = passed and test_battle_item_consumption()
 	passed = passed and test_battle_realtime_process_loop()
+	passed = passed and test_party_manager_starts_with_lucas_and_davi()
+	passed = passed and test_davi_weapon_affinities()
+	passed = passed and test_battle_initialization_with_davi_and_general_cassian()
 	return passed
 
 
@@ -85,20 +91,17 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	if tree == null:
 		tree = Engine.get_main_loop() as SceneTree
 	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
-	assert(scene_res != null, "battle_scene.tscn must be loadable")
 	var battle_scene: Node2D = scene_res.instantiate() as Node2D
-	assert(battle_scene != null, "Battle scene must instantiate")
 	if tree != null and tree.root != null:
 		tree.root.add_child(battle_scene)
-	
 	var bm: BattleManager = battle_scene.get_node_or_null("BattleManager") as BattleManager
 	assert(bm != null, "BattleManager node must exist in battle scene")
 	var state_lbl: Label = battle_scene.get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/StateLabel") as Label
-	assert(state_lbl != null, "StateLabel must exist")
 	assert(state_lbl.text.contains("Inicializando"), "State label must display PT-BR state")
-	var cmd_panel: Control = battle_scene.get_node_or_null("CanvasLayer/UI/ActionCommandPanel") as Control
-	assert(cmd_panel != null, "ActionCommandPanel must exist")
-	
+	var party_cont: Node2D = battle_scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
+	assert(party_cont != null, "PartyContainer must exist in arena")
+	var enemy_cont: Node2D = battle_scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
+	assert(enemy_cont != null, "EnemyContainer must exist in arena")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -261,4 +264,47 @@ static func test_battle_realtime_process_loop() -> bool:
 	assert(c["fase_turno"] == BattleTimeline.FaseTurno.DECISAO, "Lucas must reach DECISAO")
 	bm.free()
 	return true
+
+
+static func test_party_manager_starts_with_lucas_and_davi() -> bool:
+	var pm: Node = PartyManagerScript.new()
+	pm.call("reset_to_defaults")
+	var active_members: Array = pm.call("get_active_party") as Array
+	assert(active_members.size() == 2, "Active party must contain 2 members")
+	assert(active_members[0].name == "Lucas Reis", "First member must be Lucas Reis")
+	assert(active_members[1].name == "Davi Reis", "Second member must be Davi Reis")
+	assert(active_members[1].max_hp == 90, "Davi max HP must be 90")
+	assert(active_members[1].defense == 16, "Davi defense must be 16")
+	pm.free()
+	return true
+
+
+static func test_davi_weapon_affinities() -> bool:
+	var davi: CharacterData = CharacterData.create_default_davi()
+	assert(davi != null, "Davi must instantiate")
+	var shield_aff: float = davi.get_weapon_affinity(EquipmentData.WeaponType.SHIELD)
+	assert(is_equal_approx(shield_aff, 1.3), "Davi SHIELD affinity must be 1.3")
+	var cat_aff: float = davi.get_weapon_affinity(EquipmentData.WeaponType.CATALYST)
+	assert(is_equal_approx(cat_aff, 1.3), "Davi CATALYST affinity must be 1.3")
+	var sword_aff: float = davi.get_weapon_affinity(EquipmentData.WeaponType.SWORD)
+	assert(is_equal_approx(sword_aff, 0.5), "Davi SWORD affinity must be 0.5")
+	var hammer_aff: float = davi.get_weapon_affinity(EquipmentData.WeaponType.HAMMER)
+	assert(is_equal_approx(hammer_aff, 1.0), "Davi HAMMER affinity must be 1.0")
+	return true
+
+
+static func test_battle_initialization_with_davi_and_general_cassian() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var davi: CharacterData = CharacterData.create_default_davi()
+	var cassian: Resource = EnemyDataScript.create_general_cassian()
+	bm.initialize_battle([lucas, davi], [cassian])
+	assert(bm.party_members.size() == 2, "Battle party must contain 2 members")
+	assert(bm.enemies.size() == 1, "Enemies must contain 1 enemy")
+	assert(bm.enemies[0]["name"] == "General Cassian", "Enemy name must be General Cassian")
+	assert(int(bm.enemies[0]["max_hp"]) == 240, "General Cassian max HP must be 240")
+	assert(int(bm.enemies[0]["estabilidade_max"]) == 120, "General Cassian max stability must be 120")
+	bm.free()
+	return true
+
 

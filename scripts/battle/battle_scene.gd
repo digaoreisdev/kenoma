@@ -1,7 +1,7 @@
 class_name BattleScene
 extends Node2D
 
-## Cena de combate com HUD de combatentes e painel de comandos de ação.
+## Cena de combate com arena visual de combatentes, HUD e comandos de ação.
 
 @onready var battle_manager: BattleManager = get_node_or_null("BattleManager")
 @onready var state_label: Label = get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/StateLabel")
@@ -19,15 +19,24 @@ extends Node2D
 @onready var enemy_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/HPLabel")
 @onready var enemy_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/EstLabel")
 @onready var enemy_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/FaseLabel")
+@onready var party_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PartyContainer")
+@onready var enemy_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer")
+
+var ally_sprites: Dictionary = {}
+var enemy_sprites: Dictionary = {}
 
 
 func _ready() -> void:
 	if battle_manager != null:
 		battle_manager.battle_state_changed.connect(_on_state_changed)
 		battle_manager.timeline_updated.connect(_update_hud)
+		battle_manager.battle_initialized.connect(_setup_arena_combatants)
+		battle_manager.action_executed.connect(_on_action_executed)
 		_update_labels(battle_manager.current_state)
 		_update_hud()
 		_update_command_panel(battle_manager.current_state)
+		if not battle_manager.party_members.is_empty():
+			_setup_arena_combatants(battle_manager.party_members, battle_manager.enemies)
 	_connect_buttons()
 
 
@@ -40,6 +49,162 @@ func _connect_buttons() -> void:
 		btn_itens.pressed.connect(_on_itens_pressed)
 	if btn_fugir != null:
 		btn_fugir.pressed.connect(_on_fugir_pressed)
+
+
+func _setup_arena_combatants(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
+	_spawn_allies(allies)
+	_spawn_enemies(enemy_list)
+
+
+func _spawn_allies(allies: Array[CharacterData]) -> void:
+	if party_container == null:
+		return
+	for child: Node in party_container.get_children():
+		child.queue_free()
+	ally_sprites.clear()
+	for idx: int in range(allies.size()):
+		var ally: CharacterData = allies[idx]
+		if ally != null:
+			_criar_sprite_aliado(ally, idx)
+
+
+func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
+	var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
+	sprite.name = ally.character_id
+	var frames: SpriteFrames = ally.sprite_frames
+	if frames == null:
+		frames = _obter_fallback_frames_aliado(ally.character_id)
+	sprite.sprite_frames = frames
+	sprite.scale = Vector2(0.45, 0.45)
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sprite.position = Vector2(-70.0 * idx, 70.0 * idx)
+	_tocar_idle_aliado(sprite, ally.character_id)
+	party_container.add_child(sprite)
+	ally_sprites[ally.character_id] = sprite
+
+
+func _obter_fallback_frames_aliado(c_id: String) -> SpriteFrames:
+	var path: String = "res://assets/art/characters/player/player_frames.tres"
+	if c_id == "davi":
+		path = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
+	if ResourceLoader.exists(path):
+		return load(path) as SpriteFrames
+	return null
+
+
+func _spawn_enemies(enemy_list: Array[Dictionary]) -> void:
+	if enemy_container == null:
+		return
+	for child: Node in enemy_container.get_children():
+		child.queue_free()
+	enemy_sprites.clear()
+	for idx: int in range(enemy_list.size()):
+		_criar_sprite_inimigo(enemy_list[idx], idx)
+
+
+func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
+	var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
+	var e_id: String = str(e.get("id", "inimigo_%d" % idx))
+	sprite.name = e_id
+	var frames: SpriteFrames = e.get("sprite_frames") as SpriteFrames
+	if frames == null and str(e.get("name", "")).contains("Cassian"):
+		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
+		if ResourceLoader.exists(CASSIAN_PATH):
+			frames = load(CASSIAN_PATH) as SpriteFrames
+	sprite.sprite_frames = frames
+	sprite.scale = Vector2(0.45, 0.45)
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sprite.position = Vector2(70.0 * idx, 70.0 * idx)
+	_tocar_idle_inimigo(sprite)
+	enemy_container.add_child(sprite)
+	enemy_sprites[e_id] = sprite
+
+
+func _tocar_idle_aliado(sprite: AnimatedSprite2D, c_id: String) -> void:
+	if sprite == null or sprite.sprite_frames == null:
+		return
+	var anim: String = "idle_down_right"
+	if c_id == "davi":
+		anim = "iso_idle_southeast_right"
+	if not sprite.sprite_frames.has_animation(anim):
+		var anims: PackedStringArray = sprite.sprite_frames.get_animation_names()
+		anim = anims[0] if anims.size() > 0 else ""
+	if not anim.is_empty():
+		sprite.play(anim)
+
+
+func _tocar_idle_inimigo(sprite: AnimatedSprite2D) -> void:
+	if sprite == null or sprite.sprite_frames == null:
+		return
+	var anim: String = "Idle Southwest_right"
+	if not sprite.sprite_frames.has_animation(anim):
+		var anims: PackedStringArray = sprite.sprite_frames.get_animation_names()
+		anim = anims[0] if anims.size() > 0 else ""
+	if not anim.is_empty():
+		sprite.play(anim)
+
+
+func _on_action_executed(actor_id: String, target_id: String, action_type: String) -> void:
+	_tocar_animacao_acao(actor_id, action_type)
+	if action_type == "ataque":
+		_tocar_reacao_alvo(target_id)
+
+
+func _tocar_animacao_acao(actor_id: String, action_type: String) -> void:
+	var sprite: AnimatedSprite2D = ally_sprites.get(actor_id) as AnimatedSprite2D
+	var is_ally: bool = true
+	if sprite == null:
+		sprite = enemy_sprites.get(actor_id) as AnimatedSprite2D
+		is_ally = false
+	if sprite == null or sprite.sprite_frames == null:
+		return
+	_executar_animacao_com_movimento(sprite, actor_id, action_type, is_ally)
+
+
+func _executar_animacao_com_movimento(sprite: AnimatedSprite2D, actor_id: String, action_type: String, is_ally: bool) -> void:
+	var anim: String = _obter_nome_anim_acao(sprite.sprite_frames, actor_id, action_type)
+	if not anim.is_empty():
+		sprite.play(anim)
+	var t: Tween = create_tween()
+	var orig: Vector2 = sprite.position
+	var dx: float = 30.0 if is_ally else -30.0
+	t.tween_property(sprite, "position", orig + Vector2(dx, 0.0), 0.1)
+	t.tween_property(sprite, "position", orig, 0.15)
+	t.tween_callback(func(): _restaurar_idle(sprite, actor_id, is_ally))
+
+
+func _obter_nome_anim_acao(frames: SpriteFrames, actor_id: String, action_type: String) -> String:
+	if action_type == "ataque":
+		if actor_id == "lucas" and frames.has_animation("attack_axe_right"):
+			return "attack_axe_right"
+		if frames.has_animation("Cast Right_right"):
+			return "Cast Right_right"
+		if frames.has_animation("iso_walk_down_right"):
+			return "iso_walk_down_right"
+	elif action_type == "defesa":
+		if frames.has_animation("Block Right_right"):
+			return "Block Right_right"
+		if frames.has_animation("crouch_down_right"):
+			return "crouch_down_right"
+	return ""
+
+
+func _restaurar_idle(sprite: AnimatedSprite2D, actor_id: String, is_ally: bool) -> void:
+	if is_ally:
+		_tocar_idle_aliado(sprite, actor_id)
+	else:
+		_tocar_idle_inimigo(sprite)
+
+
+func _tocar_reacao_alvo(target_id: String) -> void:
+	var sprite: AnimatedSprite2D = ally_sprites.get(target_id) as AnimatedSprite2D
+	if sprite == null:
+		sprite = enemy_sprites.get(target_id) as AnimatedSprite2D
+	if sprite == null:
+		return
+	var t: Tween = create_tween()
+	sprite.modulate = Color(2.0, 0.3, 0.3, 1.0)
+	t.tween_property(sprite, "modulate", Color.WHITE, 0.25)
 
 
 func _on_state_changed(_old_state: BattleManager.BattleState, new_state: BattleManager.BattleState) -> void:
@@ -75,7 +240,7 @@ func _update_hud() -> void:
 func _update_ally_hud() -> void:
 	if battle_manager.party_members.is_empty() or ally_name_lbl == null:
 		return
-	var hero: CharacterData = battle_manager.party_members[0]
+	var hero: CharacterData = battle_manager.get_active_actor()
 	ally_name_lbl.text = hero.name
 	if ally_hp_lbl != null:
 		ally_hp_lbl.text = "PV: %d/%d" % [hero.current_hp, hero.max_hp]
@@ -123,7 +288,7 @@ func _on_atacar_pressed() -> void:
 	if command_panel != null:
 		command_panel.visible = false
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
-	var hero: CharacterData = battle_manager.party_members[0] if not battle_manager.party_members.is_empty() else null
+	var hero: CharacterData = battle_manager.get_active_actor()
 	var enemy: Dictionary = battle_manager.enemies[0]
 	battle_manager.executar_ataque_basico(hero, enemy)
 	_update_hud()
@@ -135,7 +300,7 @@ func _on_defender_pressed() -> void:
 	if command_panel != null:
 		command_panel.visible = false
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
-	var hero: CharacterData = battle_manager.party_members[0] if not battle_manager.party_members.is_empty() else null
+	var hero: CharacterData = battle_manager.get_active_actor()
 	battle_manager.executar_defesa(hero)
 	_update_hud()
 
@@ -146,7 +311,7 @@ func _on_itens_pressed() -> void:
 	if command_panel != null:
 		command_panel.visible = false
 	battle_manager.change_state(BattleManager.BattleState.EXECUTANDO_ACAO)
-	var hero: CharacterData = battle_manager.party_members[0]
+	var hero: CharacterData = battle_manager.get_active_actor()
 	battle_manager.executar_item(hero, ItemData.create_potion(), hero)
 	_update_hud()
 
