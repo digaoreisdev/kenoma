@@ -27,6 +27,7 @@ extends Node2D
 @onready var enemy_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/VBox/FaseLabel")
 @onready var party_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PartyContainer")
 @onready var enemy_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer")
+@onready var victory_banner: Control = get_node_or_null("CanvasLayer/UI/VictoryBanner")
 
 var ally_sprites: Dictionary = {}
 var enemy_sprites: Dictionary = {}
@@ -38,6 +39,7 @@ func _ready() -> void:
 		battle_manager.timeline_updated.connect(_update_hud)
 		battle_manager.battle_initialized.connect(_setup_arena_combatants)
 		battle_manager.action_executed.connect(_on_action_executed)
+		battle_manager.rupture_triggered.connect(_mostrar_efeito_ruptura)
 		_update_labels(battle_manager.current_state)
 		_update_hud()
 		_update_command_panel(battle_manager.current_state)
@@ -83,7 +85,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	sprite.sprite_frames = frames
 	sprite.scale = Vector2(0.45, 0.45)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(-70.0 * idx, 70.0 * idx)
+	sprite.position = Vector2(60.0 * idx, 60.0 * idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite
@@ -120,7 +122,7 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	sprite.sprite_frames = frames
 	sprite.scale = Vector2(0.45, 0.45)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(70.0 * idx, 70.0 * idx)
+	sprite.position = Vector2(-60.0 * idx, 60.0 * idx)
 	_tocar_idle_inimigo(sprite)
 	enemy_container.add_child(sprite)
 	enemy_sprites[e_id] = sprite
@@ -129,87 +131,112 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 func _tocar_idle_aliado(sprite: AnimatedSprite2D, c_id: String) -> void:
 	if sprite == null or sprite.sprite_frames == null:
 		return
-	var anim: String = "idle_down_right"
+	var anim: String = "idle_down_left"
 	if c_id == "davi":
-		anim = "iso_idle_southeast_right"
+		anim = "Idle Southwest_right"
 	if not sprite.sprite_frames.has_animation(anim):
 		var anims: PackedStringArray = sprite.sprite_frames.get_animation_names()
-		anim = anims[0] if anims.size() > 0 else ""
-	if not anim.is_empty():
+		for a: String in anims:
+			if a.to_lower().contains("idle"):
+				anim = a
+				break
+	if not anim.is_empty() and sprite.sprite_frames.has_animation(anim):
 		sprite.play(anim)
 
 
 func _tocar_idle_inimigo(sprite: AnimatedSprite2D) -> void:
 	if sprite == null or sprite.sprite_frames == null:
 		return
-	var anim: String = "Idle Southwest_right"
+	var anim: String = "iso_idle_southeast_right"
+	if not sprite.sprite_frames.has_animation(anim):
+		anim = "iso_idle_right_right"
 	if not sprite.sprite_frames.has_animation(anim):
 		var anims: PackedStringArray = sprite.sprite_frames.get_animation_names()
-		anim = anims[0] if anims.size() > 0 else ""
-	if not anim.is_empty():
+		for a: String in anims:
+			if a.to_lower().contains("idle"):
+				anim = a
+				break
+	if not anim.is_empty() and sprite.sprite_frames.has_animation(anim):
 		sprite.play(anim)
+
+
+func _obter_sprite_combatente(c_id: String) -> AnimatedSprite2D:
+	if ally_sprites.has(c_id):
+		return ally_sprites[c_id] as AnimatedSprite2D
+	if enemy_sprites.has(c_id):
+		return enemy_sprites[c_id] as AnimatedSprite2D
+	return null
+
+
+func _eh_aliado(c_id: String) -> bool:
+	return ally_sprites.has(c_id)
 
 
 func _on_action_executed(actor_id: String, target_id: String, action_type: String) -> void:
-	_tocar_animacao_acao(actor_id, action_type)
 	if action_type == "ataque":
-		_tocar_reacao_alvo(target_id)
+		_executar_passo_ataque_tween(actor_id, target_id)
+	else:
+		_tocar_animacao_estacionaria(actor_id, action_type)
 
 
-func _tocar_animacao_acao(actor_id: String, action_type: String) -> void:
-	var sprite: AnimatedSprite2D = ally_sprites.get(actor_id) as AnimatedSprite2D
-	var is_ally: bool = true
-	if sprite == null:
-		sprite = enemy_sprites.get(actor_id) as AnimatedSprite2D
-		is_ally = false
+func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:
+	var atk_sprite: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
+	var tgt_sprite: AnimatedSprite2D = _obter_sprite_combatente(target_id)
+	if atk_sprite == null:
+		return
+	var orig_pos: Vector2 = atk_sprite.position
+	var dash_vec: Vector2 = Vector2(-120.0, 0.0) if _eh_aliado(actor_id) else Vector2(120.0, 0.0)
+	if tgt_sprite != null and atk_sprite.global_position.distance_to(tgt_sprite.global_position) > 10.0:
+		dash_vec = (tgt_sprite.global_position - atk_sprite.global_position).normalized() * 120.0
+	var anim: String = _obter_nome_anim_ataque(atk_sprite.sprite_frames, actor_id)
+	var tw: Tween = create_tween()
+	tw.tween_property(atk_sprite, "position", orig_pos + dash_vec, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func(): _no_contato_golpe(atk_sprite, anim, target_id))
+	tw.tween_interval(0.18)
+	tw.tween_property(atk_sprite, "position", orig_pos, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_callback(func(): _restaurar_idle(atk_sprite, actor_id, _eh_aliado(actor_id)))
+
+
+func _no_contato_golpe(atk_sprite: AnimatedSprite2D, anim: String, target_id: String) -> void:
+	if not anim.is_empty() and atk_sprite.sprite_frames != null and atk_sprite.sprite_frames.has_animation(anim):
+		atk_sprite.sprite_frames.set_animation_loop(anim, false)
+		atk_sprite.play(anim)
+	_tocar_reacao_alvo(target_id)
+
+
+func _tocar_animacao_estacionaria(actor_id: String, _action_type: String) -> void:
+	var sprite: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
 	if sprite == null or sprite.sprite_frames == null:
 		return
-	_executar_animacao_com_movimento(sprite, actor_id, action_type, is_ally)
-
-
-func _executar_animacao_com_movimento(sprite: AnimatedSprite2D, actor_id: String, action_type: String, is_ally: bool) -> void:
-	var anim: String = _obter_nome_anim_acao(sprite.sprite_frames, actor_id, action_type)
-	var orig: Vector2 = sprite.position
-	var dx: float = 30.0 if is_ally else -30.0
-	var t: Tween = create_tween()
-	t.tween_property(sprite, "position", orig + Vector2(dx, 0.0), 0.1)
-	t.tween_property(sprite, "position", orig, 0.15)
+	var anim: String = _obter_nome_anim_defesa(sprite.sprite_frames)
 	if not anim.is_empty() and sprite.sprite_frames.has_animation(anim):
-		sprite.sprite_frames.set_animation_loop(anim, false)
-		var cb: Callable
-		cb = func():
-			if sprite.animation_finished.is_connected(cb):
-				sprite.animation_finished.disconnect(cb)
-			_restaurar_idle(sprite, actor_id, is_ally)
-		sprite.animation_finished.connect(cb, CONNECT_ONE_SHOT)
 		sprite.play(anim)
-	else:
-		t.tween_callback(func(): _restaurar_idle(sprite, actor_id, is_ally))
-
-
-func _obter_nome_anim_acao(frames: SpriteFrames, actor_id: String, action_type: String) -> String:
-	if action_type == "ataque":
-		return _obter_nome_anim_ataque(frames, actor_id)
-	elif action_type == "defesa":
-		return _obter_nome_anim_defesa(frames)
-	return ""
+	var orig: Vector2 = sprite.position
+	var offset: Vector2 = Vector2(15.0, 0.0) if _eh_aliado(actor_id) else Vector2(-15.0, 0.0)
+	var tw: Tween = create_tween()
+	tw.tween_property(sprite, "position", orig + offset, 0.1)
+	tw.tween_property(sprite, "position", orig, 0.15)
+	tw.tween_callback(func(): _restaurar_idle(sprite, actor_id, _eh_aliado(actor_id)))
 
 
 func _obter_nome_anim_ataque(frames: SpriteFrames, actor_id: String) -> String:
-	if actor_id == "lucas" and frames.has_animation("attack_axe_down_right"):
-		return "attack_axe_down_right"
-	if frames.has_animation("Cast Right_right"):
-		return "Cast Right_right"
+	if frames == null:
+		return ""
+	if actor_id == "lucas":
+		for pref: String in ["attack_axe_down_left", "attack_axe_left", "attack_axe_down_right"]:
+			if frames.has_animation(pref):
+				return pref
+	if actor_id == "davi":
+		for pref: String in ["Cast Southwest_right", "Cast Left_right", "Throw Left_right", "Cast Right_right"]:
+			if frames.has_animation(pref):
+				return pref
+	for pref: String in ["iso_walk_southeast_right", "iso_walk_right_right", "iso_walk_down_right"]:
+		if frames.has_animation(pref):
+			return pref
 	for n: String in frames.get_animation_names():
-		var lower: String = n.to_lower()
-		if lower.contains("attack") or lower.contains("hit"):
+		if n.to_lower().contains("attack") or n.to_lower().contains("hit"):
 			return n
-	for n: String in frames.get_animation_names():
-		var lower: String = n.to_lower()
-		if lower.contains("cast") or lower.contains("throw") or lower.contains("walk"):
-			return n
-	var all_names: PackedStringArray = frames.get_animation_names()
-	return all_names[0] if all_names.size() > 0 else ""
+	return frames.get_animation_names()[0] if frames.get_animation_names().size() > 0 else ""
 
 
 func _obter_nome_anim_defesa(frames: SpriteFrames) -> String:
@@ -228,20 +255,61 @@ func _restaurar_idle(sprite: AnimatedSprite2D, actor_id: String, is_ally: bool) 
 
 
 func _tocar_reacao_alvo(target_id: String) -> void:
-	var sprite: AnimatedSprite2D = ally_sprites.get(target_id) as AnimatedSprite2D
-	if sprite == null:
-		sprite = enemy_sprites.get(target_id) as AnimatedSprite2D
+	var sprite: AnimatedSprite2D = _obter_sprite_combatente(target_id)
 	if sprite == null:
 		return
 	var t: Tween = create_tween()
-	sprite.modulate = Color(2.0, 0.3, 0.3, 1.0)
+	sprite.modulate = Color(2.5, 0.3, 0.3, 1.0)
 	t.tween_property(sprite, "modulate", Color.WHITE, 0.25)
+
+
+func _mostrar_efeito_ruptura(target_id: String) -> void:
+	var sprite: AnimatedSprite2D = _obter_sprite_combatente(target_id)
+	if sprite == null:
+		return
+	_aplicar_flash_atordoamento(sprite)
+	_criar_label_flutuante_ruptura(sprite)
+
+
+func _aplicar_flash_atordoamento(sprite: AnimatedSprite2D) -> void:
+	var tw: Tween = create_tween()
+	sprite.modulate = Color(2.5, 1.8, 0.2, 1.0)
+	tw.tween_property(sprite, "modulate", Color(1.8, 1.4, 0.4, 1.0), 0.3)
+	tw.tween_property(sprite, "modulate", Color.WHITE, 0.4)
+
+
+func _criar_label_flutuante_ruptura(sprite: AnimatedSprite2D) -> void:
+	var lbl: Label = Label.new()
+	lbl.text = "RUPTURA!"
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1, 1.0))
+	lbl.add_theme_font_size_override("font_size", 22)
+	lbl.position = sprite.position + Vector2(-45.0, -95.0)
+	sprite.get_parent().add_child(lbl)
+	var tw: Tween = create_tween()
+	tw.tween_property(lbl, "position:y", lbl.position.y - 35.0, 0.8)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.tween_callback(lbl.queue_free)
 
 
 func _on_state_changed(_old_state: BattleManager.BattleState, new_state: BattleManager.BattleState) -> void:
 	_update_labels(new_state)
 	_update_command_panel(new_state)
 	_update_hud()
+	if new_state == BattleManager.BattleState.VITORIA:
+		_executar_sequencia_vitoria()
+
+
+func _executar_sequencia_vitoria() -> void:
+	if command_panel != null:
+		command_panel.visible = false
+	if victory_banner != null:
+		victory_banner.visible = true
+	var tree: SceneTree = get_tree()
+	if tree != null:
+		await tree.create_timer(1.5).timeout
+	var sm: Node = get_node_or_null("/root/SceneManager")
+	if sm != null and sm.has_method("finalizar_batalha"):
+		sm.call("finalizar_batalha", true)
 
 
 func _update_command_panel(state: BattleManager.BattleState) -> void:

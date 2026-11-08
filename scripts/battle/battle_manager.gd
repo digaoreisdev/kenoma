@@ -18,8 +18,10 @@ signal battle_finished(is_victory: bool)
 signal timeline_updated
 signal combatant_ready_for_action(combatant_id: String, is_player: bool)
 signal action_executed(actor_id: String, target_id: String, action_type: String)
+signal rupture_triggered(target_id: String)
 
 @export var current_state: BattleState = BattleState.INICIALIZANDO
+@export var timeline_speed_scale: float = 0.65
 
 var party_members: Array[CharacterData] = []
 var enemies: Array[Dictionary] = []
@@ -33,7 +35,7 @@ func _process(delta: float) -> void:
 		return
 	if _verificar_proximo_turno():
 		return
-	var eventos: Array[Dictionary] = timeline.avancar_tempo(delta)
+	var eventos: Array[Dictionary] = timeline.avancar_tempo(delta * timeline_speed_scale)
 	timeline_updated.emit()
 	if not eventos.is_empty():
 		_processar_eventos_timeline(eventos)
@@ -208,7 +210,7 @@ func can_transition_to(target_state: BattleState) -> bool:
 		BattleState.AGUARDANDO_TURNO:
 			return target_state in [BattleState.SELECIONANDO_ACAO, BattleState.EXECUTANDO_ACAO, BattleState.VITORIA, BattleState.DERROTA]
 		BattleState.SELECIONANDO_ACAO:
-			return target_state in [BattleState.EXECUTANDO_ACAO, BattleState.AGUARDANDO_TURNO]
+			return target_state in [BattleState.EXECUTANDO_ACAO, BattleState.AGUARDANDO_TURNO, BattleState.VITORIA, BattleState.DERROTA]
 		BattleState.EXECUTANDO_ACAO:
 			return target_state in [BattleState.AGUARDANDO_TURNO, BattleState.VITORIA, BattleState.DERROTA]
 		BattleState.VITORIA, BattleState.DERROTA:
@@ -262,14 +264,22 @@ func _processar_estabilidade_golpe(defensor: Dictionary, impacto: int) -> Dictio
 	var est: int = maxi(0, int(defensor.get("estabilidade_atual", 100)) - impacto)
 	defensor["estabilidade_atual"] = est
 	defensor["stability"] = est
+	var def_id: String = str(defensor.get("id", ""))
+	if est <= 0:
+		defensor["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+		defensor["posicao_tempo"] = 0.0
+		defensor["progresso_conjuracao"] = 0.0
+		defensor["irritado"] = false
+		if timeline != null and not def_id.is_empty():
+			var t_c: Dictionary = timeline.obter_combatente(def_id)
+			if not t_c.is_empty():
+				t_c["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+				t_c["posicao_tempo"] = 0.0
+				t_c["progresso_conjuracao"] = 0.0
+				t_c["estabilidade_atual"] = 0
+		return {"ruptura": true, "irritado": false}
 	var fase: int = int(defensor.get("fase_turno", BattleTimeline.FaseTurno.ESPERA))
 	if fase == BattleTimeline.FaseTurno.CONJURACAO:
-		if est <= 0:
-			defensor["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
-			defensor["posicao_tempo"] = 0.0
-			defensor["progresso_conjuracao"] = 0.0
-			defensor["irritado"] = false
-			return {"ruptura": true, "irritado": false}
 		defensor["irritado"] = true
 		return {"ruptura": false, "irritado": true}
 	return {"ruptura": false, "irritado": bool(defensor.get("irritado", false))}
@@ -282,6 +292,8 @@ func aplicar_golpe(atacante: Dictionary, defensor: Dictionary, dano: int, impact
 	var hp_atual: int = int(defensor.get("current_hp", defensor.get("max_hp", 100)))
 	defensor["current_hp"] = maxi(0, hp_atual - dano_final)
 	var res_est: Dictionary = _processar_estabilidade_golpe(defensor, impacto_estabilidade)
+	if bool(res_est.get("ruptura", false)):
+		rupture_triggered.emit(str(defensor.get("id", "")))
 	return {
 		"dano": dano_final,
 		"ruptura": bool(res_est.get("ruptura", false)),
@@ -443,11 +455,11 @@ func is_all_allies_defeated() -> bool:
 
 func check_battle_end_conditions() -> bool:
 	if is_all_enemies_defeated():
-		if current_state == BattleState.EXECUTANDO_ACAO or current_state == BattleState.AGUARDANDO_TURNO:
+		if current_state != BattleState.VITORIA:
 			change_state(BattleState.VITORIA)
 		return true
 	if is_all_allies_defeated():
-		if current_state == BattleState.EXECUTANDO_ACAO or current_state == BattleState.AGUARDANDO_TURNO:
+		if current_state != BattleState.DERROTA:
 			change_state(BattleState.DERROTA)
 		return true
 	return false

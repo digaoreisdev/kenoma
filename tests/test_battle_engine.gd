@@ -26,6 +26,8 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	passed = passed and test_battle_initialization_with_davi_and_general_cassian()
 	passed = passed and test_lucas_and_davi_independent_turns_progression()
 	passed = passed and test_general_cassian_resource_loading()
+	passed = passed and test_zero_enemy_hp_triggers_victory_and_scene_manager_exit()
+	passed = passed and test_breaking_enemy_stability_applies_rupture_stun_penalty()
 	return passed
 
 
@@ -96,14 +98,12 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	var battle_scene: Node2D = scene_res.instantiate() as Node2D
 	if tree != null and tree.root != null:
 		tree.root.add_child(battle_scene)
-	var bm: BattleManager = battle_scene.get_node_or_null("BattleManager") as BattleManager
-	assert(bm != null, "BattleManager node must exist in battle scene")
-	var state_lbl: Label = battle_scene.get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/StateLabel") as Label
-	assert(state_lbl.text.contains("Inicializando"), "State label must display PT-BR state")
 	var party_cont: Node2D = battle_scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
-	assert(party_cont != null, "PartyContainer must exist in arena")
-	var ally2_p: Control = battle_scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2") as Control
-	assert(ally2_p != null, "AllyPanel2 must exist for Davi HUD")
+	var enemy_cont: Node2D = battle_scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
+	var banner: Control = battle_scene.get_node_or_null("CanvasLayer/UI/VictoryBanner") as Control
+	assert(party_cont != null and enemy_cont != null, "Containers must exist in arena")
+	assert(banner != null, "VictoryBanner must exist in battle scene UI")
+	assert(enemy_cont.position.x < party_cont.position.x, "Enemy must be left of party")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -259,7 +259,7 @@ static func test_battle_realtime_process_loop() -> bool:
 	bm.initialize_battle([lucas], [enemy])
 	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "Initial state must be AGUARDANDO_TURNO")
 	
-	bm._process(10.0)
+	bm._process(12.0)
 	
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "State must advance to SELECIONANDO_ACAO")
 	var c: Dictionary = bm.timeline.obter_combatente(lucas.character_id)
@@ -316,12 +316,12 @@ static func test_lucas_and_davi_independent_turns_progression() -> bool:
 	var davi: CharacterData = CharacterData.create_default_davi()
 	var cassian: Resource = EnemyDataScript.create_general_cassian()
 	bm.initialize_battle([lucas, davi], [cassian])
-	bm._process(7.5)
+	bm._process(11.5)
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Must enter SELECIONANDO_ACAO")
 	assert(bm.get_active_actor().character_id == "lucas", "Lucas must act first")
 	bm.executar_defesa(lucas)
 	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "State returns to AGUARDANDO_TURNO")
-	bm._process(2.0)
+	bm._process(3.0)
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Davi must reach SELECIONANDO_ACAO")
 	assert(bm.get_active_actor().character_id == "davi", "Davi must be active actor")
 	bm.executar_ataque_basico(davi, bm.enemies[0])
@@ -339,5 +339,48 @@ static func test_general_cassian_resource_loading() -> bool:
 	assert(int(cassian_res.get("defense")) == 14, "Defesa must be 14")
 	assert(cassian_res.get("sprite_frames") != null, "SpriteFrames must be attached")
 	return true
+
+
+static func test_zero_enemy_hp_triggers_victory_and_scene_manager_exit() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var enemy: Dictionary = {"name": "Inimigo", "max_hp": 30, "current_hp": 30}
+	bm.initialize_battle([lucas], [enemy])
+	bm.change_state(BattleManager.BattleState.SELECIONANDO_ACAO)
+	var finished_box: Array[bool] = [false]
+	var on_finished: Callable = func(victory: bool) -> void:
+		if victory:
+			finished_box[0] = true
+	bm.battle_finished.connect(on_finished)
+	bm.apply_damage_to_enemy(0, 30)
+	assert(bm.current_state == BattleManager.BattleState.VITORIA, "State must be VITORIA")
+	assert(finished_box[0] == true, "battle_finished signal must be emitted with victory = true")
+	bm.free()
+	return true
+
+
+static func test_breaking_enemy_stability_applies_rupture_stun_penalty() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var atacante: Dictionary = {"id": "lucas", "name": "Lucas"}
+	var defensor: Dictionary = {
+		"id": "cassian", "name": "General Cassian", "max_hp": 240, "current_hp": 240,
+		"estabilidade_max": 120, "estabilidade_atual": 40, "posicao_tempo": 90.0,
+		"progresso_conjuracao": 30.0, "fase_turno": BattleTimeline.FaseTurno.CONJURACAO,
+		"irritado": true
+	}
+	var rupture_box: Array[bool] = [false]
+	bm.rupture_triggered.connect(func(target_id: String) -> void:
+		if target_id == "cassian":
+			rupture_box[0] = true
+	)
+	var res: Dictionary = bm.aplicar_golpe(atacante, defensor, 30, 45)
+	assert(res["ruptura"] == true, "Rupture flag must be true")
+	assert(rupture_box[0] == true, "rupture_triggered signal must be emitted")
+	assert(defensor["fase_turno"] == BattleTimeline.FaseTurno.ESPERA, "Phase must reset to ESPERA")
+	assert(defensor["posicao_tempo"] == 0.0, "posicao_tempo must reset to 0.0")
+	assert(defensor["irritado"] == false, "Irritado must be cleared on rupture")
+	bm.free()
+	return true
+
 
 

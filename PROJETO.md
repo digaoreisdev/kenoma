@@ -34,7 +34,7 @@
 * GDScript tipado para robustez, legibilidade e suporte a autocompletar eficiente.
 
 ## Fase Atual
-* **F3 - Combate por Turnos** (Passo 4 concluído).
+* **F3 - Combate por Turnos** (Passo 5 e Polimento concluídos).
 
 ## Passos Concluídos
 * [x] **F0.1:** Verificação da raiz do projeto, criação do `PROJETO.md` e configuração dos arquivos de versionamento (`.gitignore` e `.gitattributes`).
@@ -72,6 +72,7 @@
 * [x] **F3.6 (Assets):** Localização, filtragem isométrica vs lateral e organização de assets de Davi e General Cassian em `res://assets/sprites/characters/`: isolamento de sprites laterais em `cassian/archive_lateral/`, retenção exclusiva de 16 animações isométricas no `General_Cassian_frames.tres` e 96 animações em 8 direções no `Davi_Reis_frames.tres`.
 * [x] **F3.7 (Passo 5):** Integração de Davi Reis (Party Data) e General Cassian (Boss Data) com arena visual de batalha: criação dos recursos `davi.tres` e `general_cassian.tres`, classe `EnemyData`, suporte a 2 membros iniciais na equipe (Lucas e Davi) no `PartyManager`, arena visual com `PartyContainer` e `EnemyContainer` na `battle_scene.tscn`, instanciamento dinâmico de `AnimatedSprite2D` com animações isométricas em loop e feedback de ataque/dano, e testes em `test_battle_engine.gd`.
 * [x] **F3.8 (Bugfix Multi-Hero & Cassian):** Resolução de HUD de múltiplos heróis (Lucas e Davi), turnos independentes na timeline, hook de General Cassian na Fenda de Miasma e execução de animações de ataque conectadas a animation_finished com retorno a idle, com testes automatizados em `test_battle_engine.gd`.
+* [x] **F3.9 (Polimento de Batalha):** Refatoração da arena de combate com inversão de lados (inimigos à esquerda e aliados à direita), deslocamento cinético via SceneTreeTween no ataque físico (~120px com retorno suave e impacto), feedback visual de RUPTURA com flash dourado e texto flutuante, redução do ritmo da linha do tempo em 35% (`timeline_speed_scale = 0.65`), e sequência de vitória com banner "VITÓRIA!" e transição de retorno automático à exploração desativando o Miasma Rift.
 
 
 
