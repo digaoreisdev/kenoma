@@ -5,6 +5,7 @@ extends Node2D
 
 const LayoutScript = preload("res://scripts/battle/battle_scene_layout.gd")
 const ESCALA_COMBATENTE_BASE: Vector2 = Vector2(0.9, 0.9)
+const ESCALA_CHEFE_BASE: Vector2 = Vector2(1.05, 1.05)
 const MULTIPLICADOR_COMPENSACAO_ATAQUE: float = 1.25
 
 @onready var battle_manager: BattleManager = get_node_or_null("BattleManager")
@@ -376,6 +377,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int, _total_aliados: int = 2
 	if frames == null:
 		frames = _obter_fallback_frames_aliado(ally.character_id)
 	sprite.sprite_frames = frames
+	sprite.set_meta("escala_base", ESCALA_COMBATENTE_BASE)
 	sprite.scale = ESCALA_COMBATENTE_BASE
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -412,11 +414,16 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	var frames: SpriteFrames = e.get("sprite_frames") as SpriteFrames
 	var is_boss: bool = str(e.get("name", "")).contains("Cassian") or e.get("is_boss", false)
 	if frames == null and is_boss:
+		const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
 		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
-		if ResourceLoader.exists(CASSIAN_PATH):
+		if ResourceLoader.exists(CASSIAN_COMBAT_PATH):
+			frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
+		elif ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
-	sprite.scale = ESCALA_COMBATENTE_BASE
+	var escala: Vector2 = ESCALA_CHEFE_BASE if is_boss else ESCALA_COMBATENTE_BASE
+	sprite.set_meta("escala_base", escala)
+	sprite.scale = escala
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var total_inimigos: int = 1
@@ -477,6 +484,11 @@ func _tocar_idle_inimigo(sprite: AnimatedSprite2D) -> void:
 		for a: String in anims:
 			if a.to_lower().contains("idle"):
 				anim = a
+				break
+	if anim.is_empty() or not sprite.sprite_frames.has_animation(anim):
+		for fallback: String in ["iso_walk_southeast_right", "iso_walk_right_right", "Walk Southeast_right", "Walk Right_right"]:
+			if sprite.sprite_frames.has_animation(fallback):
+				anim = fallback
 				break
 	if not anim.is_empty() and sprite.sprite_frames.has_animation(anim):
 		sprite.play(anim)
@@ -696,12 +708,15 @@ func _obter_nome_anim_ataque(frames: SpriteFrames, actor_id: String) -> String:
 		for pref: String in ["Cast Southwest_right", "Cast Left_right", "Throw Left_right", "Cast Right_right"]:
 			if frames.has_animation(pref):
 				return pref
-	for pref: String in ["iso_walk_southeast_right", "iso_walk_right_right", "iso_walk_down_right"]:
+	for pref: String in ["Attack Southeast_right", "Attack Right_right", "Attack Northeast_right", "Attack Down_right", "Attack Up_right", "Attack Left_right"]:
 		if frames.has_animation(pref):
 			return pref
 	for n: String in frames.get_animation_names():
 		if n.to_lower().contains("attack") or n.to_lower().contains("hit"):
 			return n
+	for pref: String in ["iso_walk_southeast_right", "iso_walk_right_right", "iso_walk_down_right"]:
+		if frames.has_animation(pref):
+			return pref
 	return frames.get_animation_names()[0] if frames.get_animation_names().size() > 0 else ""
 
 
@@ -724,13 +739,15 @@ func _restaurar_idle(sprite: AnimatedSprite2D, actor_id: String, is_ally: bool) 
 static func aplicar_escala_ataque(sprite: AnimatedSprite2D) -> void:
 	if sprite == null:
 		return
-	sprite.scale = ESCALA_COMBATENTE_BASE * MULTIPLICADOR_COMPENSACAO_ATAQUE
+	var base: Vector2 = sprite.get_meta("escala_base", ESCALA_COMBATENTE_BASE) as Vector2
+	sprite.scale = base * MULTIPLICADOR_COMPENSACAO_ATAQUE
 
 
 static func restaurar_escala_base(sprite: AnimatedSprite2D) -> void:
 	if sprite == null:
 		return
-	sprite.scale = ESCALA_COMBATENTE_BASE
+	var base: Vector2 = sprite.get_meta("escala_base", ESCALA_COMBATENTE_BASE) as Vector2
+	sprite.scale = base
 
 
 func _tocar_reacao_alvo(target_id: String) -> void:

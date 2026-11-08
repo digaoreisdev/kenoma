@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://ertfxewsxboq"]
+
+[ext_resource type="SpriteFrames" uid="uid://cvtbb2burh7yo" path="res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres" id="1_15uui"]
+
+[node name="General_Cassian1" type="AnimatedSprite2D" unique_id=1489129022]
+texture_filter = 1
+sprite_frames = ExtResource("1_15uui")
+animation = &"2D Pixel Art Up_right"
+autoplay = "2D Pixel Art Up_right"

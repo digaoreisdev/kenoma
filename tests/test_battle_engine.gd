@@ -53,6 +53,7 @@ static func _run_group_c() -> bool:
 	p = p and test_melee_dash_straight_horizontal_and_return()
 	p = p and test_attack_aligns_to_target_line_before_advancing()
 	p = p and test_combatant_attack_scale_compensation_and_idle_restoration()
+	p = p and test_general_cassian_combat_frames_and_attack_selection()
 	return p
 
 
@@ -794,16 +795,42 @@ static func test_combatant_attack_scale_compensation_and_idle_restoration() -> b
 	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	assert(BattleScene.ESCALA_COMBATENTE_BASE == Vector2(0.9, 0.9), "Base scale must be (0.9, 0.9)")
+	assert(BattleScene.ESCALA_CHEFE_BASE == Vector2(1.05, 1.05), "Boss base scale must be (1.05, 1.05)")
 	assert(is_equal_approx(BattleScene.MULTIPLICADOR_COMPENSACAO_ATAQUE, 1.25), "Attack scale compensation multiplier must be 1.25")
-	var dummy_sprite: AnimatedSprite2D = AnimatedSprite2D.new()
-	scene.restaurar_escala_base(dummy_sprite)
-	assert(dummy_sprite.scale == BattleScene.ESCALA_COMBATENTE_BASE, "Idle restoration resets sprite scale to base")
-	scene.aplicar_escala_ataque(dummy_sprite)
-	assert(dummy_sprite.scale == BattleScene.ESCALA_COMBATENTE_BASE * BattleScene.MULTIPLICADOR_COMPENSACAO_ATAQUE, "Attack scale applies 1.25 compensation")
-	assert(is_equal_approx(dummy_sprite.scale.x, 1.125) and is_equal_approx(dummy_sprite.scale.y, 1.125), "Attack scale equals (1.125, 1.125)")
-	scene.restaurar_escala_base(dummy_sprite)
-	assert(dummy_sprite.scale == BattleScene.ESCALA_COMBATENTE_BASE, "Restores back to base scale after strike")
-	dummy_sprite.free()
+	var dummy_ally: AnimatedSprite2D = AnimatedSprite2D.new()
+	dummy_ally.set_meta("escala_base", BattleScene.ESCALA_COMBATENTE_BASE)
+	scene.restaurar_escala_base(dummy_ally)
+	assert(dummy_ally.scale == BattleScene.ESCALA_COMBATENTE_BASE, "Idle restoration resets sprite scale to base")
+	scene.aplicar_escala_ataque(dummy_ally)
+	assert(dummy_ally.scale == BattleScene.ESCALA_COMBATENTE_BASE * BattleScene.MULTIPLICADOR_COMPENSACAO_ATAQUE, "Attack scale applies 1.25 compensation")
+	assert(is_equal_approx(dummy_ally.scale.x, 1.125) and is_equal_approx(dummy_ally.scale.y, 1.125), "Attack scale equals (1.125, 1.125)")
+	scene.restaurar_escala_base(dummy_ally)
+	assert(dummy_ally.scale == BattleScene.ESCALA_COMBATENTE_BASE, "Restores back to base scale after strike")
+
+	var dummy_boss: AnimatedSprite2D = AnimatedSprite2D.new()
+	dummy_boss.set_meta("escala_base", BattleScene.ESCALA_CHEFE_BASE)
+	scene.restaurar_escala_base(dummy_boss)
+	assert(dummy_boss.scale == BattleScene.ESCALA_CHEFE_BASE, "Boss idle scale is (1.05, 1.05)")
+	scene.aplicar_escala_ataque(dummy_boss)
+	assert(is_equal_approx(dummy_boss.scale.x, 1.05 * 1.25) and is_equal_approx(dummy_boss.scale.y, 1.05 * 1.25), "Boss attack scale is 1.05 * 1.25")
+	scene.restaurar_escala_base(dummy_boss)
+	assert(dummy_boss.scale == BattleScene.ESCALA_CHEFE_BASE, "Boss restores back to (1.05, 1.05)")
+	dummy_ally.free()
+	dummy_boss.free()
+	scene.free()
+	return true
+
+
+static func test_general_cassian_combat_frames_and_attack_selection() -> bool:
+	var cassian_res: Resource = load("res://resources/enemies/general_cassian.tres")
+	assert(cassian_res != null, "General Cassian resource must exist")
+	var frames: SpriteFrames = cassian_res.get("sprite_frames") as SpriteFrames
+	assert(frames != null, "SpriteFrames must be assigned to General Cassian")
+	assert(frames.has_animation("Attack Southeast_right") or frames.has_animation("Attack Right_right"), "Must possess directional sword attack")
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var atk_anim: String = scene._obter_nome_anim_ataque(frames, "general_cassian")
+	assert(atk_anim == "Attack Southeast_right" or atk_anim == "Attack Right_right", "Boss must select directional sword attack animation")
 	scene.free()
 	return true
 

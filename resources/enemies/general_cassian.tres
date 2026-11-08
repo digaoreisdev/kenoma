@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3]
 
 [ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1_nwl0i"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/characters/cassian/General_Cassian_frames.tres" id="2_wv0a4"]
+[ext_resource type="SpriteFrames" path="res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres" id="2_wv0a4"]
 
 [resource]
 script = ExtResource("1_nwl0i")

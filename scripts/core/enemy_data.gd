@@ -62,8 +62,11 @@ func to_dictionary() -> Dictionary:
 
 static func create_general_cassian() -> Resource:
 	var frames: SpriteFrames = null
+	const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
 	const FRAMES_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
-	if ResourceLoader.exists(FRAMES_PATH):
+	if ResourceLoader.exists(CASSIAN_COMBAT_PATH):
+		frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
+	elif ResourceLoader.exists(FRAMES_PATH):
 		frames = load(FRAMES_PATH) as SpriteFrames
 	var script: GDScript = load("res://scripts/core/enemy_data.gd")
 	var boss: Resource = script.new(
