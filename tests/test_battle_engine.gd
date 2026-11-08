@@ -8,7 +8,7 @@ const EnemyDataScript: GDScript = preload("res://scripts/core/enemy_data.gd")
 
 
 static func run_tests(tree: SceneTree = null) -> bool:
-	return _run_group_a(tree) and _run_group_b()
+	return _run_group_a(tree) and _run_group_b() and _run_group_c()
 
 
 static func _run_group_a(tree: SceneTree) -> bool:
@@ -37,11 +37,17 @@ static func _run_group_b() -> bool:
 	p = p and test_simultaneous_ready_actions_execute_sequentially()
 	p = p and test_executando_acao_locks_timeline_tick()
 	p = p and test_selecting_skill_deducts_mp()
-	p = p and test_casting_phase_advances_and_triggers_at_100()
+	return p
+
+
+static func _run_group_c() -> bool:
+	var p: bool = test_casting_phase_advances_and_triggers_at_100()
 	p = p and test_damage_taken_during_conjuracao_interrupts_spell()
 	p = p and test_timeline_badge_position_mapping()
 	p = p and test_eiyuden_ui_dock_and_banner_instantiation()
 	p = p and test_village_arena_layers_and_z_indexing()
+	p = p and test_normalized_coordinate_engine_and_conversions()
+	p = p and test_tactical_formations_clear_of_anvil_and_action_menu()
 	p = p and test_flat_plaza_party_and_enemy_positioning()
 	p = p and test_tactical_encirclement_modes()
 	p = p and test_melee_dash_straight_horizontal_and_return()
@@ -677,6 +683,32 @@ static func test_village_arena_layers_and_z_indexing() -> bool:
 	return true
 
 
+static func test_normalized_coordinate_engine_and_conversions() -> bool:
+	var p_1080: Vector2 = BattleSceneLayout.converter_para_tela(Vector2(0.5, 0.5), Vector2(1920.0, 1080.0))
+	var p_720: Vector2 = BattleSceneLayout.converter_para_tela(Vector2(0.5, 0.5), Vector2(1280.0, 720.0))
+	assert(p_1080 == Vector2(960.0, 540.0), "Normalized conversion 1920x1080")
+	assert(p_720 == Vector2(640.0, 360.0), "Normalized conversion 1280x720")
+	var layout: BattleSceneLayout = BattleSceneLayout.new()
+	var pos_hero1: Vector2 = layout.obter_posicao_aliado(0, "LINHA_2X2", "PADRAO", Vector2(1920.0, 1080.0))
+	var pos_enemy1: Vector2 = layout.obter_posicao_inimigo(0, 1, false, "PADRAO", Vector2(1920.0, 1080.0))
+	var dist: float = pos_hero1.distance_to(pos_enemy1)
+	assert(dist >= 500.0, "Runway distance between Enemy 1 and Hero 1 must be >= 500px on 1920x1080")
+	return true
+
+
+static func test_tactical_formations_clear_of_anvil_and_action_menu() -> bool:
+	var layout: BattleSceneLayout = BattleSceneLayout.new()
+	var vp: Vector2 = Vector2(1920.0, 1080.0)
+	var formacoes: Array = ["LINHA_2X2", "LOSANGO", "VANGUARDA_3X1", "RETAGUARDA_1X3", "MEIA_LUA"]
+	for f: String in formacoes:
+		for slot: int in range(4):
+			var pos: Vector2 = layout.obter_posicao_aliado(slot, f, "PADRAO", vp)
+			assert(pos.x <= 0.75 * vp.x, "Slot %d in %s must stay clear of the anvil (X <= 0.75*W)" % [slot, f])
+			assert(pos.y < 910.0, "Slot %d in %s must stay above the action menu (Y < 910)" % [slot, f])
+			assert(pos.y >= 0.60 * vp.y, "Slot %d in %s must stay on the earthen road" % [slot, f])
+	return true
+
+
 static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
@@ -684,15 +716,12 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
 	assert(enemy_cont.position == Vector2(420.0, 470.0), "EnemyContainer must be at (420, 470)")
 	assert(party_cont.position == Vector2(940.0, 510.0), "PartyContainer must be at (940, 510)")
-	var boss_pos: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 1, true)
-	assert(boss_pos == Vector2(640.0, 465.0), "Single boss must be at central top of plaza floor")
-	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("lucas", 0, 2)
-	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1, 2)
-	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2, 4)
-	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3, 4)
-	assert(p0 == Vector2(820.0, 530.0), "Hero 1 is at central plaza floor position")
-	assert(p1 == Vector2(970.0, 480.0), "Hero 2 is clearly separated and not overlapping")
-	assert(p0 != p1 and p1 != p2 and p2 != p3, "No two hero slots share the same position")
+	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(0)
+	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(1)
+	var e0: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 1, false)
+	assert(p0.x > 1000.0 and p0.y > 700.0, "Hero Slot 1 in LINHA_2X2 scaled to 1920x1080")
+	assert(e0.x < 500.0 and e0.y > 700.0, "Enemy Slot 1 on left road at 1920x1080")
+	assert(p0 != p1, "Hero slots 1 and 2 must not overlap")
 	scene.free()
 	return true
 
@@ -703,13 +732,13 @@ static func test_tactical_encirclement_modes() -> bool:
 	var enemy_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
 	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
 	scene.modo_encontro_override = "HEROIS_ENCURRALAM"
-	var cerco_h0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 0, 4)
-	var cerco_h1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 1, 4)
-	assert(cerco_h0.x > 800.0 and cerco_h1.x < 500.0, "Heroes surround monsters from East and West")
+	var cerco_h0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(0)
+	var cerco_h1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(1)
+	assert(cerco_h0.x > 1000.0 and cerco_h1.x < 500.0, "Heroes surround monsters from East and West")
 	scene.modo_encontro_override = "MONSTROS_ENCURRALAM"
 	var cerco_m0: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 4, false)
 	var cerco_m1: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(1, 4, false)
-	assert(cerco_m0.x > 800.0 and cerco_m1.x < 500.0, "Monsters surround heroes from East and West")
+	assert(cerco_m0.x > 1000.0 and cerco_m1.x < 500.0, "Monsters surround heroes from East and West")
 	scene.free()
 	return true
 

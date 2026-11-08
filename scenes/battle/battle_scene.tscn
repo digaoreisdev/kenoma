@@ -124,10 +124,10 @@ stretch_mode = 0
 
 [node name="HeaderPanel" type="ColorRect" parent="CanvasLayer/UI"]
 layout_mode = 0
-offset_left = 920.0
-offset_top = 16.0
-offset_right = 1250.0
-offset_bottom = 66.0
+offset_left = 1520.0
+offset_top = 20.0
+offset_right = 1880.0
+offset_bottom = 70.0
 color = Color(0.08, 0.1, 0.15, 0.85)
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/HeaderPanel"]
@@ -160,10 +160,10 @@ text = "Estado: Inicializando"
 
 [node name="TimelineTracker" type="PanelContainer" parent="CanvasLayer/UI"]
 layout_mode = 0
-offset_left = 370.0
-offset_top = 16.0
-offset_right = 900.0
-offset_bottom = 66.0
+offset_left = 660.0
+offset_top = 20.0
+offset_right = 1260.0
+offset_bottom = 70.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/TimelineTracker"]
 layout_mode = 2
@@ -183,7 +183,7 @@ theme_override_font_sizes/font_size = 11
 text = "ESPERA"
 
 [node name="TrackArea" type="Control" parent="CanvasLayer/UI/TimelineTracker/Margin/HBox"]
-custom_minimum_size = Vector2(390, 40)
+custom_minimum_size = Vector2(460, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -215,10 +215,10 @@ grow_vertical = 2
 
 [node name="EnemyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
-offset_left = 25.0
-offset_top = 16.0
-offset_right = 350.0
-offset_bottom = 175.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = 410.0
+offset_bottom = 155.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/EnemyPanel"]
 layout_mode = 2
@@ -287,10 +287,10 @@ text = "Fase: Espera"
 
 [node name="AllyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
-offset_left = 920.0
-offset_top = 80.0
-offset_right = 1250.0
-offset_bottom = 195.0
+offset_left = 1540.0
+offset_top = 770.0
+offset_right = 1880.0
+offset_bottom = 900.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel"]
 layout_mode = 2
@@ -365,10 +365,10 @@ text = "Fase: Espera"
 
 [node name="AllyPanel2" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
-offset_left = 920.0
-offset_top = 205.0
-offset_right = 1250.0
-offset_bottom = 320.0
+offset_left = 1540.0
+offset_top = 915.0
+offset_right = 1880.0
+offset_bottom = 1045.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2"]
 layout_mode = 2
@@ -444,10 +444,10 @@ text = "Fase: Espera"
 [node name="ActionCommandPanel" type="PanelContainer" parent="CanvasLayer/UI"]
 visible = false
 layout_mode = 0
-offset_left = 480.0
-offset_top = 515.0
-offset_right = 890.0
-offset_bottom = 695.0
+offset_left = 720.0
+offset_top = 915.0
+offset_right = 1200.0
+offset_bottom = 1050.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/ActionCommandPanel"]
 layout_mode = 2
@@ -501,10 +501,10 @@ text = "Fugir"
 [node name="SkillsPanel" type="PanelContainer" parent="CanvasLayer/UI"]
 visible = false
 layout_mode = 0
-offset_left = 480.0
-offset_top = 465.0
-offset_right = 890.0
-offset_bottom = 695.0
+offset_left = 720.0
+offset_top = 870.0
+offset_right = 1200.0
+offset_bottom = 1050.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/SkillsPanel"]
 layout_mode = 2

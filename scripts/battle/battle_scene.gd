@@ -337,9 +337,21 @@ func _carregar_layout_cenario() -> void:
 		layout_cenario = LayoutScript.new()
 
 
-func _obter_posicao_base_aliado(_c_id: String, idx: int, _total_aliados: int = 2, _fileira: String = "VANGUARDA") -> Vector2:
+func _obter_tamanho_viewport() -> Vector2:
+	var vp: Viewport = get_viewport()
+	if vp != null and vp.get_visible_rect().size != Vector2.ZERO:
+		return vp.get_visible_rect().size
+	return Vector2(1920.0, 1080.0)
+
+
+func _obter_posicao_base_aliado(idx_ou_id: Variant = 0, idx_extra: int = -1, _arg3: Variant = null, _arg4: Variant = null) -> Vector2:
 	if layout_cenario == null:
 		_carregar_layout_cenario()
+	var slot_index: int = 0
+	if idx_extra >= 0:
+		slot_index = idx_extra
+	elif typeof(idx_ou_id) == TYPE_INT:
+		slot_index = int(idx_ou_id)
 	var tatica: String = "LINHA_2X2"
 	var tree: SceneTree = Engine.get_main_loop() as SceneTree
 	if tree != null and tree.root != null and tree.root.has_node("PartyManager"):
@@ -347,12 +359,13 @@ func _obter_posicao_base_aliado(_c_id: String, idx: int, _total_aliados: int = 2
 		if pm.has_method("obter_tatica"):
 			tatica = pm.obter_tatica()
 	var modo: String = modo_encontro_override if not modo_encontro_override.is_empty() else modo_encontro
-	var pos_global: Vector2 = layout_cenario.obter_posicao_aliado(idx, tatica, modo)
+	var vp_size: Vector2 = _obter_tamanho_viewport()
+	var pos_global: Vector2 = layout_cenario.obter_posicao_aliado(slot_index, tatica, modo, vp_size)
 	var base_container: Vector2 = party_container.position if party_container != null else Vector2(940.0, 510.0)
 	return pos_global - base_container
 
 
-func _criar_sprite_aliado(ally: CharacterData, idx: int, total_aliados: int = 2) -> void:
+func _criar_sprite_aliado(ally: CharacterData, idx: int, _total_aliados: int = 2) -> void:
 	var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
 	sprite.name = ally.character_id
 	var frames: SpriteFrames = ally.sprite_frames
@@ -362,8 +375,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int, total_aliados: int = 2)
 	sprite.scale = Vector2(0.9, 0.9)
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var f: String = ally.fileira if ("fileira" in ally) else "VANGUARDA"
-	sprite.position = _obter_posicao_base_aliado(ally.character_id, idx, total_aliados, f)
+	sprite.position = _obter_posicao_base_aliado(idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
 	_adicionar_sombra_pe(sprite)
 	party_container.add_child(sprite)
@@ -417,7 +429,8 @@ func _obter_posicao_base_inimigo(idx: int, total_inimigos: int, is_boss: bool) -
 	if layout_cenario == null:
 		_carregar_layout_cenario()
 	var modo: String = modo_encontro_override if not modo_encontro_override.is_empty() else modo_encontro
-	var pos_global: Vector2 = layout_cenario.obter_posicao_inimigo(idx, total_inimigos, is_boss, modo)
+	var vp_size: Vector2 = _obter_tamanho_viewport()
+	var pos_global: Vector2 = layout_cenario.obter_posicao_inimigo(idx, total_inimigos, is_boss, modo, vp_size)
 	var base_container: Vector2 = enemy_container.position if enemy_container != null else Vector2(420.0, 470.0)
 	return pos_global - base_container
 

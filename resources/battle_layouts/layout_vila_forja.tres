@@ -6,4 +6,3 @@
 script = ExtResource("1_layout")
 id_cenario = "baltazar_village"
 nome_cenario = "Vila da Forja de Baltazar"
-posicao_chefe_unico = Vector2(640, 465)
