@@ -44,6 +44,7 @@ static func _run_group_b() -> bool:
 	p = p and test_village_arena_layers_and_z_indexing()
 	p = p and test_flat_plaza_party_and_enemy_positioning()
 	p = p and test_melee_dash_straight_horizontal_and_return()
+	p = p and test_attack_aligns_to_target_line_before_advancing()
 	return p
 
 
@@ -679,9 +680,12 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1)
 	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2)
 	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3)
-	assert(p0 == Vector2(940.0, 510.0) and p1 == Vector2(1120.0, 410.0), "Lucas and Davi positions")
-	assert(p2 == Vector2(940.0, 430.0) and p3 == Vector2(1120.0, 490.0), "Slots 3 and 4 positions")
-	assert(p0.y - p1.y >= 80.0, "Lucas and Davi have clear vertical rank separation")
+	assert(p0 == Vector2(940.0, 510.0) and p1 == Vector2(1080.0, 430.0), "Lucas and Davi positions")
+	assert(p2 == Vector2(1010.0, 470.0) and p3 == Vector2(1150.0, 390.0), "Slots 3 and 4 positions")
+	assert(p0.x != p1.x and p0.x != p2.x and p0.x != p3.x, "All party X coords must be unique")
+	assert(p1.x != p2.x and p1.x != p3.x and p2.x != p3.x, "All party X coords must be unique")
+	assert(p0.y != p1.y and p0.y != p2.y and p0.y != p3.y, "All party Y coords must be unique")
+	assert(p0.y - p1.y >= 70.0, "Lucas and Davi have clear vertical rank separation")
 	for p: Vector2 in [enemy_cont.position, p0, p1, p2, p3]:
 		assert(p.y >= 350.0 and p.y <= 550.0, "Combatant Y within visible viewport bounds (350..550)")
 	scene.free()
@@ -706,8 +710,27 @@ static func test_melee_dash_straight_horizontal_and_return() -> bool:
 	return true
 
 
-
-
-
-
+static func test_attack_aligns_to_target_line_before_advancing() -> bool:
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
+	var enemy_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
+	var atk: AnimatedSprite2D = AnimatedSprite2D.new()
+	var tgt: AnimatedSprite2D = AnimatedSprite2D.new()
+	party_cont.add_child(atk)
+	enemy_cont.add_child(tgt)
+	atk.position = Vector2.ZERO
+	tgt.position = Vector2.ZERO
+	var linha_y: float = scene._obter_y_local_alvo(atk, tgt, 0.0)
+	assert(is_equal_approx(party_cont.global_position.y + linha_y, tgt.global_position.y), "Aligns to target Y")
+	var contato_x: float = scene._obter_x_local_contato(atk, tgt, 50.0, -650.0)
+	var pos_final: Vector2 = party_cont.global_position + Vector2(contato_x, linha_y)
+	assert(is_equal_approx(pos_final.y, tgt.global_position.y), "Contact strike is on target's line")
+	assert(is_equal_approx(pos_final.x, tgt.global_position.x + 50.0), "Contact strike stops 50px away")
+	var boss_linha_y: float = scene._obter_y_local_alvo(tgt, atk, 0.0)
+	assert(is_equal_approx(enemy_cont.global_position.y + boss_linha_y, atk.global_position.y), "Boss aligns to ally Y")
+	atk.free()
+	tgt.free()
+	scene.free()
+	return true
 

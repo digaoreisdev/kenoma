@@ -81,13 +81,7 @@ func _inicializar_referencias_hud() -> void:
 		ally_est_lbl = ally_panel.find_child("EstLabel", true, false) as Label
 		ally_fase_lbl = ally_panel.find_child("FaseLabel", true, false) as Label
 		ally_portrait_rect = ally_panel.find_child("PortraitRect", true, false) as TextureRect
-	if ally2_panel != null and ally2_name_lbl == null:
-		ally2_name_lbl = ally2_panel.find_child("NameLabel", true, false) as Label
-		ally2_hp_lbl = ally2_panel.find_child("HPLabel", true, false) as Label
-		ally2_mp_lbl = ally2_panel.find_child("MPLabel", true, false) as Label
-		ally2_est_lbl = ally2_panel.find_child("EstLabel", true, false) as Label
-		ally2_fase_lbl = ally2_panel.find_child("FaseLabel", true, false) as Label
-		ally2_portrait_rect = ally2_panel.find_child("PortraitRect", true, false) as TextureRect
+	_inicializar_referencias_ally2()
 	if skills_panel != null:
 		if skill_list == null:
 			skill_list = skills_panel.find_child("SkillList", true, false) as VBoxContainer
@@ -97,6 +91,17 @@ func _inicializar_referencias_hud() -> void:
 		track_area = timeline_tracker.find_child("TrackArea", true, false) as Control
 	_inicializar_referencias_cenario()
 	_inicializar_referencias_inimigo()
+
+
+func _inicializar_referencias_ally2() -> void:
+	if ally2_panel == null or ally2_name_lbl != null:
+		return
+	ally2_name_lbl = ally2_panel.find_child("NameLabel", true, false) as Label
+	ally2_hp_lbl = ally2_panel.find_child("HPLabel", true, false) as Label
+	ally2_mp_lbl = ally2_panel.find_child("MPLabel", true, false) as Label
+	ally2_est_lbl = ally2_panel.find_child("EstLabel", true, false) as Label
+	ally2_fase_lbl = ally2_panel.find_child("FaseLabel", true, false) as Label
+	ally2_portrait_rect = ally2_panel.find_child("PortraitRect", true, false) as TextureRect
 
 
 func _inicializar_referencias_cenario() -> void:
@@ -248,12 +253,12 @@ func _obter_posicao_base_aliado(c_id: String, idx: int) -> Vector2:
 	if c_id == "lucas" or idx == 0:
 		return Vector2(0.0, 0.0)
 	if c_id == "davi" or idx == 1:
-		return Vector2(180.0, -100.0)
+		return Vector2(140.0, -80.0)
 	if idx == 2:
-		return Vector2(0.0, -80.0)
+		return Vector2(70.0, -40.0)
 	if idx == 3:
-		return Vector2(180.0, -20.0)
-	return Vector2(180.0 * (idx % 2), -80.0 * int(idx / 2))
+		return Vector2(210.0, -120.0)
+	return Vector2(70.0 * idx, -40.0 * idx)
 
 
 func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
@@ -366,6 +371,37 @@ func _on_action_executed(actor_id: String, target_id: String, action_type: Strin
 		_tocar_animacao_estacionaria(actor_id, action_type)
 
 
+func _obter_y_local_alvo(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, y_padrao: float) -> float:
+	if tgt == null or atk == null or atk.get_parent() == null:
+		return y_padrao
+	var pai: Node2D = atk.get_parent() as Node2D
+	if pai == null:
+		return y_padrao
+	return tgt.global_position.y - pai.global_position.y
+
+
+func _obter_x_local_contato(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, dist_offset: float, x_padrao: float) -> float:
+	if tgt == null or atk == null or atk.get_parent() == null:
+		return x_padrao
+	var pai: Node2D = atk.get_parent() as Node2D
+	if pai == null:
+		return x_padrao
+	return (tgt.global_position.x + dist_offset) - pai.global_position.x
+
+
+func _adicionar_impacto_e_retorno(tw: Tween, atk: AnimatedSprite2D, anim: String, tgt_id: String, orig: Vector2, actor_id: String, is_ally: bool) -> void:
+	tw.tween_callback(func():
+		_no_contato_golpe(atk, anim, tgt_id)
+		_aplicar_tremor_impacto()
+	)
+	tw.tween_interval(0.40)
+	tw.tween_property(atk, "position", orig, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func():
+		_restaurar_idle(atk, actor_id, is_ally)
+		_finalizar_acao_cena()
+	)
+
+
 func _executar_ataque_melee_lucas(actor_id: String, target_id: String) -> void:
 	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
 	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
@@ -373,24 +409,19 @@ func _executar_ataque_melee_lucas(actor_id: String, target_id: String) -> void:
 		_finalizar_acao_cena()
 		return
 	var orig: Vector2 = atk.position
-	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(-650.0, -40.0))
+	var linha_y: float = _obter_y_local_alvo(atk, tgt, orig.y)
+	var contato_x: float = _obter_x_local_contato(atk, tgt, 50.0, orig.x - 650.0)
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
-	tw.tween_property(atk, "position", orig + dash, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_callback(func():
-		_no_contato_golpe(atk, anim, target_id)
-		_aplicar_tremor_impacto()
-	)
-	tw.tween_interval(0.45)
-	tw.tween_property(atk, "position", orig, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func():
-		_restaurar_idle(atk, actor_id, true)
-		_finalizar_acao_cena()
-	)
+	if not is_equal_approx(orig.y, linha_y):
+		tw.tween_property(atk, "position", Vector2(orig.x, linha_y), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_interval(0.04)
+	tw.tween_property(atk, "position", Vector2(contato_x, linha_y), 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_adicionar_impacto_e_retorno(tw, atk, anim, target_id, orig, actor_id, true)
 
 
 func _calcular_dash_ataque(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, fallback: Vector2) -> Vector2:
-	if tgt == null:
+	if tgt == null or atk == null:
 		return fallback
 	var diff: Vector2 = tgt.global_position - atk.global_position
 	return diff.normalized() * (diff.length() - 50.0) if diff.length() > 60.0 else fallback
@@ -402,16 +433,24 @@ func _executar_ataque_aura_davi(actor_id: String, target_id: String) -> void:
 	if atk == null:
 		_finalizar_acao_cena()
 		return
+	var orig: Vector2 = atk.position
+	var linha_y: float = _obter_y_local_alvo(atk, tgt, orig.y)
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
-	if not anim.is_empty() and atk.sprite_frames != null and atk.sprite_frames.has_animation(anim):
-		atk.sprite_frames.set_animation_loop(anim, false)
-		atk.play(anim)
 	var tw: Tween = create_tween()
-	tw.tween_interval(0.4)
-	tw.tween_callback(func(): _disparar_projetil_aura(atk, tgt, actor_id, target_id))
+	if not is_equal_approx(orig.y, linha_y):
+		tw.tween_property(atk, "position", Vector2(orig.x, linha_y), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_interval(0.04)
+	tw.tween_callback(func():
+		if not anim.is_empty() and atk.sprite_frames != null and atk.sprite_frames.has_animation(anim):
+			atk.sprite_frames.set_animation_loop(anim, false)
+			atk.play(anim)
+	)
+	tw.tween_interval(0.35)
+	tw.tween_callback(func(): _disparar_projetil_aura(atk, tgt, actor_id, target_id, orig))
 
 
-func _disparar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, actor_id: String, target_id: String) -> void:
+func _disparar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, actor_id: String, target_id: String, orig_pos: Vector2 = Vector2.INF) -> void:
+	var orig_retorno: Vector2 = orig_pos if orig_pos != Vector2.INF else (atk.position if atk != null else Vector2.ZERO)
 	var aura: ColorRect = ColorRect.new()
 	aura.custom_minimum_size = Vector2(28.0, 28.0)
 	aura.size = Vector2(28.0, 28.0)
@@ -420,21 +459,23 @@ func _disparar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, actor
 	get_parent().add_child(aura)
 	var tgt_pos: Vector2 = tgt.global_position - Vector2(14.0, 14.0) if tgt != null else aura.position + Vector2(-400.0, 0.0)
 	var tw: Tween = create_tween()
-	tw.tween_property(aura, "position", tgt_pos, 0.45).set_trans(Tween.TRANS_SINE)
-	tw.tween_callback(func(): _no_impacto_aura(aura, atk, actor_id, target_id))
+	tw.tween_property(aura, "position", tgt_pos, 0.40).set_trans(Tween.TRANS_SINE)
+	tw.tween_callback(func(): _no_impacto_aura(aura, atk, actor_id, target_id, orig_retorno))
 
 
 func _criar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, target_id: String) -> void:
 	_disparar_projetil_aura(atk, tgt, "davi", target_id)
 
 
-func _no_impacto_aura(aura: ColorRect, atk: AnimatedSprite2D, actor_id: String, target_id: String) -> void:
+func _no_impacto_aura(aura: ColorRect, atk: AnimatedSprite2D, actor_id: String, target_id: String, orig_retorno: Vector2 = Vector2.ZERO) -> void:
 	_tocar_reacao_alvo(target_id)
 	_aplicar_tremor_impacto()
 	if is_instance_valid(aura):
 		aura.queue_free()
 	var tw: Tween = create_tween()
-	tw.tween_interval(0.4)
+	tw.tween_interval(0.25)
+	if atk != null and not is_equal_approx(atk.position.y, orig_retorno.y):
+		tw.tween_property(atk, "position", orig_retorno, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func():
 		_restaurar_idle(atk, actor_id, true)
 		_finalizar_acao_cena()
@@ -448,20 +489,15 @@ func _executar_ataque_melee_boss(actor_id: String, target_id: String) -> void:
 		_finalizar_acao_cena()
 		return
 	var orig: Vector2 = atk.position
-	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(160.0, 0.0))
+	var linha_y: float = _obter_y_local_alvo(atk, tgt, orig.y)
+	var contato_x: float = _obter_x_local_contato(atk, tgt, -50.0, orig.x + 160.0)
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
-	tw.tween_property(atk, "position", orig + dash, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_callback(func():
-		_no_contato_golpe(atk, anim, target_id)
-		_aplicar_tremor_impacto()
-	)
-	tw.tween_interval(0.45)
-	tw.tween_property(atk, "position", orig, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func():
-		_restaurar_idle(atk, actor_id, false)
-		_finalizar_acao_cena()
-	)
+	if not is_equal_approx(orig.y, linha_y):
+		tw.tween_property(atk, "position", Vector2(orig.x, linha_y), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_interval(0.04)
+	tw.tween_property(atk, "position", Vector2(contato_x, linha_y), 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_adicionar_impacto_e_retorno(tw, atk, anim, target_id, orig, actor_id, false)
 
 
 func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:

@@ -47,11 +47,14 @@ expand_mode = 1
 stretch_mode = 0
 
 [node name="Arena" type="Node2D" parent="CanvasLayer/UI"]
+y_sort_enabled = true
 
 [node name="EnemyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
+y_sort_enabled = true
 position = Vector2(240, 470)
 
 [node name="PartyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
+y_sort_enabled = true
 position = Vector2(940, 510)
 
 [node name="HeaderPanel" type="ColorRect" parent="CanvasLayer/UI"]
