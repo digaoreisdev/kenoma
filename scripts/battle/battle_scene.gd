@@ -40,6 +40,10 @@ extends Node2D
 @onready var enemy_ruptura_badge: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/RupturaBadge")
 @onready var timeline_tracker: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker")
 @onready var track_area: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker/Margin/HBox/TrackArea")
+@onready var arena_background: TextureRect = get_node_or_null("CanvasLayer/UI/ArenaBackground")
+@onready var props_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer")
+@onready var miasma_crystal_prop: Sprite2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/MiasmaCrystalProp")
+@onready var elevated_rock_prop: Sprite2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/ElevatedRockProp")
 @onready var party_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PartyContainer")
 @onready var enemy_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer")
 @onready var victory_banner: Control = get_node_or_null("CanvasLayer/UI/VictoryBanner")
@@ -51,6 +55,8 @@ var timeline_badges: Dictionary = {}
 
 func _ready() -> void:
 	_inicializar_referencias_hud()
+	_configurar_texturas_cenario()
+	_iniciar_pulsacao_cristal()
 	if battle_manager != null:
 		battle_manager.battle_state_changed.connect(_on_state_changed)
 		battle_manager.timeline_updated.connect(_update_hud)
@@ -88,7 +94,17 @@ func _inicializar_referencias_hud() -> void:
 			btn_voltar_skills = skills_panel.find_child("BtnVoltar", true, false) as Button
 	if timeline_tracker != null and track_area == null:
 		track_area = timeline_tracker.find_child("TrackArea", true, false) as Control
+	_inicializar_referencias_cenario()
 	_inicializar_referencias_inimigo()
+
+
+func _inicializar_referencias_cenario() -> void:
+	if arena_background == null:
+		arena_background = find_child("ArenaBackground", true, false) as TextureRect
+	if miasma_crystal_prop == null:
+		miasma_crystal_prop = find_child("MiasmaCrystalProp", true, false) as Sprite2D
+	if elevated_rock_prop == null:
+		elevated_rock_prop = find_child("ElevatedRockProp", true, false) as Sprite2D
 
 
 func _inicializar_referencias_inimigo() -> void:
@@ -165,6 +181,54 @@ func _spawn_allies(allies: Array[CharacterData]) -> void:
 			_criar_sprite_aliado(ally, idx)
 
 
+static func obter_caminho_background() -> String:
+	const BG_PATH: String = "res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png"
+	if ResourceLoader.exists(BG_PATH):
+		return BG_PATH
+	return ""
+
+
+static func obter_caminho_prop(nome_prop: String) -> String:
+	var p1: String = "res://assets/art/props/battle/" + nome_prop
+	if ResourceLoader.exists(p1):
+		return p1
+	var p2: String = "res://assets/art/props/batle/" + nome_prop
+	if ResourceLoader.exists(p2):
+		return p2
+	return ""
+
+
+func _configurar_texturas_cenario() -> void:
+	if arena_background != null and arena_background.texture == null:
+		var bg_path: String = obter_caminho_background()
+		if not bg_path.is_empty():
+			arena_background.texture = load(bg_path) as Texture2D
+	if miasma_crystal_prop != null and miasma_crystal_prop.texture == null:
+		var cry_path: String = obter_caminho_prop("prop_fenda_cristal_miasma.png")
+		if not cry_path.is_empty():
+			miasma_crystal_prop.texture = load(cry_path) as Texture2D
+	if elevated_rock_prop != null and elevated_rock_prop.texture == null:
+		var rk_path: String = obter_caminho_prop("prop_plato_rocha_elevada.png")
+		if not rk_path.is_empty():
+			elevated_rock_prop.texture = load(rk_path) as Texture2D
+
+
+func _iniciar_pulsacao_cristal() -> void:
+	if miasma_crystal_prop == null:
+		return
+	var tw: Tween = create_tween().set_loops()
+	tw.tween_property(miasma_crystal_prop, "modulate:a", 0.85, 1.2).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(miasma_crystal_prop, "modulate:a", 1.0, 1.2).set_trans(Tween.TRANS_SINE)
+
+
+func _obter_posicao_base_aliado(c_id: String, idx: int) -> Vector2:
+	if c_id == "lucas":
+		return Vector2(-80.0, 70.0)
+	if c_id == "davi":
+		return Vector2(60.0, -40.0)
+	return Vector2(40.0 * idx, 50.0 * idx)
+
+
 func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
 	sprite.name = ally.character_id
@@ -175,7 +239,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	sprite.scale = Vector2(0.9, 0.9)
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(40.0 * idx, 50.0 * idx)
+	sprite.position = _obter_posicao_base_aliado(ally.character_id, idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite
