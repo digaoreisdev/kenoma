@@ -13,3 +13,4 @@ dano_estabilidade = 15
 tempo_conjuracao = 2.0
 tipo = "MAGICO"
 target_type = 0
+

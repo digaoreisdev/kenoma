@@ -35,12 +35,18 @@ extends Node2D
 @onready var enemy_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/HPLabel")
 @onready var enemy_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/EstLabel")
 @onready var enemy_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/FaseLabel")
+@onready var enemy_hp_bar: ProgressBar = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/HPBar")
+@onready var enemy_est_bar: ProgressBar = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/EstBar")
+@onready var enemy_ruptura_badge: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/RupturaBadge")
+@onready var timeline_tracker: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker")
+@onready var track_area: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker/Margin/HBox/TrackArea")
 @onready var party_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PartyContainer")
 @onready var enemy_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer")
 @onready var victory_banner: Control = get_node_or_null("CanvasLayer/UI/VictoryBanner")
 
 var ally_sprites: Dictionary = {}
 var enemy_sprites: Dictionary = {}
+var timeline_badges: Dictionary = {}
 
 
 func _ready() -> void:
@@ -80,16 +86,21 @@ func _inicializar_referencias_hud() -> void:
 			skill_list = skills_panel.find_child("SkillList", true, false) as VBoxContainer
 		if btn_voltar_skills == null:
 			btn_voltar_skills = skills_panel.find_child("BtnVoltar", true, false) as Button
+	if timeline_tracker != null and track_area == null:
+		track_area = timeline_tracker.find_child("TrackArea", true, false) as Control
 	_inicializar_referencias_inimigo()
 
 
 func _inicializar_referencias_inimigo() -> void:
-	if enemy_panel != null and enemy_name_lbl == null:
-		enemy_name_lbl = enemy_panel.find_child("NameLabel", true, false) as Label
-		enemy_hp_lbl = enemy_panel.find_child("HPLabel", true, false) as Label
-		enemy_est_lbl = enemy_panel.find_child("EstLabel", true, false) as Label
-		enemy_fase_lbl = enemy_panel.find_child("FaseLabel", true, false) as Label
-		enemy_portrait_rect = enemy_panel.find_child("PortraitRect", true, false) as TextureRect
+	if enemy_panel != null:
+		if enemy_name_lbl == null: enemy_name_lbl = enemy_panel.find_child("NameLabel", true, false) as Label
+		if enemy_hp_lbl == null: enemy_hp_lbl = enemy_panel.find_child("HPLabel", true, false) as Label
+		if enemy_est_lbl == null: enemy_est_lbl = enemy_panel.find_child("EstLabel", true, false) as Label
+		if enemy_fase_lbl == null: enemy_fase_lbl = enemy_panel.find_child("FaseLabel", true, false) as Label
+		if enemy_portrait_rect == null: enemy_portrait_rect = enemy_panel.find_child("PortraitRect", true, false) as TextureRect
+		if enemy_hp_bar == null: enemy_hp_bar = enemy_panel.find_child("HPBar", true, false) as ProgressBar
+		if enemy_est_bar == null: enemy_est_bar = enemy_panel.find_child("EstBar", true, false) as ProgressBar
+		if enemy_ruptura_badge == null: enemy_ruptura_badge = enemy_panel.find_child("RupturaBadge", true, false) as Label
 
 
 func _connect_buttons() -> void:
@@ -110,6 +121,36 @@ func _connect_buttons() -> void:
 func _setup_arena_combatants(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
 	_spawn_allies(allies)
 	_spawn_enemies(enemy_list)
+	_setup_timeline_badges(allies, enemy_list)
+
+
+func _setup_timeline_badges(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
+	if track_area == null:
+		return
+	for c: Node in track_area.get_children():
+		if c.name != "TrackLine":
+			c.queue_free()
+	timeline_badges.clear()
+	for ally: CharacterData in allies:
+		if ally != null:
+			_criar_badge_combatente(ally.character_id, _obter_textura_retrato(ally), true)
+	for e: Dictionary in enemy_list:
+		var e_id: String = str(e.get("id", "inimigo"))
+		_criar_badge_combatente(e_id, _obter_textura_retrato_inimigo(e), false)
+
+
+func _criar_badge_combatente(c_id: String, tex: Texture2D, _eh_aliado: bool) -> void:
+	var badge: TextureRect = TextureRect.new()
+	badge.name = "Badge_" + c_id
+	badge.custom_minimum_size = Vector2(36.0, 36.0)
+	badge.size = Vector2(36.0, 36.0)
+	badge.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	badge.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	badge.texture = tex
+	badge.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	badge.position = Vector2(0.0, 2.0)
+	track_area.add_child(badge)
+	timeline_badges[c_id] = badge
 
 
 func _spawn_allies(allies: Array[CharacterData]) -> void:
@@ -514,8 +555,35 @@ func _update_labels(state: BattleManager.BattleState) -> void:
 func _update_hud() -> void:
 	if battle_manager == null:
 		return
+	_update_timeline_tracker()
 	_update_ally_hud()
 	_update_enemy_hud()
+
+
+static func obter_posicao_badge_timeline(progresso: float, largura_trilha: float) -> float:
+	return clampf(progresso / 100.0, 0.0, 1.0) * largura_trilha
+
+
+func _update_timeline_tracker() -> void:
+	if track_area == null or battle_manager == null or battle_manager.timeline == null:
+		return
+	if timeline_badges.is_empty() and not battle_manager.party_members.is_empty():
+		_setup_timeline_badges(battle_manager.party_members, battle_manager.enemies)
+	var largura: float = maxf(10.0, track_area.size.x - 36.0)
+	for c: Dictionary in battle_manager.timeline.combatentes:
+		var c_id: String = str(c.get("id", ""))
+		if not timeline_badges.has(c_id):
+			continue
+		var badge: TextureRect = timeline_badges[c_id] as TextureRect
+		if badge == null:
+			continue
+		var pos: float = float(c.get("posicao_tempo", 0.0))
+		badge.position.x = obter_posicao_badge_timeline(pos, largura)
+		var fase: int = int(c.get("fase_turno", BattleTimeline.FaseTurno.ESPERA))
+		if fase == BattleTimeline.FaseTurno.CONJURACAO:
+			badge.modulate = Color(0.7, 0.4, 2.2, 1.0)
+		else:
+			badge.modulate = Color.WHITE
 
 
 func _update_ally_hud() -> void:
@@ -541,12 +609,29 @@ func _atualizar_painel_aliado(hero: CharacterData, panel: Control, p_rect: Textu
 	if hp_lbl != null: hp_lbl.text = "PV: %d/%d" % [hero.current_hp, hero.max_hp]
 	if mp_lbl != null: mp_lbl.text = "PM: %d/%d" % [hero.pm_atual, hero.pm_max]
 	var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id) if battle_manager.timeline != null else {}
-	if est_lbl != null: est_lbl.text = "Estabilidade: %d/100" % int(c_comb.get("estabilidade_atual", 100))
+	var est_val: int = int(c_comb.get("estabilidade_atual", 100))
+	if est_lbl != null: est_lbl.text = "Estabilidade: %d/100" % est_val
 	if f_lbl != null:
 		var pos: float = float(c_comb.get("posicao_tempo", 0.0))
 		f_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(hero.character_id), pos]
+	_atualizar_barras_aliado(panel, hero, est_val)
 	var is_acting: bool = (battle_manager.current_state == BattleManager.BattleState.SELECIONANDO_ACAO and battle_manager.active_actor_index == idx)
-	panel.modulate = Color(1.2, 1.2, 0.7, 1.0) if is_acting else Color.WHITE
+	panel.modulate = Color(1.3, 1.25, 0.7, 1.0) if is_acting else Color.WHITE
+
+
+func _atualizar_barras_aliado(panel: Control, hero: CharacterData, est_val: int) -> void:
+	var hp_b: ProgressBar = panel.find_child("HPBar", true, false) as ProgressBar
+	if hp_b != null:
+		hp_b.max_value = hero.max_hp
+		hp_b.value = hero.current_hp
+	var mp_b: ProgressBar = panel.find_child("MPBar", true, false) as ProgressBar
+	if mp_b != null:
+		mp_b.max_value = hero.pm_max
+		mp_b.value = hero.pm_atual
+	var est_b: ProgressBar = panel.find_child("EstBar", true, false) as ProgressBar
+	if est_b != null:
+		est_b.max_value = 100
+		est_b.value = est_val
 
 
 func _obter_textura_retrato(hero: CharacterData) -> Texture2D:
@@ -574,13 +659,29 @@ func _update_enemy_hud() -> void:
 		var tex: Texture2D = _obter_textura_retrato_inimigo(en)
 		if tex != null and enemy_portrait_rect.texture != tex:
 			enemy_portrait_rect.texture = tex
+	var cur_hp: int = int(en.get("current_hp", 0))
+	var max_hp: int = int(en.get("max_hp", 100))
+	var cur_est: int = int(en.get("estabilidade_atual", 100))
+	var max_est: int = int(en.get("estabilidade_max", 100))
 	if enemy_name_lbl != null: enemy_name_lbl.text = str(en.get("name", "Inimigo"))
-	if enemy_hp_lbl != null: enemy_hp_lbl.text = "PV: %d/%d" % [int(en.get("current_hp", 0)), int(en.get("max_hp", 100))]
-	if enemy_est_lbl != null: enemy_est_lbl.text = "Estabilidade: %d/%d" % [int(en.get("estabilidade_atual", 100)), int(en.get("estabilidade_max", 100))]
+	if enemy_hp_lbl != null: enemy_hp_lbl.text = "PV: %d/%d" % [cur_hp, max_hp]
+	if enemy_est_lbl != null: enemy_est_lbl.text = "Estabilidade: %d/%d" % [cur_est, max_est]
+	_atualizar_barras_inimigo(cur_hp, max_hp, cur_est, max_est)
 	if enemy_fase_lbl != null:
 		var c_comb: Dictionary = battle_manager.timeline.obter_combatente(str(en.get("id", ""))) if battle_manager.timeline != null else {}
 		var pos: float = float(c_comb.get("posicao_tempo", 0.0))
 		enemy_fase_lbl.text = "Fase: %s (%.0f%%)" % [_obter_nome_fase(str(en.get("id", ""))), pos]
+
+
+func _atualizar_barras_inimigo(cur_hp: int, max_hp: int, cur_est: int, max_est: int) -> void:
+	if enemy_hp_bar != null:
+		enemy_hp_bar.max_value = max_hp
+		enemy_hp_bar.value = cur_hp
+	if enemy_est_bar != null:
+		enemy_est_bar.max_value = max_est
+		enemy_est_bar.value = cur_est
+	if enemy_ruptura_badge != null:
+		enemy_ruptura_badge.visible = (cur_est <= 0)
 
 
 func _obter_textura_retrato_inimigo(en: Dictionary) -> Texture2D:

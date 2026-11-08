@@ -39,6 +39,8 @@ static func _run_group_b() -> bool:
 	p = p and test_selecting_skill_deducts_mp()
 	p = p and test_casting_phase_advances_and_triggers_at_100()
 	p = p and test_damage_taken_during_conjuracao_interrupts_spell()
+	p = p and test_timeline_badge_position_mapping()
+	p = p and test_eiyuden_ui_dock_and_banner_instantiation()
 	return p
 
 
@@ -616,6 +618,34 @@ static func test_damage_taken_during_conjuracao_interrupts_spell() -> bool:
 	assert(int(t_davi["fase_turno"]) == BattleTimeline.FaseTurno.ESPERA, "Phase must reset to ESPERA on interrupt")
 	assert(float(t_davi["progresso_conjuracao"]) == 0.0, "Casting progress must reset to 0.0")
 	bm.free()
+	return true
+
+
+static func test_timeline_badge_position_mapping() -> bool:
+	assert(is_equal_approx(BattleScene.obter_posicao_badge_timeline(0.0, 400.0), 0.0), "0% progress is at 0.0")
+	assert(is_equal_approx(BattleScene.obter_posicao_badge_timeline(50.0, 400.0), 200.0), "50% progress is at 200.0")
+	assert(is_equal_approx(BattleScene.obter_posicao_badge_timeline(100.0, 400.0), 400.0), "100% progress is at 400.0")
+	assert(is_equal_approx(BattleScene.obter_posicao_badge_timeline(-10.0, 400.0), 0.0), "Clamp lower bound")
+	assert(is_equal_approx(BattleScene.obter_posicao_badge_timeline(120.0, 400.0), 400.0), "Clamp upper bound")
+	return true
+
+
+static func test_eiyuden_ui_dock_and_banner_instantiation() -> bool:
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(scene)
+	var tracker: Control = scene.get_node_or_null("CanvasLayer/UI/TimelineTracker") as Control
+	var track_area: Control = scene.get_node_or_null("CanvasLayer/UI/TimelineTracker/Margin/HBox/TrackArea") as Control
+	var enemy_hp_bar: ProgressBar = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/HPBar") as ProgressBar
+	var ally_mp_bar: ProgressBar = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/MPBar") as ProgressBar
+	assert(tracker != null and track_area != null, "TimelineTracker and TrackArea must exist")
+	assert(enemy_hp_bar != null, "EnemyPanel HPBar must exist")
+	assert(ally_mp_bar != null, "AllyPanel MPBar must exist")
+	if tree != null and tree.root != null:
+		tree.root.remove_child(scene)
+	scene.free()
 	return true
 
 

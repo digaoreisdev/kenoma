@@ -13,3 +13,4 @@ dano_estabilidade = 45
 tempo_conjuracao = 0.0
 tipo = "FISICO"
 target_type = 0
+
