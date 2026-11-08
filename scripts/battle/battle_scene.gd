@@ -106,12 +106,14 @@ func _inicializar_referencias_cenario() -> void:
 		arena_foreground = find_child("ArenaForeground", true, false) as TextureRect
 	if arena_background != null:
 		arena_background.z_index = -10
-		arena_background.position = Vector2.ZERO
-		arena_background.size = Vector2(1920.0, 1080.0)
+		arena_background.set_anchors_preset(Control.PRESET_FULL_RECT)
+		arena_background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		arena_background.stretch_mode = TextureRect.STRETCH_SCALE
 	if arena_foreground != null:
 		arena_foreground.z_index = 10
-		arena_foreground.position = Vector2.ZERO
-		arena_foreground.size = Vector2(1920.0, 1080.0)
+		arena_foreground.set_anchors_preset(Control.PRESET_FULL_RECT)
+		arena_foreground.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		arena_foreground.stretch_mode = TextureRect.STRETCH_SCALE
 		arena_foreground.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
@@ -190,12 +192,11 @@ func _spawn_allies(allies: Array[CharacterData]) -> void:
 
 
 static func obter_caminho_background() -> String:
-	const P_VILLAGE: String = "res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.png"
-	if ResourceLoader.exists(P_VILLAGE):
-		return P_VILLAGE
-	const P_JPG: String = "res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.jpg"
-	if ResourceLoader.exists(P_JPG):
-		return P_JPG
+	const BASE_DIR: String = "res://assets/art/battle_backgrounds/baltazar_village/"
+	for ext: String in ["png", "jpg", "jpeg"]:
+		var p: String = BASE_DIR + "battle_bg_forge_village." + ext
+		if ResourceLoader.exists(p):
+			return p
 	const P_FALLBACK: String = "res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png"
 	if ResourceLoader.exists(P_FALLBACK):
 		return P_FALLBACK
@@ -242,12 +243,12 @@ func _obter_posicao_base_aliado(c_id: String, idx: int) -> Vector2:
 	if c_id == "lucas" or idx == 0:
 		return Vector2(0.0, 0.0)
 	if c_id == "davi" or idx == 1:
-		return Vector2(160.0, -30.0)
+		return Vector2(120.0, -30.0)
 	if idx == 2:
 		return Vector2(0.0, -70.0)
 	if idx == 3:
-		return Vector2(160.0, -90.0)
-	return Vector2(160.0 * (idx % 2), -70.0 * int(idx / 2))
+		return Vector2(120.0, -100.0)
+	return Vector2(120.0 * (idx % 2), -70.0 * int(idx / 2))
 
 
 func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
@@ -367,7 +368,7 @@ func _executar_ataque_melee_lucas(actor_id: String, target_id: String) -> void:
 		_finalizar_acao_cena()
 		return
 	var orig: Vector2 = atk.position
-	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(-220.0, 0.0))
+	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(-690.0, -20.0))
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
 	tw.tween_property(atk, "position", orig + dash, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)

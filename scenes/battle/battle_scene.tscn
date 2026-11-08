@@ -32,30 +32,36 @@ color = Color(0.04, 0.05, 0.08, 1)
 
 [node name="ArenaBackground" type="TextureRect" parent="CanvasLayer/UI"]
 z_index = -10
-layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("3_bg_village")
 expand_mode = 1
-stretch_mode = 6
+stretch_mode = 0
 
 [node name="ArenaForeground" type="TextureRect" parent="CanvasLayer/UI"]
 z_index = 10
-layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("4_fg_signpost")
 expand_mode = 1
-stretch_mode = 6
+stretch_mode = 0
 
 [node name="Arena" type="Node2D" parent="CanvasLayer/UI"]
 
 [node name="EnemyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-position = Vector2(360, 650)
+position = Vector2(240, 480)
 
 [node name="PartyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-position = Vector2(1100, 670)
+position = Vector2(980, 500)
 
 [node name="HeaderPanel" type="ColorRect" parent="CanvasLayer/UI"]
 layout_mode = 0
@@ -223,9 +229,9 @@ text = "Fase: Espera"
 [node name="AllyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
 offset_left = 920.0
-offset_top = 210.0
+offset_top = 80.0
 offset_right = 1250.0
-offset_bottom = 330.0
+offset_bottom = 195.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel"]
 layout_mode = 2
@@ -301,9 +307,9 @@ text = "Fase: Espera"
 [node name="AllyPanel2" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
 offset_left = 920.0
-offset_top = 340.0
+offset_top = 205.0
 offset_right = 1250.0
-offset_bottom = 460.0
+offset_bottom = 320.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2"]
 layout_mode = 2
