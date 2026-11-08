@@ -4,6 +4,8 @@ extends Node2D
 ## Cena de combate com arena visual de combatentes, HUD e comandos de ação.
 
 const LayoutScript = preload("res://scripts/battle/battle_scene_layout.gd")
+const ESCALA_COMBATENTE_BASE: Vector2 = Vector2(0.9, 0.9)
+const MULTIPLICADOR_COMPENSACAO_ATAQUE: float = 1.25
 
 @onready var battle_manager: BattleManager = get_node_or_null("BattleManager")
 @onready var state_label: Label = get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/StateLabel")
@@ -374,7 +376,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int, _total_aliados: int = 2
 	if frames == null:
 		frames = _obter_fallback_frames_aliado(ally.character_id)
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(0.9, 0.9)
+	sprite.scale = ESCALA_COMBATENTE_BASE
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = _obter_posicao_base_aliado(idx)
@@ -414,7 +416,7 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 		if ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(0.9, 0.9)
+	sprite.scale = ESCALA_COMBATENTE_BASE
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var total_inimigos: int = 1
@@ -574,6 +576,7 @@ func _executar_ataque_aura_davi(actor_id: String, target_id: String) -> void:
 		tw.tween_property(atk, "position", Vector2(orig.x, linha_y), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tw.tween_interval(0.04)
 	tw.tween_callback(func():
+		aplicar_escala_ataque(atk)
 		if not anim.is_empty() and atk.sprite_frames != null and atk.sprite_frames.has_animation(anim):
 			atk.sprite_frames.set_animation_loop(anim, false)
 			atk.play(anim)
@@ -655,9 +658,11 @@ func _finalizar_acao_cena() -> void:
 
 
 func _no_contato_golpe(atk_sprite: AnimatedSprite2D, anim: String, target_id: String) -> void:
-	if not anim.is_empty() and atk_sprite.sprite_frames != null and atk_sprite.sprite_frames.has_animation(anim):
-		atk_sprite.sprite_frames.set_animation_loop(anim, false)
-		atk_sprite.play(anim)
+	if atk_sprite != null:
+		aplicar_escala_ataque(atk_sprite)
+		if not anim.is_empty() and atk_sprite.sprite_frames != null and atk_sprite.sprite_frames.has_animation(anim):
+			atk_sprite.sprite_frames.set_animation_loop(anim, false)
+			atk_sprite.play(anim)
 	_tocar_reacao_alvo(target_id)
 
 
@@ -709,10 +714,23 @@ func _obter_nome_anim_defesa(frames: SpriteFrames) -> String:
 
 
 func _restaurar_idle(sprite: AnimatedSprite2D, actor_id: String, is_ally: bool) -> void:
+	restaurar_escala_base(sprite)
 	if is_ally:
 		_tocar_idle_aliado(sprite, actor_id)
 	else:
 		_tocar_idle_inimigo(sprite)
+
+
+static func aplicar_escala_ataque(sprite: AnimatedSprite2D) -> void:
+	if sprite == null:
+		return
+	sprite.scale = ESCALA_COMBATENTE_BASE * MULTIPLICADOR_COMPENSACAO_ATAQUE
+
+
+static func restaurar_escala_base(sprite: AnimatedSprite2D) -> void:
+	if sprite == null:
+		return
+	sprite.scale = ESCALA_COMBATENTE_BASE
 
 
 func _tocar_reacao_alvo(target_id: String) -> void:

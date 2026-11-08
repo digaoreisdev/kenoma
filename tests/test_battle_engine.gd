@@ -52,6 +52,7 @@ static func _run_group_c() -> bool:
 	p = p and test_tactical_encirclement_modes()
 	p = p and test_melee_dash_straight_horizontal_and_return()
 	p = p and test_attack_aligns_to_target_line_before_advancing()
+	p = p and test_combatant_attack_scale_compensation_and_idle_restoration()
 	return p
 
 
@@ -674,6 +675,10 @@ static func test_village_arena_layers_and_z_indexing() -> bool:
 	assert(fg.z_index == 10, "Foreground z_index must be 10")
 	assert(birds != null and birds.z_index == -9, "DistantBirds sky ambiance must exist at z=-9")
 	assert(clouds != null and clouds.z_index == -9, "SkyClouds drifting ambiance must exist at z=-9")
+	clouds.inicializar()
+	assert(clouds.get_child_count() > 0, "SkyClouds must spawn Sprite2D children")
+	var first_cloud: Sprite2D = clouds.get_child(0) as Sprite2D
+	assert(first_cloud != null and first_cloud.texture != null, "SkyClouds sprite must have valid texture")
 	assert(ally_panel != null and ally_panel.offset_top < 400.0, "AllyPanel must be placed in the upper right dock (Y < 400)")
 	assert(action_panel != null and action_panel.offset_top < 800.0, "ActionCommandPanel must be raised comfortably above screen edge (Y < 800)")
 	assert(not BattleScene.obter_caminho_background().is_empty(), "Background path must resolve")
@@ -783,4 +788,23 @@ static func test_attack_aligns_to_target_line_before_advancing() -> bool:
 	tgt.free()
 	scene.free()
 	return true
+
+
+static func test_combatant_attack_scale_compensation_and_idle_restoration() -> bool:
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	assert(BattleScene.ESCALA_COMBATENTE_BASE == Vector2(0.9, 0.9), "Base scale must be (0.9, 0.9)")
+	assert(is_equal_approx(BattleScene.MULTIPLICADOR_COMPENSACAO_ATAQUE, 1.25), "Attack scale compensation multiplier must be 1.25")
+	var dummy_sprite: AnimatedSprite2D = AnimatedSprite2D.new()
+	scene.restaurar_escala_base(dummy_sprite)
+	assert(dummy_sprite.scale == BattleScene.ESCALA_COMBATENTE_BASE, "Idle restoration resets sprite scale to base")
+	scene.aplicar_escala_ataque(dummy_sprite)
+	assert(dummy_sprite.scale == BattleScene.ESCALA_COMBATENTE_BASE * BattleScene.MULTIPLICADOR_COMPENSACAO_ATAQUE, "Attack scale applies 1.25 compensation")
+	assert(is_equal_approx(dummy_sprite.scale.x, 1.125) and is_equal_approx(dummy_sprite.scale.y, 1.125), "Attack scale equals (1.125, 1.125)")
+	scene.restaurar_escala_base(dummy_sprite)
+	assert(dummy_sprite.scale == BattleScene.ESCALA_COMBATENTE_BASE, "Restores back to base scale after strike")
+	dummy_sprite.free()
+	scene.free()
+	return true
+
 
