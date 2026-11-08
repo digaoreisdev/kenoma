@@ -41,9 +41,9 @@ static func _run_group_b() -> bool:
 	p = p and test_damage_taken_during_conjuracao_interrupts_spell()
 	p = p and test_timeline_badge_position_mapping()
 	p = p and test_eiyuden_ui_dock_and_banner_instantiation()
-	p = p and test_battle_background_and_props_instantiation()
-	p = p and test_multi_level_party_positioning()
-	p = p and test_melee_dash_math_with_new_ground_coordinates()
+	p = p and test_village_arena_layers_and_z_indexing()
+	p = p and test_flat_plaza_party_and_enemy_positioning()
+	p = p and test_melee_dash_straight_horizontal_and_return()
 	return p
 
 
@@ -119,8 +119,8 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	var banner: Control = battle_scene.get_node_or_null("CanvasLayer/UI/VictoryBanner") as Control
 	assert(party_cont != null and enemy_cont != null, "Containers must exist in arena")
 	assert(banner != null, "VictoryBanner must exist in battle scene UI")
-	assert(is_equal_approx(enemy_cont.position.x, 280.0), "EnemyContainer must be at X=280")
-	assert(is_equal_approx(party_cont.position.x, 1020.0), "PartyContainer must be at X=1020")
+	assert(is_equal_approx(enemy_cont.position.x, 360.0), "EnemyContainer must be at X=360")
+	assert(is_equal_approx(party_cont.position.x, 1100.0), "PartyContainer must be at X=1100")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -652,51 +652,53 @@ static func test_eiyuden_ui_dock_and_banner_instantiation() -> bool:
 	return true
 
 
-static func test_battle_background_and_props_instantiation() -> bool:
+static func test_village_arena_layers_and_z_indexing() -> bool:
 	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var bg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaBackground") as TextureRect
-	var props: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PropsContainer") as Node2D
-	var rock: Sprite2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/ElevatedRockProp") as Sprite2D
-	var crystal: Sprite2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/MiasmaCrystalProp") as Sprite2D
-	assert(bg != null, "ArenaBackground must exist")
-	assert(props != null, "PropsContainer must exist")
-	assert(rock != null and crystal != null, "Props must exist in arena")
-	assert(not BattleScene.obter_caminho_background().is_empty(), "Background path must resolve")
-	assert(not BattleScene.obter_caminho_prop("prop_fenda_cristal_miasma.png").is_empty(), "Crystal prop must resolve")
-	assert(not BattleScene.obter_caminho_prop("prop_plato_rocha_elevada.png").is_empty(), "Rock prop must resolve")
+	var fg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaForeground") as TextureRect
+	assert(bg != null and fg != null, "ArenaBackground and ArenaForeground must exist")
+	assert(bg.z_index == -10, "Background z_index must be -10")
+	assert(fg.z_index == 10, "Foreground z_index must be 10")
+	assert(is_equal_approx(bg.size.x, 1920.0) and is_equal_approx(bg.size.y, 1080.0), "BG must be 1920x1080")
+	assert(is_equal_approx(fg.size.x, 1920.0) and is_equal_approx(fg.size.y, 1080.0), "FG must be 1920x1080")
+	assert(not BattleScene.obter_caminho_background().is_empty(), "Village background must resolve")
+	assert(not BattleScene.obter_caminho_foreground().is_empty(), "Village foreground must resolve")
 	scene.free()
 	return true
 
 
-static func test_multi_level_party_positioning() -> bool:
+static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
-	var lucas_rel: Vector2 = scene._obter_posicao_base_aliado("lucas", 0)
-	var davi_rel: Vector2 = scene._obter_posicao_base_aliado("davi", 1)
-	assert(lucas_rel == Vector2(-80.0, 70.0), "Lucas relative pos must be (-80, 70)")
-	assert(davi_rel == Vector2(60.0, -40.0), "Davi relative pos must be (60, -40)")
-	var party_base: Vector2 = Vector2(1020.0, 440.0)
-	var lucas_glob: Vector2 = party_base + lucas_rel
-	var davi_glob: Vector2 = party_base + davi_rel
-	assert(lucas_glob == Vector2(940.0, 510.0), "Lucas global pos must be (940, 510)")
-	assert(davi_glob == Vector2(1080.0, 400.0), "Davi global pos must be (1080, 400)")
-	assert(davi_glob.y < lucas_glob.y, "Davi must be elevated above Lucas on the rock")
+	var enemy_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
+	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
+	assert(enemy_cont.position == Vector2(360.0, 650.0), "EnemyContainer must be at (360, 650)")
+	assert(party_cont.position == Vector2(1100.0, 670.0), "PartyContainer must be at (1100, 670)")
+	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("lucas", 0)
+	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1)
+	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2)
+	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3)
+	assert(p0 == Vector2(1100.0, 670.0), "Lucas must be at (1100, 670)")
+	assert(p1 == Vector2(1260.0, 640.0), "Davi must be at (1260, 640)")
+	assert(p2 == Vector2(1100.0, 600.0), "Slot 3 must be at (1100, 600)")
+	assert(p3 == Vector2(1260.0, 580.0), "Slot 4 must be at (1260, 580)")
 	scene.free()
 	return true
 
 
-static func test_melee_dash_math_with_new_ground_coordinates() -> bool:
+static func test_melee_dash_straight_horizontal_and_return() -> bool:
 	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var dummy_atk: AnimatedSprite2D = AnimatedSprite2D.new()
 	var dummy_tgt: AnimatedSprite2D = AnimatedSprite2D.new()
-	dummy_atk.global_position = Vector2(940.0, 510.0)
-	dummy_tgt.global_position = Vector2(280.0, 460.0)
-	var fallback: Vector2 = Vector2(-120.0, 0.0)
+	dummy_atk.global_position = Vector2(1100.0, 670.0)
+	dummy_tgt.global_position = Vector2(360.0, 650.0)
+	var fallback: Vector2 = Vector2(-690.0, 0.0)
 	var dash: Vector2 = scene._calcular_dash_ataque(dummy_atk, dummy_tgt, fallback)
 	var dest: Vector2 = dummy_atk.global_position + dash
 	assert(is_equal_approx(dest.distance_to(dummy_tgt.global_position), 50.0), "Dash target must stop 50px away")
+	assert(dash.x < -600.0, "Dash must travel across the central earthen plaza horizontally")
 	dummy_atk.free()
 	dummy_tgt.free()
 	scene.free()

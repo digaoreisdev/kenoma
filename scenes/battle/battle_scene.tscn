@@ -2,9 +2,8 @@
 
 [ext_resource type="Script" path="res://scripts/battle/battle_scene.gd" id="1_scene_script"]
 [ext_resource type="Script" path="res://scripts/battle/battle_manager.gd" id="2_mgr_script"]
-[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png" id="3_bg_forest"]
-[ext_resource type="Texture2D" path="res://assets/art/props/battle/prop_plato_rocha_elevada.png" id="4_rock_prop"]
-[ext_resource type="Texture2D" path="res://assets/art/props/battle/prop_fenda_cristal_miasma.png" id="5_crystal_prop"]
+[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.png" id="3_bg_village"]
+[ext_resource type="Texture2D" path="res://assets/art/props/battle/battle_fg_signpost_village.png" id="4_fg_signpost"]
 
 [node name="BattleScene" type="Node2D"]
 script = ExtResource("1_scene_script")
@@ -32,35 +31,31 @@ grow_vertical = 2
 color = Color(0.04, 0.05, 0.08, 1)
 
 [node name="ArenaBackground" type="TextureRect" parent="CanvasLayer/UI"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_bg_forest")
+z_index = -10
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("3_bg_village")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ArenaForeground" type="TextureRect" parent="CanvasLayer/UI"]
+z_index = 10
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+texture = ExtResource("4_fg_signpost")
 expand_mode = 1
 stretch_mode = 6
 
 [node name="Arena" type="Node2D" parent="CanvasLayer/UI"]
 
-[node name="PropsContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-
-[node name="ElevatedRockProp" type="Sprite2D" parent="CanvasLayer/UI/Arena/PropsContainer"]
-position = Vector2(1080, 460)
-scale = Vector2(0.6, 0.6)
-texture = ExtResource("4_rock_prop")
-
-[node name="MiasmaCrystalProp" type="Sprite2D" parent="CanvasLayer/UI/Arena/PropsContainer"]
-position = Vector2(620, 500)
-scale = Vector2(0.75, 0.75)
-texture = ExtResource("5_crystal_prop")
-
 [node name="EnemyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-position = Vector2(280, 460)
+position = Vector2(360, 650)
 
 [node name="PartyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-position = Vector2(1020, 440)
+position = Vector2(1100, 670)
 
 [node name="HeaderPanel" type="ColorRect" parent="CanvasLayer/UI"]
 layout_mode = 0
@@ -228,9 +223,9 @@ text = "Fase: Espera"
 [node name="AllyPanel" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
 offset_left = 920.0
-offset_top = 455.0
+offset_top = 210.0
 offset_right = 1250.0
-offset_bottom = 575.0
+offset_bottom = 330.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel"]
 layout_mode = 2
@@ -306,9 +301,9 @@ text = "Fase: Espera"
 [node name="AllyPanel2" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
 layout_mode = 0
 offset_left = 920.0
-offset_top = 585.0
+offset_top = 340.0
 offset_right = 1250.0
-offset_bottom = 705.0
+offset_bottom = 460.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2"]
 layout_mode = 2

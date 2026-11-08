@@ -41,6 +41,7 @@ extends Node2D
 @onready var timeline_tracker: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker")
 @onready var track_area: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker/Margin/HBox/TrackArea")
 @onready var arena_background: TextureRect = get_node_or_null("CanvasLayer/UI/ArenaBackground")
+@onready var arena_foreground: TextureRect = get_node_or_null("CanvasLayer/UI/ArenaForeground")
 @onready var props_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer")
 @onready var miasma_crystal_prop: Sprite2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/MiasmaCrystalProp")
 @onready var elevated_rock_prop: Sprite2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/ElevatedRockProp")
@@ -101,10 +102,17 @@ func _inicializar_referencias_hud() -> void:
 func _inicializar_referencias_cenario() -> void:
 	if arena_background == null:
 		arena_background = find_child("ArenaBackground", true, false) as TextureRect
-	if miasma_crystal_prop == null:
-		miasma_crystal_prop = find_child("MiasmaCrystalProp", true, false) as Sprite2D
-	if elevated_rock_prop == null:
-		elevated_rock_prop = find_child("ElevatedRockProp", true, false) as Sprite2D
+	if arena_foreground == null:
+		arena_foreground = find_child("ArenaForeground", true, false) as TextureRect
+	if arena_background != null:
+		arena_background.z_index = -10
+		arena_background.position = Vector2.ZERO
+		arena_background.size = Vector2(1920.0, 1080.0)
+	if arena_foreground != null:
+		arena_foreground.z_index = 10
+		arena_foreground.position = Vector2.ZERO
+		arena_foreground.size = Vector2(1920.0, 1080.0)
+		arena_foreground.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _inicializar_referencias_inimigo() -> void:
@@ -182,9 +190,22 @@ func _spawn_allies(allies: Array[CharacterData]) -> void:
 
 
 static func obter_caminho_background() -> String:
-	const BG_PATH: String = "res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png"
-	if ResourceLoader.exists(BG_PATH):
-		return BG_PATH
+	const P_VILLAGE: String = "res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.png"
+	if ResourceLoader.exists(P_VILLAGE):
+		return P_VILLAGE
+	const P_JPG: String = "res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.jpg"
+	if ResourceLoader.exists(P_JPG):
+		return P_JPG
+	const P_FALLBACK: String = "res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png"
+	if ResourceLoader.exists(P_FALLBACK):
+		return P_FALLBACK
+	return ""
+
+
+static func obter_caminho_foreground() -> String:
+	const FG_PATH: String = "res://assets/art/props/battle/battle_fg_signpost_village.png"
+	if ResourceLoader.exists(FG_PATH):
+		return FG_PATH
 	return ""
 
 
@@ -203,14 +224,10 @@ func _configurar_texturas_cenario() -> void:
 		var bg_path: String = obter_caminho_background()
 		if not bg_path.is_empty():
 			arena_background.texture = load(bg_path) as Texture2D
-	if miasma_crystal_prop != null and miasma_crystal_prop.texture == null:
-		var cry_path: String = obter_caminho_prop("prop_fenda_cristal_miasma.png")
-		if not cry_path.is_empty():
-			miasma_crystal_prop.texture = load(cry_path) as Texture2D
-	if elevated_rock_prop != null and elevated_rock_prop.texture == null:
-		var rk_path: String = obter_caminho_prop("prop_plato_rocha_elevada.png")
-		if not rk_path.is_empty():
-			elevated_rock_prop.texture = load(rk_path) as Texture2D
+	if arena_foreground != null and arena_foreground.texture == null:
+		var fg_path: String = obter_caminho_foreground()
+		if not fg_path.is_empty():
+			arena_foreground.texture = load(fg_path) as Texture2D
 
 
 func _iniciar_pulsacao_cristal() -> void:
@@ -222,11 +239,15 @@ func _iniciar_pulsacao_cristal() -> void:
 
 
 func _obter_posicao_base_aliado(c_id: String, idx: int) -> Vector2:
-	if c_id == "lucas":
-		return Vector2(-80.0, 70.0)
-	if c_id == "davi":
-		return Vector2(60.0, -40.0)
-	return Vector2(40.0 * idx, 50.0 * idx)
+	if c_id == "lucas" or idx == 0:
+		return Vector2(0.0, 0.0)
+	if c_id == "davi" or idx == 1:
+		return Vector2(160.0, -30.0)
+	if idx == 2:
+		return Vector2(0.0, -70.0)
+	if idx == 3:
+		return Vector2(160.0, -90.0)
+	return Vector2(160.0 * (idx % 2), -70.0 * int(idx / 2))
 
 
 func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
