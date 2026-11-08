@@ -41,6 +41,9 @@ extends Node2D
 @onready var timeline_tracker: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker")
 @onready var track_area: Control = get_node_or_null("CanvasLayer/UI/TimelineTracker/Margin/HBox/TrackArea")
 @onready var arena_background: TextureRect = get_node_or_null("CanvasLayer/UI/ArenaBackground")
+@onready var layer_casas: TextureRect = get_node_or_null("CanvasLayer/UI/LayerCasas")
+@onready var layer_chao: TextureRect = get_node_or_null("CanvasLayer/UI/LayerChao")
+@onready var prop_bigorna: TextureRect = get_node_or_null("CanvasLayer/UI/PropBigorna")
 @onready var arena_foreground: TextureRect = get_node_or_null("CanvasLayer/UI/ArenaForeground")
 @onready var props_container: Node2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer")
 @onready var miasma_crystal_prop: Sprite2D = get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/MiasmaCrystalProp")
@@ -110,21 +113,30 @@ func _inicializar_referencias_cenario() -> void:
 		dim.queue_free()
 	if arena_background == null:
 		arena_background = find_child("ArenaBackground", true, false) as TextureRect
+	if layer_casas == null:
+		layer_casas = find_child("LayerCasas", true, false) as TextureRect
+	if layer_chao == null:
+		layer_chao = find_child("LayerChao", true, false) as TextureRect
+	if prop_bigorna == null:
+		prop_bigorna = find_child("PropBigorna", true, false) as TextureRect
 	if arena_foreground == null:
 		arena_foreground = find_child("ArenaForeground", true, false) as TextureRect
-	if arena_background != null:
-		arena_background.z_index = -10
-		arena_background.set_anchors_preset(Control.PRESET_FULL_RECT)
-		arena_background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		arena_background.stretch_mode = TextureRect.STRETCH_SCALE
-		arena_background.visible = true
-	if arena_foreground != null:
-		arena_foreground.z_index = 10
-		arena_foreground.set_anchors_preset(Control.PRESET_FULL_RECT)
-		arena_foreground.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		arena_foreground.stretch_mode = TextureRect.STRETCH_SCALE
-		arena_foreground.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		arena_foreground.visible = true
+	_configurar_rect_cenario(arena_background, -10)
+	_configurar_rect_cenario(layer_casas, -8)
+	_configurar_rect_cenario(layer_chao, -5)
+	_configurar_rect_cenario(prop_bigorna, 5)
+	_configurar_rect_cenario(arena_foreground, 10)
+
+
+func _configurar_rect_cenario(rect: TextureRect, z: int) -> void:
+	if rect == null:
+		return
+	rect.z_index = z
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_SCALE
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.visible = true
 
 
 func _inicializar_referencias_inimigo() -> void:
@@ -202,12 +214,30 @@ func _spawn_allies(allies: Array[CharacterData]) -> void:
 			_criar_sprite_aliado(ally, idx, total)
 
 
+static func obter_caminho_ceu() -> String:
+	const P: String = "res://assets/art/battle_backgrounds/baltazar_village/layer_01_ceu.png"
+	return P if ResourceLoader.exists(P) else ""
+
+
+static func obter_caminho_casas() -> String:
+	const P: String = "res://assets/art/battle_backgrounds/baltazar_village/layer_02_casas.png"
+	return P if ResourceLoader.exists(P) else ""
+
+
+static func obter_caminho_chao() -> String:
+	const P: String = "res://assets/art/battle_backgrounds/baltazar_village/layer_03_chao.png"
+	return P if ResourceLoader.exists(P) else ""
+
+
 static func obter_caminho_background() -> String:
 	const BASE_DIR: String = "res://assets/art/battle_backgrounds/baltazar_village/"
 	for ext: String in ["png", "jpg", "jpeg"]:
 		var p: String = BASE_DIR + "battle_bg_forge_village." + ext
 		if ResourceLoader.exists(p):
 			return p
+	var p_ceu: String = obter_caminho_ceu()
+	if not p_ceu.is_empty():
+		return p_ceu
 	const P_FALLBACK: String = "res://assets/art/battle_backgrounds/floresta_miasma/bg_floresta_miasma_completo.png"
 	if ResourceLoader.exists(P_FALLBACK):
 		return P_FALLBACK
@@ -231,11 +261,27 @@ static func obter_caminho_prop(nome_prop: String) -> String:
 	return ""
 
 
+static func _carregar_textura_layer(rect: TextureRect, path: String) -> void:
+	if rect == null:
+		return
+	if not path.is_empty() and ResourceLoader.exists(path):
+		rect.texture = load(path) as Texture2D
+		rect.visible = true
+	else:
+		rect.visible = false
+
+
 func _configurar_texturas_cenario() -> void:
-	if arena_background != null:
+	var ceu_path: String = obter_caminho_ceu()
+	if not ceu_path.is_empty() and arena_background != null:
+		arena_background.texture = load(ceu_path) as Texture2D
+	elif arena_background != null:
 		var bg_path: String = obter_caminho_background()
 		if not bg_path.is_empty():
 			arena_background.texture = load(bg_path) as Texture2D
+	_carregar_textura_layer(layer_casas, obter_caminho_casas())
+	_carregar_textura_layer(layer_chao, obter_caminho_chao())
+	_carregar_textura_layer(prop_bigorna, obter_caminho_prop("prop_bigorna_forja.png"))
 	if arena_foreground != null:
 		var fg_path: String = obter_caminho_foreground()
 		if not fg_path.is_empty():

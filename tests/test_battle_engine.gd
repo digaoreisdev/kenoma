@@ -658,13 +658,20 @@ static func test_village_arena_layers_and_z_indexing() -> bool:
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var bg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaBackground") as TextureRect
 	var fg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaForeground") as TextureRect
+	var casas: TextureRect = scene.get_node_or_null("CanvasLayer/UI/LayerCasas") as TextureRect
+	var chao: TextureRect = scene.get_node_or_null("CanvasLayer/UI/LayerChao") as TextureRect
+	var bigorna: TextureRect = scene.get_node_or_null("CanvasLayer/UI/PropBigorna") as TextureRect
+	var fire: AnimatedSprite2D = scene.get_node_or_null("CanvasLayer/UI/ForgeFurnaceFire") as AnimatedSprite2D
 	assert(bg != null and fg != null, "ArenaBackground and ArenaForeground must exist")
+	assert(casas != null and chao != null and bigorna != null, "Layered arena nodes must exist")
 	assert(bg.z_index == -10, "Background z_index must be -10")
-	assert(fg.z_index == 10, "Foreground z_index must be 10")
-	assert(bg.texture != null, "Background texture resource loads without returning null")
-	assert(fg.texture != null, "Foreground texture resource loads without returning null")
-	assert(not BattleScene.obter_caminho_background().is_empty(), "Village background must resolve")
-	assert(not BattleScene.obter_caminho_foreground().is_empty(), "Village foreground must resolve")
+	assert(casas.z_index == -8 and chao.z_index == -5, "Casas and Chao z_index check")
+	assert(bigorna.z_index == 5 and fg.z_index == 10, "Bigorna and Foreground z_index check")
+	assert(fire != null and fire.sprite_frames != null, "Furnace fire must exist with frames")
+	assert(fire.sprite_frames.get_animation_speed("default") <= 4.0, "Fire speed must be slow")
+	assert(not BattleScene.obter_caminho_ceu().is_empty(), "Ceu path must resolve")
+	assert(not BattleScene.obter_caminho_casas().is_empty(), "Casas path must resolve")
+	assert(not BattleScene.obter_caminho_chao().is_empty(), "Chao path must resolve")
 	scene.free()
 	return true
 
