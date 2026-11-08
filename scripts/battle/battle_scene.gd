@@ -195,10 +195,11 @@ func _spawn_allies(allies: Array[CharacterData]) -> void:
 	for child: Node in party_container.get_children():
 		child.queue_free()
 	ally_sprites.clear()
-	for idx: int in range(allies.size()):
+	var total: int = allies.size()
+	for idx: int in range(total):
 		var ally: CharacterData = allies[idx]
 		if ally != null:
-			_criar_sprite_aliado(ally, idx)
+			_criar_sprite_aliado(ally, idx, total)
 
 
 static func obter_caminho_background() -> String:
@@ -249,19 +250,23 @@ func _iniciar_pulsacao_cristal() -> void:
 	tw.tween_property(miasma_crystal_prop, "modulate:a", 1.0, 1.2).set_trans(Tween.TRANS_SINE)
 
 
-func _obter_posicao_base_aliado(c_id: String, idx: int) -> Vector2:
-	if c_id == "lucas" or idx == 0:
-		return Vector2(0.0, 0.0)
-	if c_id == "davi" or idx == 1:
-		return Vector2(140.0, -80.0)
-	if idx == 2:
-		return Vector2(70.0, -40.0)
-	if idx == 3:
-		return Vector2(210.0, -120.0)
-	return Vector2(70.0 * idx, -40.0 * idx)
+func _obter_posicao_base_aliado(c_id: String, idx: int, total_aliados: int = 2, fileira: String = "VANGUARDA") -> Vector2:
+	var em_retaguarda: bool = (fileira == "RETAGUARDA") or (total_aliados >= 4 and idx >= 2)
+	var x_offset: float = 100.0 if em_retaguarda else 0.0
+	if total_aliados <= 1:
+		return Vector2(x_offset, -35.0)
+	if total_aliados == 2:
+		var y_pos: float = 0.0 if (idx == 0 or c_id == "lucas") else -70.0
+		var x_iso: float = 0.0 if (idx == 0 or c_id == "lucas") else 10.0
+		return Vector2(x_offset + x_iso, y_pos)
+	if total_aliados == 3:
+		var y_pos3: float = -80.0 if idx == 0 else (-20.0 if idx == 1 else 40.0)
+		return Vector2(x_offset + (10.0 if idx != 1 else 0.0), y_pos3)
+	var y_pos4: float = -70.0 if (idx % 2 == 1) else 0.0
+	return Vector2(x_offset + (10.0 if idx % 2 == 1 else 0.0), y_pos4)
 
 
-func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
+func _criar_sprite_aliado(ally: CharacterData, idx: int, total_aliados: int = 2) -> void:
 	var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
 	sprite.name = ally.character_id
 	var frames: SpriteFrames = ally.sprite_frames
@@ -271,7 +276,8 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	sprite.scale = Vector2(0.9, 0.9)
 	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = _obter_posicao_base_aliado(ally.character_id, idx)
+	var f: String = ally.fileira if ("fileira" in ally) else "VANGUARDA"
+	sprite.position = _obter_posicao_base_aliado(ally.character_id, idx, total_aliados, f)
 	_tocar_idle_aliado(sprite, ally.character_id)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite

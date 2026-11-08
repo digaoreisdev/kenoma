@@ -51,7 +51,7 @@ y_sort_enabled = true
 
 [node name="EnemyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
 y_sort_enabled = true
-position = Vector2(240, 470)
+position = Vector2(420, 470)
 
 [node name="PartyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
 y_sort_enabled = true

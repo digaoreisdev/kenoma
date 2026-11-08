@@ -120,7 +120,7 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	var banner: Control = battle_scene.get_node_or_null("CanvasLayer/UI/VictoryBanner") as Control
 	assert(party_cont != null and enemy_cont != null, "Containers must exist in arena")
 	assert(banner != null, "VictoryBanner must exist in battle scene UI")
-	assert(is_equal_approx(enemy_cont.position.x, 240.0), "EnemyContainer must be at X=240")
+	assert(is_equal_approx(enemy_cont.position.x, 420.0), "EnemyContainer must be at X=420 (centered arena)")
 	assert(is_equal_approx(party_cont.position.x, 940.0), "PartyContainer must be at X=940")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
@@ -674,20 +674,18 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var enemy_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
 	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
-	assert(enemy_cont.position == Vector2(240.0, 470.0), "EnemyContainer must be at (240, 470)")
+	assert(enemy_cont.position == Vector2(420.0, 470.0), "EnemyContainer must be at (420, 470)")
 	assert(party_cont.position == Vector2(940.0, 510.0), "PartyContainer must be at (940, 510)")
-	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("lucas", 0)
-	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1)
-	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2)
-	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3)
-	assert(p0 == Vector2(940.0, 510.0) and p1 == Vector2(1080.0, 430.0), "Lucas and Davi positions")
-	assert(p2 == Vector2(1010.0, 470.0) and p3 == Vector2(1150.0, 390.0), "Slots 3 and 4 positions")
-	assert(p0.x != p1.x and p0.x != p2.x and p0.x != p3.x, "All party X coords must be unique")
-	assert(p1.x != p2.x and p1.x != p3.x and p2.x != p3.x, "All party X coords must be unique")
-	assert(p0.y != p1.y and p0.y != p2.y and p0.y != p3.y, "All party Y coords must be unique")
-	assert(p0.y - p1.y >= 70.0, "Lucas and Davi have clear vertical rank separation")
+	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("lucas", 0, 2)
+	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1, 2)
+	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2, 4)
+	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3, 4)
+	assert(p0 == Vector2(940.0, 510.0) and p1 == Vector2(950.0, 440.0), "Lucas and Davi side by side")
+	assert(p2 == Vector2(1040.0, 510.0) and p3 == Vector2(1050.0, 440.0), "Slots 3 and 4 back rank")
+	assert(abs(p0.x - p1.x) <= 15.0, "2-hero party stands side-by-side along rank")
+	assert(p0.y - p1.y >= 60.0, "Lucas and Davi have clear vertical separation")
 	for p: Vector2 in [enemy_cont.position, p0, p1, p2, p3]:
-		assert(p.y >= 350.0 and p.y <= 550.0, "Combatant Y within visible viewport bounds (350..550)")
+		assert(p.y >= 350.0 and p.y <= 550.0, "Combatant Y within visible viewport bounds")
 	scene.free()
 	return true
 
@@ -698,12 +696,12 @@ static func test_melee_dash_straight_horizontal_and_return() -> bool:
 	var dummy_atk: AnimatedSprite2D = AnimatedSprite2D.new()
 	var dummy_tgt: AnimatedSprite2D = AnimatedSprite2D.new()
 	dummy_atk.global_position = Vector2(940.0, 510.0)
-	dummy_tgt.global_position = Vector2(240.0, 470.0)
-	var fallback: Vector2 = Vector2(-650.0, -40.0)
+	dummy_tgt.global_position = Vector2(420.0, 470.0)
+	var fallback: Vector2 = Vector2(-470.0, -40.0)
 	var dash: Vector2 = scene._calcular_dash_ataque(dummy_atk, dummy_tgt, fallback)
 	var dest: Vector2 = dummy_atk.global_position + dash
 	assert(is_equal_approx(dest.distance_to(dummy_tgt.global_position), 50.0), "Dash target must stop 50px away")
-	assert(dash.x < -600.0, "Dash must travel across the central earthen plaza horizontally")
+	assert(dash.x < -400.0, "Dash must travel across the central earthen plaza horizontally")
 	dummy_atk.free()
 	dummy_tgt.free()
 	scene.free()

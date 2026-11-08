@@ -26,6 +26,7 @@ extends Resource
 @export var current_exp: int = 0
 @export var next_level_exp: int = 100
 @export var sprite_frames: SpriteFrames = null
+@export var fileira: String = "VANGUARDA"
 
 # Afinidades de arma (chave: EquipmentData.WeaponType, valor: float)
 @export var weapon_affinities: Dictionary = {}
