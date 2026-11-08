@@ -114,9 +114,9 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	if frames == null:
 		frames = _obter_fallback_frames_aliado(ally.character_id)
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(1.25, 1.25)
+	sprite.scale = Vector2(1.15, 1.15)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(55.0 * idx, 40.0 * idx)
+	sprite.position = Vector2(40.0 * idx, 50.0 * idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite
@@ -151,9 +151,9 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 		if ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(1.25, 1.25)
+	sprite.scale = Vector2(1.15, 1.15)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sprite.position = Vector2(-60.0 * idx, 60.0 * idx)
+	sprite.position = Vector2(-50.0 * idx, 50.0 * idx)
 	_tocar_idle_inimigo(sprite)
 	enemy_container.add_child(sprite)
 	enemy_sprites[e_id] = sprite
@@ -218,71 +218,120 @@ func _on_action_executed(actor_id: String, target_id: String, action_type: Strin
 func _executar_ataque_melee_lucas(actor_id: String, target_id: String) -> void:
 	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
 	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
-	if atk == null: return
+	if atk == null:
+		_finalizar_acao_cena()
+		return
 	var orig: Vector2 = atk.position
-	var dash: Vector2 = Vector2(-220.0, 0.0)
-	if tgt != null:
-		var diff: Vector2 = tgt.global_position - atk.global_position
-		if diff.length() > 60.0: dash = diff.normalized() * (diff.length() - 50.0)
+	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(-220.0, 0.0))
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
-	tw.tween_property(atk, "position", orig + dash, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_callback(func(): _no_contato_golpe(atk, anim, target_id))
-	tw.tween_interval(0.35)
+	tw.tween_property(atk, "position", orig + dash, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func():
+		_no_contato_golpe(atk, anim, target_id)
+		_aplicar_tremor_impacto()
+	)
+	tw.tween_interval(0.45)
 	tw.tween_property(atk, "position", orig, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func(): _restaurar_idle(atk, actor_id, true))
+	tw.tween_callback(func():
+		_restaurar_idle(atk, actor_id, true)
+		_finalizar_acao_cena()
+	)
+
+
+func _calcular_dash_ataque(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, fallback: Vector2) -> Vector2:
+	if tgt == null:
+		return fallback
+	var diff: Vector2 = tgt.global_position - atk.global_position
+	return diff.normalized() * (diff.length() - 50.0) if diff.length() > 60.0 else fallback
 
 
 func _executar_ataque_aura_davi(actor_id: String, target_id: String) -> void:
 	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
 	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
-	if atk == null: return
+	if atk == null:
+		_finalizar_acao_cena()
+		return
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	if not anim.is_empty() and atk.sprite_frames != null and atk.sprite_frames.has_animation(anim):
 		atk.sprite_frames.set_animation_loop(anim, false)
 		atk.play(anim)
-	_criar_projetil_aura(atk, tgt, target_id)
 	var tw: Tween = create_tween()
-	tw.tween_interval(0.5)
-	tw.tween_callback(func(): _restaurar_idle(atk, actor_id, true))
+	tw.tween_interval(0.4)
+	tw.tween_callback(func(): _disparar_projetil_aura(atk, tgt, actor_id, target_id))
 
 
-func _criar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, target_id: String) -> void:
+func _disparar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, actor_id: String, target_id: String) -> void:
 	var aura: ColorRect = ColorRect.new()
 	aura.custom_minimum_size = Vector2(28.0, 28.0)
 	aura.size = Vector2(28.0, 28.0)
 	aura.color = Color(0.3, 0.9, 2.5, 0.9)
 	aura.position = atk.global_position - Vector2(14.0, 14.0)
 	get_parent().add_child(aura)
-	var tgt_pos: Vector2 = tgt.global_position - Vector2(14.0, 14.0) if tgt != null else aura.position + Vector2(-300.0, 0.0)
+	var tgt_pos: Vector2 = tgt.global_position - Vector2(14.0, 14.0) if tgt != null else aura.position + Vector2(-400.0, 0.0)
 	var tw: Tween = create_tween()
-	tw.tween_property(aura, "position", tgt_pos, 0.35).set_trans(Tween.TRANS_SINE)
-	tw.tween_callback(func():
-		_tocar_reacao_alvo(target_id)
+	tw.tween_property(aura, "position", tgt_pos, 0.45).set_trans(Tween.TRANS_SINE)
+	tw.tween_callback(func(): _no_impacto_aura(aura, atk, actor_id, target_id))
+
+
+func _criar_projetil_aura(atk: AnimatedSprite2D, tgt: AnimatedSprite2D, target_id: String) -> void:
+	_disparar_projetil_aura(atk, tgt, "davi", target_id)
+
+
+func _no_impacto_aura(aura: ColorRect, atk: AnimatedSprite2D, actor_id: String, target_id: String) -> void:
+	_tocar_reacao_alvo(target_id)
+	_aplicar_tremor_impacto()
+	if is_instance_valid(aura):
 		aura.queue_free()
+	var tw: Tween = create_tween()
+	tw.tween_interval(0.4)
+	tw.tween_callback(func():
+		_restaurar_idle(atk, actor_id, true)
+		_finalizar_acao_cena()
 	)
 
 
 func _executar_ataque_melee_boss(actor_id: String, target_id: String) -> void:
 	var atk: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
 	var tgt: AnimatedSprite2D = _obter_sprite_combatente(target_id)
-	if atk == null: return
+	if atk == null:
+		_finalizar_acao_cena()
+		return
 	var orig: Vector2 = atk.position
-	var dash: Vector2 = Vector2(160.0, 0.0)
-	if tgt != null:
-		var diff: Vector2 = tgt.global_position - atk.global_position
-		if diff.length() > 60.0: dash = diff.normalized() * (diff.length() - 50.0)
+	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(160.0, 0.0))
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
-	tw.tween_property(atk, "position", orig + dash, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_callback(func(): _no_contato_golpe(atk, anim, target_id))
-	tw.tween_interval(0.3)
-	tw.tween_property(atk, "position", orig, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func(): _restaurar_idle(atk, actor_id, false))
+	tw.tween_property(atk, "position", orig + dash, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func():
+		_no_contato_golpe(atk, anim, target_id)
+		_aplicar_tremor_impacto()
+	)
+	tw.tween_interval(0.45)
+	tw.tween_property(atk, "position", orig, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func():
+		_restaurar_idle(atk, actor_id, false)
+		_finalizar_acao_cena()
+	)
 
 
 func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:
 	_on_action_executed(actor_id, target_id, "ataque")
+
+
+func _aplicar_tremor_impacto() -> void:
+	var arena_node: Node2D = get_node_or_null("CanvasLayer/UI/Arena") as Node2D
+	if arena_node == null:
+		return
+	var orig_pos: Vector2 = Vector2.ZERO
+	var tw: Tween = create_tween()
+	tw.tween_property(arena_node, "position", orig_pos + Vector2(6.0, -3.0), 0.05)
+	tw.tween_property(arena_node, "position", orig_pos + Vector2(-5.0, 4.0), 0.05)
+	tw.tween_property(arena_node, "position", orig_pos + Vector2(3.0, -2.0), 0.05)
+	tw.tween_property(arena_node, "position", orig_pos, 0.05)
+
+
+func _finalizar_acao_cena() -> void:
+	if battle_manager != null:
+		battle_manager.concluir_acao()
 
 
 func _no_contato_golpe(atk_sprite: AnimatedSprite2D, anim: String, target_id: String) -> void:
@@ -295,6 +344,7 @@ func _no_contato_golpe(atk_sprite: AnimatedSprite2D, anim: String, target_id: St
 func _tocar_animacao_estacionaria(actor_id: String, _action_type: String) -> void:
 	var sprite: AnimatedSprite2D = _obter_sprite_combatente(actor_id)
 	if sprite == null or sprite.sprite_frames == null:
+		_finalizar_acao_cena()
 		return
 	var anim: String = _obter_nome_anim_defesa(sprite.sprite_frames)
 	if not anim.is_empty() and sprite.sprite_frames.has_animation(anim):
@@ -304,7 +354,10 @@ func _tocar_animacao_estacionaria(actor_id: String, _action_type: String) -> voi
 	var tw: Tween = create_tween()
 	tw.tween_property(sprite, "position", orig + offset, 0.1)
 	tw.tween_property(sprite, "position", orig, 0.15)
-	tw.tween_callback(func(): _restaurar_idle(sprite, actor_id, _eh_aliado(actor_id)))
+	tw.tween_callback(func():
+		_restaurar_idle(sprite, actor_id, _eh_aliado(actor_id))
+		_finalizar_acao_cena()
+	)
 
 
 func _obter_nome_anim_ataque(frames: SpriteFrames, actor_id: String) -> String:

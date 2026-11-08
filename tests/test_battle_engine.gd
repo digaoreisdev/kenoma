@@ -8,6 +8,10 @@ const EnemyDataScript: GDScript = preload("res://scripts/core/enemy_data.gd")
 
 
 static func run_tests(tree: SceneTree = null) -> bool:
+	return _run_group_a(tree) and _run_group_b()
+
+
+static func _run_group_a(tree: SceneTree) -> bool:
 	var p: bool = test_battle_initialization_with_lucas() and test_battle_state_machine_flow()
 	p = p and test_battle_victory_condition() and test_battle_scene_instantiation(tree)
 	p = p and test_battle_timeline_progression() and test_battle_stability_ruptura()
@@ -18,7 +22,11 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	p = p and test_battle_initialization_with_davi_and_general_cassian()
 	p = p and test_lucas_and_davi_independent_turns_progression()
 	p = p and test_general_cassian_resource_loading()
-	p = p and test_zero_enemy_hp_triggers_victory_and_scene_manager_exit()
+	return p
+
+
+static func _run_group_b() -> bool:
+	var p: bool = test_zero_enemy_hp_triggers_victory_and_scene_manager_exit()
 	p = p and test_breaking_enemy_stability_applies_rupture_stun_penalty()
 	p = p and test_battle_hud_portraits_hook()
 	p = p and test_cassian_stability_withstands_multiple_hits()
@@ -26,6 +34,8 @@ static func run_tests(tree: SceneTree = null) -> bool:
 	p = p and test_parallel_timeline_and_action_queue_ordering()
 	p = p and test_distinct_melee_vs_ranged_attack_paths()
 	p = p and test_boss_turn_frequency_in_multiparty_encounter()
+	p = p and test_simultaneous_ready_actions_execute_sequentially()
+	p = p and test_executando_acao_locks_timeline_tick()
 	return p
 
 
@@ -101,8 +111,8 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	var banner: Control = battle_scene.get_node_or_null("CanvasLayer/UI/VictoryBanner") as Control
 	assert(party_cont != null and enemy_cont != null, "Containers must exist in arena")
 	assert(banner != null, "VictoryBanner must exist in battle scene UI")
-	assert(is_equal_approx(enemy_cont.position.x, 440.0), "EnemyContainer must be at X=440")
-	assert(is_equal_approx(party_cont.position.x, 840.0), "PartyContainer must be at X=840")
+	assert(is_equal_approx(enemy_cont.position.x, 280.0), "EnemyContainer must be at X=280")
+	assert(is_equal_approx(party_cont.position.x, 1020.0), "PartyContainer must be at X=1020")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -233,6 +243,7 @@ static func test_battle_defender_resets_timeline() -> bool:
 	bm.executar_defesa(lucas)
 	assert(c_comb["posicao_tempo"] == 30.0, "posicao_tempo must reset to 30.0 on defend")
 	assert(c_comb["fase_turno"] == BattleTimeline.FaseTurno.ESPERA, "fase_turno must reset to ESPERA on defend")
+	bm.concluir_acao()
 	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "State must return to AGUARDANDO_TURNO")
 	bm.free()
 	return true
@@ -319,11 +330,14 @@ static func test_lucas_and_davi_independent_turns_progression() -> bool:
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Must enter SELECIONANDO_ACAO")
 	assert(bm.get_active_actor().character_id == "lucas", "Lucas must act first")
 	bm.executar_defesa(lucas)
+	bm.concluir_acao()
 	assert(bm.current_state == BattleManager.BattleState.AGUARDANDO_TURNO, "State returns to AGUARDANDO_TURNO")
 	bm._process(4.0)
+	bm.concluir_acao()
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Davi must reach SELECIONANDO_ACAO")
 	assert(bm.get_active_actor().character_id == "davi", "Davi must be active actor")
 	bm.executar_ataque_basico(davi, bm.enemies[0])
+	bm.concluir_acao()
 	bm.free()
 	return true
 
@@ -409,9 +423,11 @@ static func test_cassian_stability_withstands_multiple_hits() -> bool:
 	bm.initialize_battle([lucas], [cassian_res])
 	var cassian: Dictionary = bm.enemies[0]
 	var res1: Dictionary = bm.executar_ataque_basico(lucas, cassian)
+	bm.concluir_acao()
 	assert(res1["ruptura"] == false, "Cassian must NOT trigger Ruptura on 1st hit")
 	assert(cassian["estabilidade_atual"] == 96, "Stability must reduce by 24 (120 -> 96)")
 	var res2: Dictionary = bm.executar_ataque_basico(lucas, cassian)
+	bm.concluir_acao()
 	assert(res2["ruptura"] == false, "Cassian must NOT trigger Ruptura on 2nd hit")
 	assert(cassian["estabilidade_atual"] == 72, "Stability must reduce by 24 (96 -> 72)")
 	bm.free()
@@ -488,14 +504,58 @@ static func test_boss_turn_frequency_in_multiparty_encounter() -> bool:
 	)
 	bm._process(15.0)
 	bm.executar_ataque_basico(lucas, bm.enemies[0])
+	bm.concluir_acao()
 	bm._process(4.0)
 	assert(order.size() >= 2, "Both Lucas and Cassian must have executed actions")
 	assert(order[0] == "lucas", "Lucas acts 1st")
 	assert(order[1] == "general_cassian", "Cassian acts 2nd between Lucas and Davi")
+	bm.concluir_acao()
 	assert(bm.current_state == BattleManager.BattleState.SELECIONANDO_ACAO, "Davi ready for action")
 	assert(bm.get_active_actor().character_id == "davi", "Davi acts 3rd")
 	bm.free()
 	return true
+
+
+static func test_simultaneous_ready_actions_execute_sequentially() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var e1: Dictionary = {"id": "e_a", "name": "A", "max_hp": 80, "current_hp": 80, "agility": 20.0}
+	var e2: Dictionary = {"id": "e_b", "name": "B", "max_hp": 80, "current_hp": 80, "agility": 20.0}
+	bm.initialize_battle([lucas], [e1, e2])
+	bm.timeline.obter_combatente("e_a")["posicao_tempo"] = 100.0
+	bm.timeline.obter_combatente("e_a")["fase_turno"] = BattleTimeline.FaseTurno.DECISAO
+	bm.timeline.obter_combatente("e_b")["posicao_tempo"] = 100.0
+	bm.timeline.obter_combatente("e_b")["fase_turno"] = BattleTimeline.FaseTurno.DECISAO
+	var order: Array[String] = []
+	bm.action_executed.connect(func(atk: String, _tgt: String, _tipo: String) -> void: order.append(atk))
+	bm._verificar_proximo_turno()
+	assert(order.size() == 1 and order[0] == "e_a", "First enemy acts first")
+	assert(bm.executando_acao and bm.fila_de_acoes.has("e_b"), "Mutex locks & second enemy waits")
+	bm.concluir_acao()
+	assert(order.size() == 2 and order[1] == "e_b", "Second enemy acts sequentially")
+	bm.concluir_acao()
+	bm.free()
+	return true
+
+
+static func test_executando_acao_locks_timeline_tick() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	bm.initialize_battle([lucas], [{"id": "e1", "name": "Inimigo", "max_hp": 80, "current_hp": 80}])
+	var c: Dictionary = bm.timeline.obter_combatente(lucas.character_id)
+	bm.executar_defesa(lucas)
+	assert(bm.executando_acao and float(c.get("posicao_tempo", 0.0)) == 30.0, "Defense locks action at 30.0")
+	bm._process(5.0)
+	assert(float(c.get("posicao_tempo", 0.0)) == 30.0, "Timeline locked during action")
+	var signaled: Array[bool] = [false]
+	bm.acao_concluida.connect(func() -> void: signaled[0] = true)
+	bm.concluir_acao()
+	assert(signaled[0] and not bm.executando_acao, "acao_concluida emitted and mutex unlocked")
+	bm._process(1.0)
+	assert(float(c.get("posicao_tempo", 0.0)) > 30.0, "Timeline advances once unlocked")
+	bm.free()
+	return true
+
 
 
 

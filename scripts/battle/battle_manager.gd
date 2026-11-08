@@ -19,6 +19,7 @@ signal timeline_updated
 signal combatant_ready_for_action(combatant_id: String, is_player: bool)
 signal action_executed(actor_id: String, target_id: String, action_type: String)
 signal rupture_triggered(target_id: String)
+signal acao_concluida
 
 @export var current_state: BattleState = BattleState.INICIALIZANDO
 @export var timeline_speed_scale: float = 0.49
@@ -29,10 +30,11 @@ var active_actor_index: int = 0
 var is_player_turn: bool = true
 var timeline: BattleTimeline = BattleTimeline.new()
 var fila_de_acoes: Array[String] = []
+var executando_acao: bool = false
 
 
 func _process(delta: float) -> void:
-	if current_state == BattleState.VITORIA or current_state == BattleState.DERROTA or current_state == BattleState.INICIALIZANDO:
+	if current_state == BattleState.VITORIA or current_state == BattleState.DERROTA or current_state == BattleState.INICIALIZANDO or executando_acao:
 		return
 	var eventos: Array[Dictionary] = timeline.avancar_tempo(delta * timeline_speed_scale)
 	timeline_updated.emit()
@@ -42,7 +44,7 @@ func _process(delta: float) -> void:
 
 
 func _verificar_proximo_turno() -> bool:
-	if current_state != BattleState.AGUARDANDO_TURNO:
+	if current_state != BattleState.AGUARDANDO_TURNO or executando_acao:
 		return false
 	_sincronizar_combatentes_prontos()
 	while not fila_de_acoes.is_empty():
@@ -166,8 +168,9 @@ func _obter_dados_inimigo(c_id: String) -> Dictionary:
 
 
 func _executar_ataque_inimigo(c_id: String) -> void:
-	if party_members.is_empty():
+	if executando_acao or party_members.is_empty():
 		return
+	executando_acao = true
 	change_state(BattleState.EXECUTANDO_ACAO)
 	var alvo: CharacterData = _obter_alvo_aliado_vivo()
 	var c: Dictionary = timeline.obter_combatente(c_id)
@@ -181,6 +184,7 @@ func _executar_ataque_inimigo(c_id: String) -> void:
 
 func initialize_battle(allies: Array[CharacterData], enemy_list: Array) -> void:
 	current_state = BattleState.INICIALIZANDO
+	executando_acao = false
 	party_members = allies.duplicate()
 	enemies = []
 	fila_de_acoes.clear()
@@ -399,6 +403,10 @@ func _obter_id_combatente(c: Variant) -> String:
 
 
 func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
+	if executando_acao:
+		return {}
+	executando_acao = true
+	change_state(BattleState.EXECUTANDO_ACAO)
 	var dados_atk: Dictionary = _extrair_dados_ataque(atacante)
 	var dano_efetivo: int = _calcular_dano_ataque_basico(dados_atk)
 	var def_dict: Dictionary = defensor if defensor is Dictionary else {}
@@ -416,6 +424,10 @@ func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
 
 
 func executar_defesa(combatente: Variant) -> Dictionary:
+	if executando_acao:
+		return {}
+	executando_acao = true
+	change_state(BattleState.EXECUTANDO_ACAO)
 	var c_id: String = _obter_id_combatente(combatente)
 	if combatente is Dictionary:
 		var c: Dictionary = combatente as Dictionary
@@ -437,8 +449,10 @@ func executar_defesa(combatente: Variant) -> Dictionary:
 
 
 func executar_item(combatente: Variant, item_data: ItemData, alvo: Variant) -> Dictionary:
-	if item_data == null or alvo == null:
+	if executando_acao or item_data == null or alvo == null:
 		return {"sucesso": false, "cura": 0}
+	executando_acao = true
+	change_state(BattleState.EXECUTANDO_ACAO)
 	var cura: int = 0
 	if alvo is CharacterData:
 		var c: CharacterData = alvo as CharacterData
@@ -487,6 +501,11 @@ func concluir_turno_combatente(combatente: Variant, posicao_inicial: float = 0.0
 	elif combatente is CharacterData:
 		var cd: CharacterData = combatente as CharacterData
 		_resetar_combatente_timeline(cd.character_id, posicao_inicial)
+
+
+func concluir_acao() -> void:
+	executando_acao = false
+	acao_concluida.emit()
 	check_battle_end_conditions()
 	if current_state != BattleState.VITORIA and current_state != BattleState.DERROTA:
 		change_state(BattleState.AGUARDANDO_TURNO)
