@@ -666,12 +666,14 @@ static func test_village_arena_layers_and_z_indexing() -> bool:
 	var bg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaBackground") as TextureRect
 	var fg: TextureRect = scene.get_node_or_null("CanvasLayer/UI/ArenaForeground") as TextureRect
 	var birds: Node2D = scene.get_node_or_null("CanvasLayer/UI/DistantBirds") as Node2D
+	var clouds: Node2D = scene.get_node_or_null("CanvasLayer/UI/SkyClouds") as Node2D
 	var ally_panel: PanelContainer = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel") as PanelContainer
 	var action_panel: PanelContainer = scene.get_node_or_null("CanvasLayer/UI/ActionCommandPanel") as PanelContainer
 	assert(bg != null and fg != null, "ArenaBackground and ArenaForeground must exist")
 	assert(bg.z_index == -10, "Background z_index must be -10")
 	assert(fg.z_index == 10, "Foreground z_index must be 10")
 	assert(birds != null and birds.z_index == -9, "DistantBirds sky ambiance must exist at z=-9")
+	assert(clouds != null and clouds.z_index == -9, "SkyClouds drifting ambiance must exist at z=-9")
 	assert(ally_panel != null and ally_panel.offset_top < 400.0, "AllyPanel must be placed in the upper right dock (Y < 400)")
 	assert(action_panel != null and action_panel.offset_top < 800.0, "ActionCommandPanel must be raised comfortably above screen edge (Y < 800)")
 	assert(not BattleScene.obter_caminho_background().is_empty(), "Background path must resolve")
