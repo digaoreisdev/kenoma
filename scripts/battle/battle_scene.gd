@@ -114,7 +114,8 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
 	if frames == null:
 		frames = _obter_fallback_frames_aliado(ally.character_id)
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(1.15, 1.15)
+	sprite.scale = Vector2(0.9, 0.9)
+	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = Vector2(40.0 * idx, 50.0 * idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
@@ -151,7 +152,8 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 		if ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
-	sprite.scale = Vector2(1.15, 1.15)
+	sprite.scale = Vector2(0.9, 0.9)
+	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = Vector2(-50.0 * idx, 50.0 * idx)
 	_tocar_idle_inimigo(sprite)
