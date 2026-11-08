@@ -100,6 +100,9 @@ func _inicializar_referencias_hud() -> void:
 
 
 func _inicializar_referencias_cenario() -> void:
+	var dim: Node = find_child("BackgroundDim", true, false)
+	if dim != null:
+		dim.queue_free()
 	if arena_background == null:
 		arena_background = find_child("ArenaBackground", true, false) as TextureRect
 	if arena_foreground == null:
@@ -109,12 +112,14 @@ func _inicializar_referencias_cenario() -> void:
 		arena_background.set_anchors_preset(Control.PRESET_FULL_RECT)
 		arena_background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		arena_background.stretch_mode = TextureRect.STRETCH_SCALE
+		arena_background.visible = true
 	if arena_foreground != null:
 		arena_foreground.z_index = 10
 		arena_foreground.set_anchors_preset(Control.PRESET_FULL_RECT)
 		arena_foreground.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		arena_foreground.stretch_mode = TextureRect.STRETCH_SCALE
 		arena_foreground.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		arena_foreground.visible = true
 
 
 func _inicializar_referencias_inimigo() -> void:
@@ -221,11 +226,11 @@ static func obter_caminho_prop(nome_prop: String) -> String:
 
 
 func _configurar_texturas_cenario() -> void:
-	if arena_background != null and arena_background.texture == null:
+	if arena_background != null:
 		var bg_path: String = obter_caminho_background()
 		if not bg_path.is_empty():
 			arena_background.texture = load(bg_path) as Texture2D
-	if arena_foreground != null and arena_foreground.texture == null:
+	if arena_foreground != null:
 		var fg_path: String = obter_caminho_foreground()
 		if not fg_path.is_empty():
 			arena_foreground.texture = load(fg_path) as Texture2D
@@ -243,12 +248,12 @@ func _obter_posicao_base_aliado(c_id: String, idx: int) -> Vector2:
 	if c_id == "lucas" or idx == 0:
 		return Vector2(0.0, 0.0)
 	if c_id == "davi" or idx == 1:
-		return Vector2(120.0, -30.0)
+		return Vector2(180.0, -100.0)
 	if idx == 2:
-		return Vector2(0.0, -70.0)
+		return Vector2(0.0, -80.0)
 	if idx == 3:
-		return Vector2(120.0, -100.0)
-	return Vector2(120.0 * (idx % 2), -70.0 * int(idx / 2))
+		return Vector2(180.0, -20.0)
+	return Vector2(180.0 * (idx % 2), -80.0 * int(idx / 2))
 
 
 func _criar_sprite_aliado(ally: CharacterData, idx: int) -> void:
@@ -368,7 +373,7 @@ func _executar_ataque_melee_lucas(actor_id: String, target_id: String) -> void:
 		_finalizar_acao_cena()
 		return
 	var orig: Vector2 = atk.position
-	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(-690.0, -20.0))
+	var dash: Vector2 = _calcular_dash_ataque(atk, tgt, Vector2(-650.0, -40.0))
 	var anim: String = _obter_nome_anim_ataque(atk.sprite_frames, actor_id)
 	var tw: Tween = create_tween()
 	tw.tween_property(atk, "position", orig + dash, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)

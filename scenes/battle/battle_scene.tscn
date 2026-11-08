@@ -21,15 +21,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="BackgroundDim" type="ColorRect" parent="CanvasLayer/UI"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.04, 0.05, 0.08, 1)
-
 [node name="ArenaBackground" type="TextureRect" parent="CanvasLayer/UI"]
 z_index = -10
 layout_mode = 1
@@ -58,10 +49,10 @@ stretch_mode = 0
 [node name="Arena" type="Node2D" parent="CanvasLayer/UI"]
 
 [node name="EnemyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-position = Vector2(240, 480)
+position = Vector2(240, 470)
 
 [node name="PartyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
-position = Vector2(980, 500)
+position = Vector2(940, 510)
 
 [node name="HeaderPanel" type="ColorRect" parent="CanvasLayer/UI"]
 layout_mode = 0

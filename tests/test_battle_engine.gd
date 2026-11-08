@@ -120,7 +120,7 @@ static func test_battle_scene_instantiation(tree: SceneTree = null) -> bool:
 	assert(party_cont != null and enemy_cont != null, "Containers must exist in arena")
 	assert(banner != null, "VictoryBanner must exist in battle scene UI")
 	assert(is_equal_approx(enemy_cont.position.x, 240.0), "EnemyContainer must be at X=240")
-	assert(is_equal_approx(party_cont.position.x, 980.0), "PartyContainer must be at X=980")
+	assert(is_equal_approx(party_cont.position.x, 940.0), "PartyContainer must be at X=940")
 	if tree != null and tree.root != null:
 		tree.root.remove_child(battle_scene)
 	battle_scene.free()
@@ -673,14 +673,15 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var enemy_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/EnemyContainer") as Node2D
 	var party_cont: Node2D = scene.get_node_or_null("CanvasLayer/UI/Arena/PartyContainer") as Node2D
-	assert(enemy_cont.position == Vector2(240.0, 480.0), "EnemyContainer must be at (240, 480)")
-	assert(party_cont.position == Vector2(980.0, 500.0), "PartyContainer must be at (980, 500)")
+	assert(enemy_cont.position == Vector2(240.0, 470.0), "EnemyContainer must be at (240, 470)")
+	assert(party_cont.position == Vector2(940.0, 510.0), "PartyContainer must be at (940, 510)")
 	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("lucas", 0)
 	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("davi", 1)
 	var p2: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 2)
 	var p3: Vector2 = party_cont.position + scene._obter_posicao_base_aliado("", 3)
-	assert(p0 == Vector2(980.0, 500.0) and p1 == Vector2(1100.0, 470.0), "Lucas and Davi positions")
-	assert(p2 == Vector2(980.0, 430.0) and p3 == Vector2(1100.0, 400.0), "Slots 3 and 4 positions")
+	assert(p0 == Vector2(940.0, 510.0) and p1 == Vector2(1120.0, 410.0), "Lucas and Davi positions")
+	assert(p2 == Vector2(940.0, 430.0) and p3 == Vector2(1120.0, 490.0), "Slots 3 and 4 positions")
+	assert(p0.y - p1.y >= 80.0, "Lucas and Davi have clear vertical rank separation")
 	for p: Vector2 in [enemy_cont.position, p0, p1, p2, p3]:
 		assert(p.y >= 350.0 and p.y <= 550.0, "Combatant Y within visible viewport bounds (350..550)")
 	scene.free()
@@ -692,9 +693,9 @@ static func test_melee_dash_straight_horizontal_and_return() -> bool:
 	var scene: BattleScene = scene_res.instantiate() as BattleScene
 	var dummy_atk: AnimatedSprite2D = AnimatedSprite2D.new()
 	var dummy_tgt: AnimatedSprite2D = AnimatedSprite2D.new()
-	dummy_atk.global_position = Vector2(980.0, 500.0)
-	dummy_tgt.global_position = Vector2(240.0, 480.0)
-	var fallback: Vector2 = Vector2(-690.0, -20.0)
+	dummy_atk.global_position = Vector2(940.0, 510.0)
+	dummy_tgt.global_position = Vector2(240.0, 470.0)
+	var fallback: Vector2 = Vector2(-650.0, -40.0)
 	var dash: Vector2 = scene._calcular_dash_ataque(dummy_atk, dummy_tgt, fallback)
 	var dest: Vector2 = dummy_atk.global_position + dash
 	assert(is_equal_approx(dest.distance_to(dummy_tgt.global_position), 50.0), "Dash target must stop 50px away")
