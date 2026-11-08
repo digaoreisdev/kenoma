@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="1_skdata"]
+
+[resource]
+script = ExtResource("1_skdata")
+id = "golpe_sismico"
+nome = "Golpe Sísmico"
+descricao = "Golpe pesado de marreta que esmaga a estabilidade do alvo."
+custo_pm = 8
+dano_base = 28
+dano_estabilidade = 45
+tempo_conjuracao = 0.0
+tipo = "FISICO"
+target_type = 0

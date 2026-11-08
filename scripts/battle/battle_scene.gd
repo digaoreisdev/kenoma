@@ -8,19 +8,25 @@ extends Node2D
 @onready var turn_label: Label = get_node_or_null("CanvasLayer/UI/HeaderPanel/Margin/HBox/TurnLabel")
 @onready var command_panel: Control = get_node_or_null("CanvasLayer/UI/ActionCommandPanel")
 @onready var btn_atacar: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnAtacar")
+@onready var btn_habilidades: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnHabilidades")
 @onready var btn_defender: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnDefender")
 @onready var btn_itens: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnItens")
 @onready var btn_fugir: Button = get_node_or_null("CanvasLayer/UI/ActionCommandPanel/Margin/Grid/BtnFugir")
+@onready var skills_panel: Control = get_node_or_null("CanvasLayer/UI/SkillsPanel")
+@onready var skill_list: VBoxContainer = get_node_or_null("CanvasLayer/UI/SkillsPanel/Margin/VBox/SkillList")
+@onready var btn_voltar_skills: Button = get_node_or_null("CanvasLayer/UI/SkillsPanel/Margin/VBox/BtnVoltar")
 @onready var ally_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel")
 @onready var ally_portrait_rect: TextureRect = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/PortraitRect")
 @onready var ally_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/NameLabel")
 @onready var ally_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/HPLabel")
+@onready var ally_mp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/MPLabel")
 @onready var ally_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/EstLabel")
 @onready var ally_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox/FaseLabel")
 @onready var ally2_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2")
 @onready var ally2_portrait_rect: TextureRect = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/PortraitRect")
 @onready var ally2_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/NameLabel")
 @onready var ally2_hp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/HPLabel")
+@onready var ally2_mp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/MPLabel")
 @onready var ally2_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/EstLabel")
 @onready var ally2_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/FaseLabel")
 @onready var enemy_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel")
@@ -45,6 +51,7 @@ func _ready() -> void:
 		battle_manager.battle_initialized.connect(_setup_arena_combatants)
 		battle_manager.action_executed.connect(_on_action_executed)
 		battle_manager.rupture_triggered.connect(_mostrar_efeito_ruptura)
+		battle_manager.spell_interrupted.connect(_mostrar_efeito_interrompido)
 		_update_labels(battle_manager.current_state)
 		_update_hud()
 		_update_command_panel(battle_manager.current_state)
@@ -57,15 +64,22 @@ func _inicializar_referencias_hud() -> void:
 	if ally_panel != null and ally_name_lbl == null:
 		ally_name_lbl = ally_panel.find_child("NameLabel", true, false) as Label
 		ally_hp_lbl = ally_panel.find_child("HPLabel", true, false) as Label
+		ally_mp_lbl = ally_panel.find_child("MPLabel", true, false) as Label
 		ally_est_lbl = ally_panel.find_child("EstLabel", true, false) as Label
 		ally_fase_lbl = ally_panel.find_child("FaseLabel", true, false) as Label
 		ally_portrait_rect = ally_panel.find_child("PortraitRect", true, false) as TextureRect
 	if ally2_panel != null and ally2_name_lbl == null:
 		ally2_name_lbl = ally2_panel.find_child("NameLabel", true, false) as Label
 		ally2_hp_lbl = ally2_panel.find_child("HPLabel", true, false) as Label
+		ally2_mp_lbl = ally2_panel.find_child("MPLabel", true, false) as Label
 		ally2_est_lbl = ally2_panel.find_child("EstLabel", true, false) as Label
 		ally2_fase_lbl = ally2_panel.find_child("FaseLabel", true, false) as Label
 		ally2_portrait_rect = ally2_panel.find_child("PortraitRect", true, false) as TextureRect
+	if skills_panel != null:
+		if skill_list == null:
+			skill_list = skills_panel.find_child("SkillList", true, false) as VBoxContainer
+		if btn_voltar_skills == null:
+			btn_voltar_skills = skills_panel.find_child("BtnVoltar", true, false) as Button
 	_inicializar_referencias_inimigo()
 
 
@@ -78,16 +92,19 @@ func _inicializar_referencias_inimigo() -> void:
 		enemy_portrait_rect = enemy_panel.find_child("PortraitRect", true, false) as TextureRect
 
 
-
 func _connect_buttons() -> void:
 	if btn_atacar != null:
 		btn_atacar.pressed.connect(_on_atacar_pressed)
+	if btn_habilidades != null:
+		btn_habilidades.pressed.connect(_on_habilidades_pressed)
 	if btn_defender != null:
 		btn_defender.pressed.connect(_on_defender_pressed)
 	if btn_itens != null:
 		btn_itens.pressed.connect(_on_itens_pressed)
 	if btn_fugir != null:
 		btn_fugir.pressed.connect(_on_fugir_pressed)
+	if btn_voltar_skills != null:
+		btn_voltar_skills.pressed.connect(_on_voltar_skills_pressed)
 
 
 func _setup_arena_combatants(allies: Array[CharacterData], enemy_list: Array[Dictionary]) -> void:
@@ -206,7 +223,7 @@ func _eh_aliado(c_id: String) -> bool:
 
 
 func _on_action_executed(actor_id: String, target_id: String, action_type: String) -> void:
-	if action_type == "ataque":
+	if action_type == "ataque" or action_type == "habilidade":
 		if actor_id == "lucas":
 			_executar_ataque_melee_lucas(actor_id, target_id)
 		elif actor_id == "davi":
@@ -434,9 +451,31 @@ func _criar_label_flutuante_ruptura(sprite: AnimatedSprite2D) -> void:
 	tw.tween_callback(lbl.queue_free)
 
 
+func _mostrar_efeito_interrompido(target_id: String) -> void:
+	var sprite: AnimatedSprite2D = _obter_sprite_combatente(target_id)
+	if sprite == null:
+		return
+	_criar_label_flutuante_interrompido(sprite)
+
+
+func _criar_label_flutuante_interrompido(sprite: AnimatedSprite2D) -> void:
+	var lbl: Label = Label.new()
+	lbl.text = "INTERROMPIDO!"
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3, 1.0))
+	lbl.add_theme_font_size_override("font_size", 22)
+	lbl.position = sprite.position + Vector2(-60.0, -95.0)
+	sprite.get_parent().add_child(lbl)
+	var tw: Tween = create_tween()
+	tw.tween_property(lbl, "position:y", lbl.position.y - 35.0, 0.8)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.tween_callback(lbl.queue_free)
+
+
 func _on_state_changed(_old_state: BattleManager.BattleState, new_state: BattleManager.BattleState) -> void:
 	_update_labels(new_state)
 	_update_command_panel(new_state)
+	if new_state != BattleManager.BattleState.SELECIONANDO_ACAO and skills_panel != null:
+		skills_panel.visible = false
 	_update_hud()
 	if new_state == BattleManager.BattleState.VITORIA:
 		_executar_sequencia_vitoria()
@@ -483,15 +522,15 @@ func _update_ally_hud() -> void:
 	if battle_manager.party_members.is_empty():
 		return
 	if battle_manager.party_members.size() > 0:
-		_atualizar_painel_aliado(battle_manager.party_members[0], ally_panel, ally_portrait_rect, ally_name_lbl, ally_hp_lbl, ally_est_lbl, ally_fase_lbl, 0)
+		_atualizar_painel_aliado(battle_manager.party_members[0], ally_panel, ally_portrait_rect, ally_name_lbl, ally_hp_lbl, ally_mp_lbl, ally_est_lbl, ally_fase_lbl, 0)
 	if battle_manager.party_members.size() > 1 and ally2_panel != null:
 		ally2_panel.visible = true
-		_atualizar_painel_aliado(battle_manager.party_members[1], ally2_panel, ally2_portrait_rect, ally2_name_lbl, ally2_hp_lbl, ally2_est_lbl, ally2_fase_lbl, 1)
+		_atualizar_painel_aliado(battle_manager.party_members[1], ally2_panel, ally2_portrait_rect, ally2_name_lbl, ally2_hp_lbl, ally2_mp_lbl, ally2_est_lbl, ally2_fase_lbl, 1)
 	elif ally2_panel != null:
 		ally2_panel.visible = false
 
 
-func _atualizar_painel_aliado(hero: CharacterData, panel: Control, p_rect: TextureRect, n_lbl: Label, hp_lbl: Label, est_lbl: Label, f_lbl: Label, idx: int) -> void:
+func _atualizar_painel_aliado(hero: CharacterData, panel: Control, p_rect: TextureRect, n_lbl: Label, hp_lbl: Label, mp_lbl: Label, est_lbl: Label, f_lbl: Label, idx: int) -> void:
 	if hero == null or panel == null:
 		return
 	if p_rect != null:
@@ -500,6 +539,7 @@ func _atualizar_painel_aliado(hero: CharacterData, panel: Control, p_rect: Textu
 			p_rect.texture = tex
 	if n_lbl != null: n_lbl.text = hero.name
 	if hp_lbl != null: hp_lbl.text = "PV: %d/%d" % [hero.current_hp, hero.max_hp]
+	if mp_lbl != null: mp_lbl.text = "PM: %d/%d" % [hero.pm_atual, hero.pm_max]
 	var c_comb: Dictionary = battle_manager.timeline.obter_combatente(hero.character_id) if battle_manager.timeline != null else {}
 	if est_lbl != null: est_lbl.text = "Estabilidade: %d/100" % int(c_comb.get("estabilidade_atual", 100))
 	if f_lbl != null:
@@ -565,7 +605,9 @@ func _obter_nome_fase(c_id: String) -> String:
 	match fase:
 		BattleTimeline.FaseTurno.ESPERA: return "Espera"
 		BattleTimeline.FaseTurno.DECISAO: return "Decisão"
-		BattleTimeline.FaseTurno.CONJURACAO: return "Conjuração"
+		BattleTimeline.FaseTurno.CONJURACAO:
+			var prog: float = float(c.get("progresso_conjuracao", 0.0))
+			return "Conjuração (%.0f%%)" % prog
 		BattleTimeline.FaseTurno.EXECUCAO: return "Execução"
 		_: return "Espera"
 
@@ -579,6 +621,59 @@ func _on_atacar_pressed() -> void:
 	var hero: CharacterData = battle_manager.get_active_actor()
 	var enemy: Dictionary = battle_manager.enemies[0]
 	battle_manager.executar_ataque_basico(hero, enemy)
+	_update_hud()
+
+
+func _on_habilidades_pressed() -> void:
+	if command_panel != null:
+		command_panel.visible = false
+	_popular_submenu_habilidades()
+	if skills_panel != null:
+		skills_panel.visible = true
+
+
+func _on_voltar_skills_pressed() -> void:
+	if skills_panel != null:
+		skills_panel.visible = false
+	if command_panel != null:
+		command_panel.visible = true
+	if btn_habilidades != null:
+		btn_habilidades.grab_focus()
+
+
+func _popular_submenu_habilidades() -> void:
+	if skill_list == null or battle_manager == null:
+		return
+	for c: Node in skill_list.get_children():
+		c.queue_free()
+	var hero: CharacterData = battle_manager.get_active_actor()
+	if hero == null:
+		return
+	var skills: Array[SkillData] = hero.obter_habilidades()
+	for sk: SkillData in skills:
+		_criar_botao_habilidade(sk, hero)
+
+
+func _criar_botao_habilidade(sk: SkillData, hero: CharacterData) -> void:
+	var btn: Button = Button.new()
+	btn.custom_minimum_size = Vector2(0, 38)
+	btn.text = "%s (%d PM)" % [sk.nome, sk.custo_pm]
+	var pode_usar: bool = hero.tem_pm(sk.custo_pm)
+	btn.disabled = not pode_usar
+	if not pode_usar:
+		btn.modulate = Color(0.6, 0.6, 0.6, 0.7)
+	btn.pressed.connect(func(): _on_skill_clicked(sk))
+	skill_list.add_child(btn)
+
+
+func _on_skill_clicked(sk: SkillData) -> void:
+	if battle_manager == null or battle_manager.enemies.is_empty():
+		return
+	if skills_panel != null:
+		skills_panel.visible = false
+	var hero: CharacterData = battle_manager.get_active_actor()
+	var enemy: Dictionary = battle_manager.enemies[0]
+	battle_manager.executar_habilidade(hero, sk, enemy)
 	_update_hud()
 
 
@@ -613,6 +708,9 @@ func _on_fugir_pressed() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and command_panel != null and command_panel.visible:
-		if btn_atacar != null:
-			btn_atacar.grab_focus()
+	if event.is_action_pressed("ui_cancel"):
+		if skills_panel != null and skills_panel.visible:
+			_on_voltar_skills_pressed()
+		elif command_panel != null and command_panel.visible:
+			if btn_atacar != null:
+				btn_atacar.grab_focus()

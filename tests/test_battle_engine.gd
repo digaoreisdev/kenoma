@@ -36,6 +36,9 @@ static func _run_group_b() -> bool:
 	p = p and test_boss_turn_frequency_in_multiparty_encounter()
 	p = p and test_simultaneous_ready_actions_execute_sequentially()
 	p = p and test_executando_acao_locks_timeline_tick()
+	p = p and test_selecting_skill_deducts_mp()
+	p = p and test_casting_phase_advances_and_triggers_at_100()
+	p = p and test_damage_taken_during_conjuracao_interrupts_spell()
 	return p
 
 
@@ -553,6 +556,65 @@ static func test_executando_acao_locks_timeline_tick() -> bool:
 	assert(signaled[0] and not bm.executando_acao, "acao_concluida emitted and mutex unlocked")
 	bm._process(1.0)
 	assert(float(c.get("posicao_tempo", 0.0)) > 30.0, "Timeline advances once unlocked")
+	bm.free()
+	return true
+
+
+static func test_selecting_skill_deducts_mp() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var lucas: CharacterData = CharacterData.create_default_lucas()
+	var enemy: Dictionary = {"id": "e1", "name": "Inimigo", "max_hp": 80, "current_hp": 80, "estabilidade_max": 100, "estabilidade_atual": 100}
+	bm.initialize_battle([lucas], [enemy])
+	var golpe: SkillData = SkillData.create_golpe_sismico()
+	assert(lucas.pm_atual == 45, "Lucas must start with 45 PM")
+	var res: Dictionary = bm.executar_habilidade(lucas, golpe, bm.enemies[0])
+	assert(res["sucesso"] == true, "Instant skill execution must succeed")
+	assert(lucas.pm_atual == 37, "Lucas PM must be deducted by 8 (45 -> 37)")
+	assert(int(bm.enemies[0]["estabilidade_atual"]) == 55, "Golpe Sismico must inflict 45 stability damage (100 -> 55)")
+	bm.concluir_acao()
+	lucas.pm_atual = 5
+	var res_insuficiente: Dictionary = bm.executar_habilidade(lucas, golpe, bm.enemies[0])
+	assert(res_insuficiente["sucesso"] == false and res_insuficiente["motivo"] == "pm_insuficiente", "Cannot cast without PM")
+	bm.free()
+	return true
+
+
+static func test_casting_phase_advances_and_triggers_at_100() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	bm.timeline_speed_scale = 1.0
+	var davi: CharacterData = CharacterData.create_default_davi()
+	var enemy: Dictionary = {"id": "e1", "name": "Inimigo", "max_hp": 100, "current_hp": 100, "estabilidade_max": 100, "estabilidade_atual": 100}
+	bm.initialize_battle([davi], [enemy])
+	var lanca: SkillData = SkillData.create_lanca_de_eter()
+	var res: Dictionary = bm.executar_habilidade(davi, lanca, bm.enemies[0])
+	assert(res["sucesso"] == true and res["conjurando"] == true, "Must enter conjuracao phase")
+	assert(davi.pm_atual == 48, "Davi PM must be deducted immediately (60 -> 48)")
+	var t_c: Dictionary = bm.timeline.obter_combatente("davi")
+	assert(int(t_c["fase_turno"]) == BattleTimeline.FaseTurno.CONJURACAO, "Timeline phase must be CONJURACAO")
+	bm._process(1.0)
+	assert(is_equal_approx(float(t_c["progresso_conjuracao"]), 50.0), "Casting progress must reach 50% in 1.0s")
+	bm._process(1.0)
+	assert(int(bm.enemies[0]["current_hp"]) < 100, "Enemy must take damage when cast reaches 100%")
+	assert(int(t_c["fase_turno"]) == BattleTimeline.FaseTurno.ESPERA, "Phase must reset to ESPERA after spell")
+	bm.free()
+	return true
+
+
+static func test_damage_taken_during_conjuracao_interrupts_spell() -> bool:
+	var bm: BattleManager = BattleManager.new()
+	var davi: CharacterData = CharacterData.create_default_davi()
+	var enemy: Dictionary = {"id": "boss", "name": "General Cassian", "max_hp": 240, "current_hp": 240, "strength": 20}
+	bm.initialize_battle([davi], [enemy])
+	var lanca: SkillData = SkillData.create_lanca_de_eter()
+	bm.executar_habilidade(davi, lanca, bm.enemies[0])
+	var interrupted: Array[bool] = [false]
+	bm.spell_interrupted.connect(func(c_id: String) -> void: if c_id == "davi": interrupted[0] = true)
+	var t_davi: Dictionary = bm.timeline.obter_combatente("davi")
+	assert(int(t_davi["fase_turno"]) == BattleTimeline.FaseTurno.CONJURACAO, "Davi must be in CONJURACAO")
+	bm._executar_ataque_inimigo("boss")
+	assert(interrupted[0] == true, "spell_interrupted must be emitted when hit during cast")
+	assert(int(t_davi["fase_turno"]) == BattleTimeline.FaseTurno.ESPERA, "Phase must reset to ESPERA on interrupt")
+	assert(float(t_davi["progresso_conjuracao"]) == 0.0, "Casting progress must reset to 0.0")
 	bm.free()
 	return true
 

@@ -19,6 +19,7 @@ signal timeline_updated
 signal combatant_ready_for_action(combatant_id: String, is_player: bool)
 signal action_executed(actor_id: String, target_id: String, action_type: String)
 signal rupture_triggered(target_id: String)
+signal spell_interrupted(target_id: String)
 signal acao_concluida
 
 @export var current_state: BattleState = BattleState.INICIALIZANDO
@@ -31,6 +32,7 @@ var is_player_turn: bool = true
 var timeline: BattleTimeline = BattleTimeline.new()
 var fila_de_acoes: Array[String] = []
 var executando_acao: bool = false
+var habilidades_em_conjuracao: Dictionary = {}
 
 
 func _process(delta: float) -> void:
@@ -149,8 +151,27 @@ func _processar_acao_inimigo(c_id: String, _combatente: Dictionary) -> void:
 
 
 func _processar_conjuracao_concluida(c_id: String) -> void:
-	if not _eh_combatente_jogador_por_id(c_id):
+	if habilidades_em_conjuracao.has(c_id):
+		var info: Dictionary = habilidades_em_conjuracao[c_id]
+		habilidades_em_conjuracao.erase(c_id)
+		var skill: SkillData = info.get("skill") as SkillData
+		var alvo: Variant = info.get("target")
+		var combatente: Variant = info.get("actor")
+		if combatente == null:
+			combatente = _obter_combatente_por_id(c_id)
+		_executar_impacto_habilidade(combatente, skill, alvo)
+	elif not _eh_combatente_jogador_por_id(c_id):
 		_executar_ataque_inimigo(c_id)
+
+
+func _obter_combatente_por_id(c_id: String) -> Variant:
+	for ally: CharacterData in party_members:
+		if ally != null and ally.character_id == c_id:
+			return ally
+	for e: Dictionary in enemies:
+		if str(e.get("id", "")) == c_id:
+			return e
+	return timeline.obter_combatente(c_id)
 
 
 func _eh_combatente_jogador_por_id(c_id: String) -> bool:
@@ -178,6 +199,9 @@ func _executar_ataque_inimigo(c_id: String) -> void:
 	var dano_base: int = int(e_data.get("strength", 20))
 	var dano_final: int = _calcular_dano_final(c, dano_base)
 	alvo.current_hp = maxi(0, alvo.current_hp - dano_final)
+	var t_alvo: Dictionary = timeline.obter_combatente(alvo.character_id)
+	if not t_alvo.is_empty() and int(t_alvo.get("fase_turno", 0)) == BattleTimeline.FaseTurno.CONJURACAO:
+		_aplicar_interrupcao_conjuracao(t_alvo, alvo.character_id)
 	action_executed.emit(c_id, alvo.character_id, "ataque")
 	concluir_turno_combatente(c, 0.0)
 
@@ -185,6 +209,7 @@ func _executar_ataque_inimigo(c_id: String) -> void:
 func initialize_battle(allies: Array[CharacterData], enemy_list: Array) -> void:
 	current_state = BattleState.INICIALIZANDO
 	executando_acao = false
+	habilidades_em_conjuracao.clear()
 	party_members = allies.duplicate()
 	enemies = []
 	fila_de_acoes.clear()
@@ -305,19 +330,35 @@ func _calcular_dano_final(atacante: Dictionary, dano_base: int) -> int:
 
 func _processar_estabilidade_golpe(defensor: Dictionary, impacto: int) -> Dictionary:
 	if bool(defensor.get("imunidade_interrupcao", false)):
-		return {"ruptura": false, "irritado": false}
+		return {"ruptura": false, "irritado": false, "interrompido": false}
 	var est: int = maxi(0, int(defensor.get("estabilidade_atual", 100)) - impacto)
 	defensor["estabilidade_atual"] = est
 	defensor["stability"] = est
 	var def_id: String = str(defensor.get("id", ""))
 	if est <= 0:
 		_aplicar_ruptura_combatente(defensor, def_id)
-		return {"ruptura": true, "irritado": false}
+		return {"ruptura": true, "irritado": false, "interrompido": false}
 	var fase: int = int(defensor.get("fase_turno", BattleTimeline.FaseTurno.ESPERA))
+	if timeline != null and not def_id.is_empty():
+		var t_c: Dictionary = timeline.obter_combatente(def_id)
+		if not t_c.is_empty():
+			fase = int(t_c.get("fase_turno", fase))
 	if fase == BattleTimeline.FaseTurno.CONJURACAO:
 		defensor["irritado"] = true
-		return {"ruptura": false, "irritado": true}
-	return {"ruptura": false, "irritado": bool(defensor.get("irritado", false))}
+		_aplicar_interrupcao_conjuracao(defensor, def_id)
+		return {"ruptura": false, "irritado": true, "interrompido": true}
+	return {"ruptura": false, "irritado": bool(defensor.get("irritado", false)), "interrompido": false}
+
+
+func _aplicar_interrupcao_conjuracao(defensor: Dictionary, def_id: String) -> void:
+	defensor["fase_turno"] = BattleTimeline.FaseTurno.ESPERA
+	defensor["progresso_conjuracao"] = 0.0
+	var pos: float = float(defensor.get("posicao_tempo", 100.0))
+	defensor["posicao_tempo"] = clampf(pos - 30.0, 0.0, 100.0)
+	habilidades_em_conjuracao.erase(def_id)
+	if timeline != null and not def_id.is_empty():
+		timeline.aplicar_interrupcao(def_id, 30.0)
+	spell_interrupted.emit(def_id)
 
 
 func _aplicar_ruptura_combatente(defensor: Dictionary, def_id: String) -> void:
@@ -326,6 +367,7 @@ func _aplicar_ruptura_combatente(defensor: Dictionary, def_id: String) -> void:
 	defensor["progresso_conjuracao"] = 0.0
 	defensor["irritado"] = false
 	defensor["em_recuperacao_ruptura"] = true
+	habilidades_em_conjuracao.erase(def_id)
 	if not def_id.is_empty():
 		fila_de_acoes.erase(def_id)
 	if timeline != null and not def_id.is_empty():
@@ -350,6 +392,7 @@ func aplicar_golpe(atacante: Dictionary, defensor: Dictionary, dano: int, impact
 	return {
 		"dano": dano_final,
 		"ruptura": bool(res_est.get("ruptura", false)),
+		"interrompido": bool(res_est.get("interrompido", false)),
 		"irritado": bool(res_est.get("irritado", false)),
 		"vida_restante": int(defensor["current_hp"]),
 		"estabilidade_restante": int(defensor.get("estabilidade_atual", 0))
@@ -411,7 +454,7 @@ func executar_ataque_basico(atacante: Variant, defensor: Variant) -> Dictionary:
 	var dano_efetivo: int = _calcular_dano_ataque_basico(dados_atk)
 	var def_dict: Dictionary = defensor if defensor is Dictionary else {}
 	if defensor is CharacterData:
-		def_dict = {"name": defensor.name, "current_hp": defensor.current_hp, "max_hp": defensor.max_hp}
+		def_dict = {"name": defensor.name, "current_hp": defensor.current_hp, "max_hp": defensor.max_hp, "id": defensor.character_id}
 	var impacto: int = _calcular_impacto_estabilidade(dados_atk, def_dict)
 	var res: Dictionary = aplicar_golpe({"id": "atacante"}, def_dict, dano_efetivo, impacto)
 	if defensor is CharacterData:
@@ -469,6 +512,88 @@ func executar_item(combatente: Variant, item_data: ItemData, alvo: Variant) -> D
 	action_executed.emit(_obter_id_combatente(combatente), _obter_id_combatente(alvo), "item")
 	concluir_turno_combatente(combatente, 0.0)
 	return {"sucesso": true, "cura": cura, "item": item_data.name}
+
+
+func _tem_pm_combatente(combatente: Variant, custo: int) -> bool:
+	if combatente is CharacterData:
+		return (combatente as CharacterData).tem_pm(custo)
+	elif combatente is Dictionary:
+		return int((combatente as Dictionary).get("pm_atual", 0)) >= custo
+	return true
+
+
+func _deduzir_pm_combatente(combatente: Variant, custo: int) -> bool:
+	if combatente is CharacterData:
+		return (combatente as CharacterData).gastar_pm(custo)
+	elif combatente is Dictionary:
+		var d: Dictionary = combatente as Dictionary
+		var pm: int = int(d.get("pm_atual", 0))
+		d["pm_atual"] = maxi(0, pm - custo)
+		return true
+	return false
+
+
+func executar_habilidade(combatente: Variant, skill: SkillData, alvo: Variant) -> Dictionary:
+	if executando_acao or skill == null or alvo == null:
+		return {"sucesso": false}
+	var custo: int = skill.custo_pm
+	if not _tem_pm_combatente(combatente, custo):
+		return {"sucesso": false, "motivo": "pm_insuficiente"}
+	_deduzir_pm_combatente(combatente, custo)
+	if skill.tempo_conjuracao > 0.0:
+		return _iniciar_conjuracao_habilidade(combatente, skill, alvo)
+	executando_acao = true
+	change_state(BattleState.EXECUTANDO_ACAO)
+	return _executar_impacto_habilidade(combatente, skill, alvo)
+
+
+func _iniciar_conjuracao_habilidade(combatente: Variant, skill: SkillData, alvo: Variant) -> Dictionary:
+	var c_id: String = _obter_id_combatente(combatente)
+	habilidades_em_conjuracao[c_id] = {"actor": combatente, "skill": skill, "target": alvo}
+	if timeline != null:
+		timeline.iniciar_conjuracao(c_id, skill.tempo_conjuracao)
+	if combatente is Dictionary:
+		var d: Dictionary = combatente as Dictionary
+		d["fase_turno"] = BattleTimeline.FaseTurno.CONJURACAO
+		d["progresso_conjuracao"] = 0.0
+	executando_acao = false
+	change_state(BattleState.AGUARDANDO_TURNO)
+	_verificar_proximo_turno()
+	return {"sucesso": true, "conjurando": true, "tempo": skill.tempo_conjuracao}
+
+
+func _calcular_dano_habilidade(combatente: Variant, skill: SkillData) -> int:
+	var poder_base: float = float(skill.dano_base)
+	var attr: float = 10.0
+	if combatente is CharacterData:
+		var cd: CharacterData = combatente as CharacterData
+		attr = float(cd.get_total_stat("willpower")) if skill.tipo == "MAGICO" else float(cd.get_total_stat("strength"))
+	elif combatente is Dictionary:
+		var d: Dictionary = combatente as Dictionary
+		attr = float(d.get("vontade", d.get("willpower", 10.0))) if skill.tipo == "MAGICO" else float(d.get("forca", d.get("strength", 10.0)))
+	var dano_total: float = poder_base + (attr * 0.8)
+	return int(round(dano_total))
+
+
+func _executar_impacto_habilidade(combatente: Variant, skill: SkillData, alvo: Variant) -> Dictionary:
+	executando_acao = true
+	change_state(BattleState.EXECUTANDO_ACAO)
+	var c_id: String = _obter_id_combatente(combatente)
+	var def_id: String = _obter_id_combatente(alvo)
+	var dano: int = _calcular_dano_habilidade(combatente, skill)
+	var def_dict: Dictionary = alvo if alvo is Dictionary else {}
+	if alvo is CharacterData:
+		var cd: CharacterData = alvo as CharacterData
+		def_dict = {"name": cd.name, "current_hp": cd.current_hp, "max_hp": cd.max_hp, "id": cd.character_id}
+	var res: Dictionary = aplicar_golpe({"id": c_id}, def_dict, dano, skill.dano_estabilidade)
+	if alvo is CharacterData:
+		(alvo as CharacterData).current_hp = int(def_dict.get("current_hp", 0))
+	res["dano_efetivo"] = dano
+	res["impacto_estabilidade"] = skill.dano_estabilidade
+	res["sucesso"] = true
+	action_executed.emit(c_id, def_id, "habilidade")
+	concluir_turno_combatente(combatente, 0.0)
+	return res
 
 
 func _resetar_combatente_timeline(c_id: String, posicao: float) -> void:

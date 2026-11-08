@@ -93,12 +93,25 @@ func _avancar_fase_conjuracao(c: Dictionary, delta: float, eventos: Array[Dictio
 		c["progresso_conjuracao"] = prog
 
 
-func iniciar_conjuracao(id: String, velocidade_conjuracao: float = 25.0) -> void:
+func iniciar_conjuracao(id: String, tempo_conjuracao: float = 2.0) -> void:
 	for c: Dictionary in combatentes:
 		if str(c.get("id", "")) == id:
 			c["fase_turno"] = FaseTurno.CONJURACAO
 			c["progresso_conjuracao"] = 0.0
-			c["velocidade_conjuracao"] = velocidade_conjuracao
+			c["tempo_conjuracao"] = tempo_conjuracao
+			var vel: float = (100.0 / tempo_conjuracao) if tempo_conjuracao > 0.0 else 100.0
+			c["velocidade_conjuracao"] = vel
+			return
+
+
+func aplicar_interrupcao(id: String, penalidade_posicao: float = 30.0) -> void:
+	for c: Dictionary in combatentes:
+		if str(c.get("id", "")) == id:
+			c["fase_turno"] = FaseTurno.ESPERA
+			c["progresso_conjuracao"] = 0.0
+			var pos: float = float(c.get("posicao_tempo", 100.0))
+			c["posicao_tempo"] = clampf(pos - penalidade_posicao, 0.0, 100.0)
+			c["irritado"] = false
 			return
 
 

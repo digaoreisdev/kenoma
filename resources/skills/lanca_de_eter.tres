@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="1_skdata"]
+
+[resource]
+script = ExtResource("1_skdata")
+id = "lanca_de_eter"
+nome = "Lança de Éter"
+descricao = "Disparo concentrado de energia mágica após canalização."
+custo_pm = 12
+dano_base = 42
+dano_estabilidade = 15
+tempo_conjuracao = 2.0
+tipo = "MAGICO"
+target_type = 0

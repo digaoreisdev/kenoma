@@ -165,6 +165,11 @@ text = "Lucas Reis"
 layout_mode = 2
 text = "PV: 120/120"
 
+[node name="MPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "PM: 40/40"
+
 [node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel/Margin/HBox/VBox"]
 layout_mode = 2
 text = "Estabilidade: 100/100"
@@ -213,6 +218,11 @@ text = "Davi Reis"
 layout_mode = 2
 text = "PV: 90/90"
 
+[node name="MPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "PM: 60/60"
+
 [node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox"]
 layout_mode = 2
 text = "Estabilidade: 100/100"
@@ -226,9 +236,9 @@ text = "Fase: Espera"
 visible = false
 layout_mode = 0
 offset_left = 60.0
-offset_top = 540.0
+offset_top = 510.0
 offset_right = 500.0
-offset_bottom = 680.0
+offset_bottom = 690.0
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/ActionCommandPanel"]
 layout_mode = 2
@@ -246,30 +256,72 @@ columns = 2
 [node name="BtnAtacar" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
 custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
-focus_neighbor_right = NodePath("../BtnDefender")
-focus_neighbor_bottom = NodePath("../BtnItens")
+focus_neighbor_right = NodePath("../BtnHabilidades")
+focus_neighbor_bottom = NodePath("../BtnDefender")
 text = "Atacar"
+
+[node name="BtnHabilidades" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
+custom_minimum_size = Vector2(190, 42)
+layout_mode = 2
+focus_neighbor_left = NodePath("../BtnAtacar")
+focus_neighbor_bottom = NodePath("../BtnItens")
+text = "Habilidades"
 
 [node name="BtnDefender" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
 custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
-focus_neighbor_left = NodePath("../BtnAtacar")
+focus_neighbor_top = NodePath("../BtnAtacar")
+focus_neighbor_right = NodePath("../BtnItens")
 focus_neighbor_bottom = NodePath("../BtnFugir")
 text = "Defender"
 
 [node name="BtnItens" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
 custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
-focus_neighbor_top = NodePath("../BtnAtacar")
-focus_neighbor_right = NodePath("../BtnFugir")
+focus_neighbor_top = NodePath("../BtnHabilidades")
+focus_neighbor_left = NodePath("../BtnDefender")
+focus_neighbor_bottom = NodePath("../BtnFugir")
 text = "Itens"
 
 [node name="BtnFugir" type="Button" parent="CanvasLayer/UI/ActionCommandPanel/Margin/Grid"]
 custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
 focus_neighbor_top = NodePath("../BtnDefender")
-focus_neighbor_left = NodePath("../BtnItens")
 text = "Fugir"
+
+[node name="SkillsPanel" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 0
+offset_left = 60.0
+offset_top = 480.0
+offset_right = 500.0
+offset_bottom = 690.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/SkillsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/SkillsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/UI/SkillsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.5, 1)
+text = "Habilidades"
+
+[node name="SkillList" type="VBoxContainer" parent="CanvasLayer/UI/SkillsPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="BtnVoltar" type="Button" parent="CanvasLayer/UI/SkillsPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "Voltar"
 
 [node name="VictoryBanner" type="CenterContainer" parent="CanvasLayer/UI"]
 visible = false

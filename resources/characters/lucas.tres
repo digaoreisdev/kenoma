@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/core/equipment_data.gd" id="1_vop3q"]
 [ext_resource type="Texture2D" path="res://assets/art/portraits/lucas/lucas_neutral.png" id="2_o74bp"]
 [ext_resource type="Script" path="res://scripts/core/character_data.gd" id="3_t4tox"]
+[ext_resource type="Resource" path="res://resources/skills/golpe_sismico.tres" id="4_sismico"]
 [ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="4_euep2"]
 [ext_resource type="SpriteFrames" path="res://assets/art/characters/player/player_frames.tres" id="5_i7upt"]
 
@@ -22,17 +23,14 @@ sockets = Array[Dictionary]([{
 "unlocked": true
 }])
 
-[sub_resource type="Resource" id="Resource_vtfpt"]
-script = ExtResource("4_euep2")
-id = "runic_impact"
-name = "Impacto Rúnico"
-description = "Golpe pesado de marreta que abala a postura inimiga."
-mp_cost = 6
-
 [resource]
 script = ExtResource("3_t4tox")
 character_id = "lucas"
 name = "Lucas Reis"
+pm_atual = 40
+pm_max = 40
+current_mp = 40
+max_mp = 40
 portrait = ExtResource("2_o74bp")
 sprite_frames = ExtResource("5_i7upt")
 weapon_affinities = {
@@ -40,7 +38,8 @@ weapon_affinities = {
 2: 0.9,
 5: 0.8
 }
-skills = Array[ExtResource("4_euep2")]([SubResource("Resource_vtfpt")])
+habilidades = Array[ExtResource("4_euep2")]([ExtResource("4_sismico")])
+skills = Array[ExtResource("4_euep2")]([ExtResource("4_sismico")])
 equipment = {
 "accessory": null,
 "body": null,
