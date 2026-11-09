@@ -13,7 +13,7 @@
 * **Engine:** Godot Engine 4.7.2 Standard (sem runtime .NET/C#).
 * **Linguagem:** GDScript estritamente tipado.
 * **Renderizador:** `Compatibility` (otimizado para compatibilidade ampla e desempenho em dispositivos móveis; será reavaliado na Fase F8 se houver necessidade de shaders avançados).
-* **Resolução Base:** Viewport 1280x720 (16:9).
+* **Resolução Base:** Viewport 1920x1080 (16:9).
 * **Modo de Stretch:** `canvas_items` com aspect `keep`.
 * **Filtro de Textura 2D:** `Nearest` (`textures/canvas_textures/default_texture_filter=0`) para preservar a nitidez da pixel art.
 * **Dimensões de Sprites de Personagem:** Quadro de 48x64 px (largura x altura). Origem de desenho no ponto dos pés (a confirmar).
@@ -97,6 +97,7 @@
 * [x] **F5.16 (Calibração de Cor, Saturação e Volume das Nuvens de Entardecer):** Enriquecimento dos tons cromáticos das nuvens em `SkyClouds` com âmbar dourado e terracota suave, elevação da densidade para 95% de opacidade no núcleo e modulação em 94%, destacando com clareza o volume e o movimento das nuvens contra o brilho do sol; suíte 100% verde.
 * [x] **F5.17 (Compensação de Escala em Ataques de Todos os Combatentes):** Manutenção da escala base de batalha em Vector2(0.9, 0.9) para todos os combatentes e introdução do fator de compensação de 1.25x (Vector2(1.125, 1.125)) acionado durante as animações de ataque de aliados e inimigos, compensando o enquadramento reduzido dos sprites de ataque gerados pelo AutoSprite e restaurando com precisão a escala original ao retornar à postura idle; suíte 100% aprovada (ALL PASS).
 * [x] **F5.18 (General Cassian 1 de Batalha com Elmo e Espada e Escala Imponente de Chefe):** Vinculação do novo `SpriteFrames` de combate com elmo e espada (`General_Cassian1_frames.tres`) ao recurso do General Cassian e carregamento dinâmico na cena de batalha; seleção automática de animações de espada voltadas para os heróis (`Attack Southeast_right` / `Attack Right_right`); calibração do porte de chefe para `ESCALA_CHEFE_BASE = Vector2(1.05, 1.05)` (~17% maior que os heróis), mantendo o fator de compensação de ataque de 1.25x em todos os combatentes e restauração precisa para suas respectivas escalas de repouso; suíte 100% verde (ALL PASS).
+* [x] **F5.19 (Auditoria e Sincronização da Suíte Automatizada de Combate):** Atualização da suíte de testes em `test_battle_engine.gd` com validação estrita de viewport 1920x1080 (canvas_items/keep), teste de extremos de proporção normalizada (0.0 e 1.0), verificação das 5 formações táticas com Slot 1 ancorado e heróis livres da forja (X <= 0.75*W), validação de ancoragem de inimigos na praça esquerda (X <= 0.38) sem posições obsoletas centralizadas (640, 465), verificação de ausência de props avulsos e integridade de camadas full-canvas carregadas com texturas válidas em Z=-10 e Z=10; suíte completa 100% verde (ALL PASS).
 
 
 

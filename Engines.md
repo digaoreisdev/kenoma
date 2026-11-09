@@ -6,7 +6,7 @@
 * **Renderizador:** `Compatibility` (otimizado para ampla compatibilidade e performance mobile)
 * **Gênero:** JRPG 16-bit estilo *Final Fantasy VI* com estética HD-2D
 * **Plataformas-Alvo:** PC (Steam / Windows) e Mobile (Android)
-* **Resolução Base:** Viewport 1280x720 (16:9), Stretch Mode `canvas_items`, Aspect `keep`, Texture Filter `Nearest`
+* **Resolução Base:** Viewport 1920x1080 (16:9), Stretch Mode `canvas_items`, Aspect `keep`, Texture Filter `Nearest`
 * **Framework de Testes:** GUT (*Godot Unit Testing*) planejado para `res://tests/`
 
 ---
@@ -116,6 +116,7 @@ Para qualquer defeito identificado ou relatado:
 * **v0.58 (2026-11-08):** Calibração de contraste, volume e saturação de entardecer das nuvens (F5 - Polimento Visual): enriquecimento cromático da textura de nuvens em `SkyClouds` com topo em âmbar dourado e base em terracota suave de crepúsculo, elevação da densidade central para 95% de opacidade e modulação em 94% de presença, garantindo contraste nítido e visual volumétrico contra o céu solar de fundo; suíte 100% aprovada (ALL PASS).
 * **v0.59 (2026-11-08):** Compensação de escala dinâmica em animações de ataque de combate (F5 - Polimento/Sprites): preservação da escala base de repouso dos combatentes em `Vector2(0.9, 0.9)` (`ESCALA_COMBATENTE_BASE`) e implementação do multiplicador de compensação `MULTIPLICADOR_COMPENSACAO_ATAQUE = 1.25` (`aplicar_escala_ataque`), elevando automaticamente a escala do sprite para `Vector2(1.125, 1.125)` durante a execução de ataques melee e mágicos de todos os personagens (Lucas, Davi, General Cassian) para equilibrar o enquadramento reduzido das folhas de ataque do AutoSprite, com restauração limpa e garantida para a escala base no retorno ao idle (`restaurar_escala_base`); expansão da suíte em `test_battle_engine.gd` aprovada (ALL PASS).
 * **v0.60 (2026-11-08):** Integração do General Cassian de Combate (Elmo e Espada Desembainhada) e Calibração de Escala de Chefe (F5 - Polimento/Sprites/Boss): vinculação do recurso `General_Cassian1_frames.tres` em `general_cassian.tres` e `enemy_data.gd`; priorização de animações de golpe direcionais (`Attack Southeast_right` e `Attack Right_right`) para chefes no `battle_scene.gd` e fallback de postura de espera para `iso_walk_southeast_right`; calibração de porte de chefe via `ESCALA_CHEFE_BASE = Vector2(1.05, 1.05)` (~17% maior que os heróis em `Vector2(0.9, 0.9)`), com preservação de escala base individualizada via metadados nos combatentes (`set_meta("escala_base")`) e compensação harmônica de ataque de 1.25x (`Vector2(1.3125, 1.3125)` para Cassian e `Vector2(1.125, 1.125)` para heróis); suíte completa de testes aprovada (ALL PASS).
+* **v0.61 (2026-11-09):** Auditoria e sincronização da suíte de testes de combate à arquitetura da engine: validação estrita de viewport 1920x1080 base (canvas_items/keep), teste de extremos de coordenadas normalizadas (0.0 e 1.0), verificação das 5 formações táticas com Slot 1 ancorado e slots 1-4 livres da bigorna/forja, validação de ancoragem de inimigos na praça esquerda (X <= 0.38) sem referências obsoletas centralizadas (640, 465), confirmação de ausência de props avulsos e integridade de camadas full-canvas com texturas carregadas em Z=-10 e Z=10, 100% aprovados em modo headless (ALL PASS).
 
 
 

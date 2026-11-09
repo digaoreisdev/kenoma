@@ -46,8 +46,11 @@ static func _run_group_c() -> bool:
 	p = p and test_timeline_badge_position_mapping()
 	p = p and test_eiyuden_ui_dock_and_banner_instantiation()
 	p = p and test_village_arena_layers_and_z_indexing()
+	p = p and test_viewport_resolution_and_stretch_settings()
 	p = p and test_normalized_coordinate_engine_and_conversions()
 	p = p and test_tactical_formations_clear_of_anvil_and_action_menu()
+	p = p and test_enemy_slotting_anchored_on_left_plaza()
+	p = p and test_deprecated_props_absence()
 	p = p and test_flat_plaza_party_and_enemy_positioning()
 	p = p and test_tactical_encirclement_modes()
 	p = p and test_melee_dash_straight_horizontal_and_return()
@@ -671,33 +674,45 @@ static func test_village_arena_layers_and_z_indexing() -> bool:
 	var clouds: Node2D = scene.get_node_or_null("CanvasLayer/UI/SkyClouds") as Node2D
 	var ally_panel: PanelContainer = scene.get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel") as PanelContainer
 	var action_panel: PanelContainer = scene.get_node_or_null("CanvasLayer/UI/ActionCommandPanel") as PanelContainer
-	assert(bg != null and fg != null, "ArenaBackground and ArenaForeground must exist")
-	assert(bg.z_index == -10, "Background z_index must be -10")
-	assert(fg.z_index == 10, "Foreground z_index must be 10")
-	assert(birds != null and birds.z_index == -9, "DistantBirds sky ambiance must exist at z=-9")
-	assert(clouds != null and clouds.z_index == -9, "SkyClouds drifting ambiance must exist at z=-9")
+	assert(bg != null and fg != null and bg.texture != null and fg.texture != null, "Camadas devem existir com texturas")
+	assert(bg.z_index == -10 and fg.z_index == 10, "Z-index: background=-10 e foreground=10")
+	assert(birds != null and birds.z_index == -9 and clouds != null and clouds.z_index == -9, "Ambiência no z=-9")
 	clouds.inicializar()
-	assert(clouds.get_child_count() > 0, "SkyClouds must spawn Sprite2D children")
+	assert(clouds.get_child_count() > 0, "SkyClouds deve instanciar nuvens filhas")
 	var first_cloud: Sprite2D = clouds.get_child(0) as Sprite2D
-	assert(first_cloud != null and first_cloud.texture != null, "SkyClouds sprite must have valid texture")
-	assert(ally_panel != null and ally_panel.offset_top < 400.0, "AllyPanel must be placed in the upper right dock (Y < 400)")
-	assert(action_panel != null and action_panel.offset_top < 800.0, "ActionCommandPanel must be raised comfortably above screen edge (Y < 800)")
-	assert(not BattleScene.obter_caminho_background().is_empty(), "Background path must resolve")
-	assert(not BattleScene.obter_caminho_foreground().is_empty(), "Foreground path must resolve")
+	assert(first_cloud != null and first_cloud.texture != null, "Nuvem filha deve ter textura válida")
+	assert(ally_panel != null and ally_panel.offset_top < 400.0, "AllyPanel posicionado no canto superior direito")
+	assert(action_panel != null and action_panel.offset_top < 800.0, "ActionCommandPanel acima da borda inferior")
+	assert(not BattleScene.obter_caminho_background().is_empty(), "Caminho do background resolvido")
+	assert(not BattleScene.obter_caminho_foreground().is_empty(), "Caminho do foreground resolvido")
 	scene.free()
 	return true
 
 
+static func test_viewport_resolution_and_stretch_settings() -> bool:
+	var largura: int = int(ProjectSettings.get_setting("display/window/size/viewport_width", 0))
+	var altura: int = int(ProjectSettings.get_setting("display/window/size/viewport_height", 0))
+	var modo_stretch: String = str(ProjectSettings.get_setting("display/window/stretch/mode", ""))
+	var aspecto_stretch: String = str(ProjectSettings.get_setting("display/window/stretch/aspect", ""))
+	assert(largura == 1920, "Largura do viewport base deve ser 1920")
+	assert(altura == 1080, "Altura do viewport base deve ser 1080")
+	assert(modo_stretch == "canvas_items", "Modo de stretch deve ser canvas_items")
+	assert(aspecto_stretch == "keep", "Aspecto de stretch deve ser keep")
+	return true
+
+
 static func test_normalized_coordinate_engine_and_conversions() -> bool:
+	var p_origem: Vector2 = BattleSceneLayout.converter_para_tela(Vector2(0.0, 0.0), Vector2(1920.0, 1080.0))
+	var p_extremo: Vector2 = BattleSceneLayout.converter_para_tela(Vector2(1.0, 1.0), Vector2(1920.0, 1080.0))
 	var p_1080: Vector2 = BattleSceneLayout.converter_para_tela(Vector2(0.5, 0.5), Vector2(1920.0, 1080.0))
 	var p_720: Vector2 = BattleSceneLayout.converter_para_tela(Vector2(0.5, 0.5), Vector2(1280.0, 720.0))
-	assert(p_1080 == Vector2(960.0, 540.0), "Normalized conversion 1920x1080")
-	assert(p_720 == Vector2(640.0, 360.0), "Normalized conversion 1280x720")
+	assert(p_origem == Vector2.ZERO and p_extremo == Vector2(1920.0, 1080.0), "Extremos de conversão 0.0 e 1.0")
+	assert(p_1080 == Vector2(960.0, 540.0) and p_720 == Vector2(640.0, 360.0), "Conversão normalizada proporcional")
 	var layout: BattleSceneLayout = BattleSceneLayout.new()
 	var pos_hero1: Vector2 = layout.obter_posicao_aliado(0, "LINHA_2X2", "PADRAO", Vector2(1920.0, 1080.0))
 	var pos_enemy1: Vector2 = layout.obter_posicao_inimigo(0, 1, false, "PADRAO", Vector2(1920.0, 1080.0))
 	var dist: float = pos_hero1.distance_to(pos_enemy1)
-	assert(dist >= 500.0, "Runway distance between Enemy 1 and Hero 1 must be >= 500px on 1920x1080")
+	assert(dist >= 500.0, "Distância de passarela entre Inimigo 1 e Herói 1 deve ser >= 500px em 1920x1080")
 	return true
 
 
@@ -706,11 +721,44 @@ static func test_tactical_formations_clear_of_anvil_and_action_menu() -> bool:
 	var vp: Vector2 = Vector2(1920.0, 1080.0)
 	var formacoes: Array = ["LINHA_2X2", "LOSANGO", "VANGUARDA_3X1", "RETAGUARDA_1X3", "MEIA_LUA"]
 	for f: String in formacoes:
+		var slot1: Vector2 = layout.obter_posicao_aliado(0, f, "PADRAO", vp)
+		assert(slot1.x >= 0.50 * vp.x and slot1.x <= 0.60 * vp.x, "Slot 1 em %s centrado na âncora" % f)
+		assert(slot1.y >= 0.50 * vp.y and slot1.y <= 0.65 * vp.y, "Slot 1 em %s na faixa vertical da praça" % f)
 		for slot: int in range(4):
 			var pos: Vector2 = layout.obter_posicao_aliado(slot, f, "PADRAO", vp)
-			assert(pos.x <= 0.75 * vp.x, "Slot %d in %s must stay clear of the anvil (X <= 0.75*W)" % [slot, f])
-			assert(pos.y < 750.0, "Slot %d in %s must stay above the action menu (Y < 750)" % [slot, f])
-			assert(pos.y >= 0.50 * vp.y, "Slot %d in %s must stay on the plaza area" % [slot, f])
+			assert(pos.x <= 0.75 * vp.x, "Slot %d em %s livre da forja/bigorna (X <= 0.75*W)" % [slot, f])
+			assert(pos.y < 750.0, "Slot %d em %s acima do menu de comando (Y < 750)" % [slot, f])
+			assert(pos.y >= 0.50 * vp.y, "Slot %d em %s dentro do piso da praça" % [slot, f])
+	return true
+
+
+static func test_enemy_slotting_anchored_on_left_plaza() -> bool:
+	var layout: BattleSceneLayout = BattleSceneLayout.new()
+	var vp: Vector2 = Vector2(1920.0, 1080.0)
+	for i: int in range(layout.posicoes_monstros_padrao.size()):
+		var pos_norm: Vector2 = layout.posicoes_monstros_padrao[i]
+		var pos_tela: Vector2 = layout.obter_posicao_inimigo(i, 8, false, "PADRAO", vp)
+		assert(pos_norm.x <= 0.38, "Slot de monstro %d normalizado deve ter X <= 0.38" % i)
+		assert(pos_tela.x <= 0.38 * vp.x, "Slot de monstro %d em tela deve ter X <= 0.38*W" % i)
+		assert(pos_tela != Vector2(640.0, 465.0), "Slot %d não pode usar centro obsoleto (640, 465)" % i)
+	var pos_cassian: Vector2 = layout.obter_posicao_inimigo(0, 1, true, "PADRAO", vp)
+	assert(pos_cassian.x <= 0.38 * vp.x, "General Cassian deve ancorar na praça esquerda (X <= 0.38*W)")
+	assert(pos_cassian != Vector2(640.0, 465.0), "Cassian não pode usar coordenadas antigas (640, 465)")
+	return true
+
+
+static func test_deprecated_props_absence() -> bool:
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var props_cont: Node = scene.get_node_or_null("CanvasLayer/UI/Arena/PropsContainer")
+	var crystal: Node = scene.get_node_or_null("CanvasLayer/UI/Arena/PropsContainer/MiasmaCrystalProp")
+	var bigorna_avulsa: Node = scene.get_node_or_null("CanvasLayer/UI/PropBigorna")
+	var fogo_flutuante: Node = scene.get_node_or_null("CanvasLayer/UI/VFXFogoFornalha")
+	assert(props_cont == null, "PropsContainer avulso foi removido da hierarquia visual")
+	assert(crystal == null, "MiasmaCrystalProp avulso foi removido")
+	assert(bigorna_avulsa == null, "PropBigorna avulsa foi removida (integrada ao background)")
+	assert(fogo_flutuante == null, "VFXFogoFornalha flutuante foi removido")
+	scene.free()
 	return true
 
 
