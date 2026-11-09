@@ -1,9 +1,0 @@
-[gd_scene format=3 uid="uid://rgjf6vw6c8qq"]
-
-[ext_resource type="SpriteFrames" uid="uid://7bgkumyaot16" path="res://assets/sprites/characters/davi/Davi_Reis_frames.tres" id="1_6nyty"]
-
-[node name="Davi_Reis" type="AnimatedSprite2D" unique_id=1666844683]
-texture_filter = 1
-sprite_frames = ExtResource("1_6nyty")
-animation = &"Dodge Lean Down_right"
-autoplay = "Dodge Lean Down_right"
