@@ -65,6 +65,7 @@ var ally_sprites: Dictionary = {}
 var enemy_sprites: Dictionary = {}
 var timeline_badges: Dictionary = {}
 var layout_cenario: Resource = null
+var _cache_pes: Dictionary = {}
 var modo_encontro: String = "PADRAO"
 var modo_encontro_override: String = ""
 
@@ -404,13 +405,43 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int, _total_aliados: int = 2
 	sprite.sprite_frames = frames
 	sprite.set_meta("escala_base", ESCALA_COMBATENTE_BASE)
 	sprite.scale = ESCALA_COMBATENTE_BASE
-	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.position = _obter_posicao_base_aliado(idx)
 	_tocar_idle_aliado(sprite, ally.character_id)
+	_ancorar_pes_e_profundidade(sprite, party_container, ESCALA_COMBATENTE_BASE)
 	_adicionar_sombra_pe(sprite)
 	party_container.add_child(sprite)
 	ally_sprites[ally.character_id] = sprite
+
+
+## Ancora o pé do sprite na posição do slot e aplica a escala de perspectiva conforme a profundidade (Y).
+func _ancorar_pes_e_profundidade(sprite: AnimatedSprite2D, container: Node2D, escala_base: Vector2) -> void:
+	if sprite == null or container == null:
+		return
+	sprite.offset = Vector2(0.0, -_medir_distancia_pes(sprite))
+	var y_norm: float = (container.position.y + sprite.position.y) / _obter_tamanho_viewport().y
+	if layout_cenario == null:
+		_carregar_layout_cenario()
+	var escala: Vector2 = escala_base * layout_cenario.obter_fator_profundidade(y_norm)
+	sprite.set_meta("escala_base", escala)
+	sprite.scale = escala
+
+
+## Distância (em px do quadro) do centro do quadro até o pé do personagem na animação atual.
+func _medir_distancia_pes(sprite: AnimatedSprite2D) -> float:
+	var frames: SpriteFrames = sprite.sprite_frames
+	if frames == null or not frames.has_animation(sprite.animation):
+		return 0.0
+	var chave: String = "%s|%s" % [frames.resource_path, sprite.animation]
+	if _cache_pes.has(chave):
+		return float(_cache_pes[chave])
+	var tex: Texture2D = frames.get_frame_texture(sprite.animation, 0)
+	var img: Image = tex.get_image() if tex != null else null
+	var dist: float = 0.0
+	if img != null and not img.is_empty():
+		dist = float(img.get_used_rect().end.y) - float(img.get_height()) * 0.5
+	_cache_pes[chave] = dist
+	return dist
 
 
 func _obter_fallback_frames_aliado(c_id: String) -> SpriteFrames:
@@ -447,15 +478,13 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 			frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
 	var escala: Vector2 = ESCALA_CHEFE_BASE if is_boss else ESCALA_COMBATENTE_BASE
-	sprite.set_meta("escala_base", escala)
-	sprite.scale = escala
-	sprite.offset = Vector2(0.0, 8.0)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var total_inimigos: int = 1
 	if battle_manager != null and not battle_manager.enemies.is_empty():
 		total_inimigos = battle_manager.enemies.size()
 	sprite.position = _obter_posicao_base_inimigo(idx, total_inimigos, is_boss)
 	_tocar_idle_inimigo(sprite)
+	_ancorar_pes_e_profundidade(sprite, enemy_container, escala)
 	_adicionar_sombra_pe(sprite)
 	enemy_container.add_child(sprite)
 	enemy_sprites[e_id] = sprite
@@ -475,7 +504,7 @@ func _adicionar_sombra_pe(sprite: AnimatedSprite2D) -> void:
 	var sombra: ColorRect = ColorRect.new()
 	sombra.name = "Sombra"
 	sombra.size = Vector2(26.0, 10.0)
-	sombra.position = Vector2(-13.0, 24.0)
+	sombra.position = Vector2(-13.0, -6.0)
 	sombra.color = Color(0.02, 0.02, 0.04, 0.38)
 	sombra.z_index = -1
 	sombra.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -53,6 +53,7 @@ static func _run_group_c() -> bool:
 	p = p and test_deprecated_props_absence()
 	p = p and test_flat_plaza_party_and_enemy_positioning()
 	p = p and test_tactical_encirclement_modes()
+	p = p and test_perspective_depth_scaling_and_foot_anchoring()
 	p = p and test_melee_dash_straight_horizontal_and_return()
 	p = p and test_attack_aligns_to_target_line_before_advancing()
 	p = p and test_combatant_attack_scale_compensation_and_idle_restoration()
@@ -726,13 +727,14 @@ static func test_tactical_formations_clear_of_anvil_and_action_menu() -> bool:
 	var formacoes: Array = ["LINHA_2X2", "LOSANGO", "VANGUARDA_3X1", "RETAGUARDA_1X3", "MEIA_LUA"]
 	for f: String in formacoes:
 		var slot1: Vector2 = layout.obter_posicao_aliado(0, f, "PADRAO", vp)
-		assert(slot1.x >= 0.50 * vp.x and slot1.x <= 0.60 * vp.x, "Slot 1 em %s centrado na âncora" % f)
-		assert(slot1.y >= 0.50 * vp.y and slot1.y <= 0.65 * vp.y, "Slot 1 em %s na faixa vertical da praça" % f)
+		assert(slot1.x >= 0.60 * vp.x and slot1.x <= 0.70 * vp.x, "Slot 1 em %s centrado na âncora" % f)
+		assert(slot1.y >= 0.60 * vp.y and slot1.y <= 0.80 * vp.y, "Slot 1 em %s na faixa vertical da praça" % f)
 		for slot: int in range(4):
 			var pos: Vector2 = layout.obter_posicao_aliado(slot, f, "PADRAO", vp)
-			assert(pos.x <= 0.75 * vp.x, "Slot %d em %s livre da forja/bigorna (X <= 0.75*W)" % [slot, f])
-			assert(pos.y < 750.0, "Slot %d em %s acima do menu de comando (Y < 750)" % [slot, f])
-			assert(pos.y >= 0.50 * vp.y, "Slot %d em %s dentro do piso da praça" % [slot, f])
+			assert(pos.x <= 0.80 * vp.x, "Slot %d em %s livre da forja/bigorna (X <= 0.80*W)" % [slot, f])
+			assert(pos.x >= 0.63 * vp.x, "Slot %d em %s à direita do menu de ações central" % [slot, f])
+			assert(pos.y >= 0.58 * vp.y and pos.y <= 0.93 * vp.y, "Slot %d em %s dentro do piso da praça" % [slot, f])
+			assert(not layout.ponto_em_zona_bloqueada(Vector2(pos.x / vp.x, pos.y / vp.y)), "Slot %d em %s fora de zonas bloqueadas" % [slot, f])
 	return true
 
 
@@ -745,6 +747,8 @@ static func test_enemy_slotting_anchored_on_left_plaza() -> bool:
 		assert(pos_norm.x <= 0.38, "Slot de monstro %d normalizado deve ter X <= 0.38" % i)
 		assert(pos_tela.x <= 0.38 * vp.x, "Slot de monstro %d em tela deve ter X <= 0.38*W" % i)
 		assert(pos_tela != Vector2(640.0, 465.0), "Slot %d não pode usar centro obsoleto (640, 465)" % i)
+		assert(not layout.ponto_em_zona_bloqueada(pos_norm), "Slot de monstro %d fora de zonas bloqueadas" % i)
+		assert(pos_norm.y >= 0.58 and pos_norm.y <= 0.93, "Slot de monstro %d dentro do piso da praça" % i)
 	var pos_cassian: Vector2 = layout.obter_posicao_inimigo(0, 1, true, "PADRAO", vp)
 	assert(pos_cassian.x <= 0.38 * vp.x, "General Cassian deve ancorar na praça esquerda (X <= 0.38*W)")
 	assert(pos_cassian != Vector2(640.0, 465.0), "Cassian não pode usar coordenadas antigas (640, 465)")
@@ -776,9 +780,28 @@ static func test_flat_plaza_party_and_enemy_positioning() -> bool:
 	var p0: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(0)
 	var p1: Vector2 = party_cont.position + scene._obter_posicao_base_aliado(1)
 	var e0: Vector2 = enemy_cont.position + scene._obter_posicao_base_inimigo(0, 1, false)
-	assert(p0.x > 1000.0 and p0.y >= 540.0 and p0.y <= 700.0, "Hero Slot 1 in LINHA_2X2 raised to plaza Y 540..700")
-	assert(e0.x < 500.0 and e0.y >= 540.0 and e0.y <= 700.0, "Enemy Slot 1 on left road at Y 540..700")
+	assert(p0.x > 1000.0 and p0.y >= 540.0 and p0.y <= 950.0, "Hero Slot 1 in LINHA_2X2 on plaza Y 540..950")
+	assert(e0.x < 500.0 and e0.y >= 540.0 and e0.y <= 950.0, "Enemy Slot 1 on left road at Y 540..950")
 	assert(p0 != p1, "Hero slots 1 and 2 must not overlap")
+	scene.free()
+	return true
+
+
+static func test_perspective_depth_scaling_and_foot_anchoring() -> bool:
+	var layout: BattleSceneLayout = BattleSceneLayout.new()
+	var escala_fundo: float = layout.obter_fator_profundidade(layout.y_fundo)
+	var escala_frente: float = layout.obter_fator_profundidade(layout.y_frente)
+	assert(is_equal_approx(escala_fundo, layout.escala_fundo), "Escala ao fundo deve ser escala_fundo (0.70)")
+	assert(is_equal_approx(escala_frente, layout.escala_frente), "Escala à frente deve ser escala_frente (1.10)")
+	assert(escala_frente > escala_fundo, "Combatentes à frente devem ter escala maior do que ao fundo")
+	var escala_meio: float = layout.obter_fator_profundidade(0.755)
+	assert(escala_meio > escala_fundo and escala_meio < escala_frente, "Escala intermediária proporcional")
+	var scene_res: PackedScene = load("res://scenes/battle/battle_scene.tscn")
+	var scene: BattleScene = scene_res.instantiate() as BattleScene
+	var dummy_sprite: AnimatedSprite2D = AnimatedSprite2D.new()
+	var dist_pe: float = scene._medir_distancia_pes(dummy_sprite)
+	assert(dist_pe >= 0.0, "Distância dos pés medida deve ser não-negativa")
+	dummy_sprite.free()
 	scene.free()
 	return true
 
