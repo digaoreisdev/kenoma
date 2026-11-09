@@ -183,3 +183,4 @@ func _exibir_texto_flutuante(texto: String, cor: Color) -> void:
 	tw.tween_property(label, "position:y", -130.0, 1.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tw.parallel().tween_property(label, "modulate:a", 0.0, 1.2)
 	tw.finished.connect(label.queue_free)
+

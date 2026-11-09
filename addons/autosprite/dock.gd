@@ -249,15 +249,28 @@ func _load_thumbnail(url: String, rect: TextureRect) -> void:
 	if not res.get("ok", false) or not is_instance_valid(rect):
 		return
 	var bytes: PackedByteArray = res.get("body", PackedByteArray())
+	if bytes.size() < 4:
+		return
 	var img := Image.new()
-	var err := img.load_png_from_buffer(bytes)
-	if err != OK:
-		err = img.load_webp_from_buffer(bytes)
-	if err != OK:
-		err = img.load_jpg_from_buffer(bytes)
+	var err: Error = _carregar_imagem_por_magic_bytes(img, bytes)
 	if err != OK:
 		return
 	rect.texture = ImageTexture.create_from_image(img)
+
+
+static func _carregar_imagem_por_magic_bytes(img: Image, bytes: PackedByteArray) -> Error:
+	if bytes.size() >= 8 and bytes[0] == 0x89 and bytes[1] == 0x50 and bytes[2] == 0x4E and bytes[3] == 0x47:
+		return img.load_png_from_buffer(bytes)
+	if bytes.size() >= 3 and bytes[0] == 0xFF and bytes[1] == 0xD8 and bytes[2] == 0xFF:
+		return img.load_jpg_from_buffer(bytes)
+	if bytes.size() >= 12 and bytes[0] == 0x52 and bytes[1] == 0x49 and bytes[2] == 0x46 and bytes[3] == 0x46:
+		return img.load_webp_from_buffer(bytes)
+	var err: Error = img.load_webp_from_buffer(bytes)
+	if err != OK:
+		err = img.load_jpg_from_buffer(bytes)
+	if err != OK:
+		err = img.load_png_from_buffer(bytes)
+	return err
 
 
 # --- Importing ---

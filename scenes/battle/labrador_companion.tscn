@@ -46,3 +46,4 @@ light_energy = 1.2
 
 [node name="LabradorModel" parent="ViewportContainer/SubViewport" instance=ExtResource("2_model")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
