@@ -12,10 +12,10 @@ ambient_light_energy = 0.8
 script = ExtResource("1_script")
 
 [node name="SombraContato" type="ColorRect" parent="."]
-offset_left = -35.0
-offset_top = 40.0
-offset_right = 35.0
-offset_bottom = 60.0
+offset_left = -30.0
+offset_top = 28.0
+offset_right = 30.0
+offset_bottom = 44.0
 color = Color(0.05, 0.05, 0.08, 0.35)
 
 [node name="ViewportContainer" type="SubViewportContainer" parent="."]
@@ -35,15 +35,15 @@ render_target_update_mode = 4
 environment = SubResource("Environment_light")
 
 [node name="Camera3D" type="Camera3D" parent="ViewportContainer/SubViewport"]
-transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 1.2, 1.5, 2.0)
+transform = Transform3D(1, 0, 0, 0, 0.98387, -0.178885, 0, 0.178885, 0.98387, 0, 0.7, 2.2)
 current = true
 fov = 35.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="ViewportContainer/SubViewport"]
-transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 2, 0)
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 2, 1)
 light_color = Color(1, 0.9, 0.75, 1)
 light_energy = 1.2
 
 [node name="LabradorModel" parent="ViewportContainer/SubViewport" instance=ExtResource("2_model")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 

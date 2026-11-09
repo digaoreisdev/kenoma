@@ -116,6 +116,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_down") or event.is_action_pressed("move_down"):
 		get_viewport().set_input_as_handled()
 		_navigate(1)
+	elif event.is_action_pressed("ui_left") or event.is_action_pressed("move_left"):
+		get_viewport().set_input_as_handled()
+		_navigate_horizontal(-1)
+	elif event.is_action_pressed("ui_right") or event.is_action_pressed("move_right"):
+		get_viewport().set_input_as_handled()
+		_navigate_horizontal(1)
 
 
 func _can_open() -> bool:
@@ -243,6 +249,7 @@ func _on_command_chosen(cmd_idx: int) -> void:
 			current_state = MenuState.FORMATION_FIRST
 			selected_slot_index = 0
 			_update_character_selection()
+			_mostrar_prompt_formacao()
 		_:
 			show_banner("Sistema de " + cmd_name + " em desenvolvimento")
 
@@ -509,6 +516,79 @@ func _handle_formation_second(slot_idx: int) -> void:
 	show_banner("Formação reorganizada com sucesso!")
 
 
+func _exibir_notificacao_banner(message: String) -> void:
+	if banner_panel != null and banner_label != null:
+		banner_label.text = message
+		banner_panel.visible = true
+
+
+func _mostrar_prompt_formacao() -> void:
+	var tatica: String = obter_tatica_atual()
+	var nome: String = obter_nome_amigavel_tatica(tatica)
+	_exibir_notificacao_banner("Tática: %s | [←/→] Mudar Tática | [Enter] Trocar Ordem" % nome)
+
+
+func _navigate_horizontal(dir: int) -> void:
+	if current_state == MenuState.COMMAND_SELECT:
+		if selected_command_index == 5:
+			ciclar_tatica_formacao(dir)
+	elif current_state == MenuState.FORMATION_FIRST or current_state == MenuState.FORMATION_SECOND:
+		ciclar_tatica_formacao(dir)
+
+
+func ciclar_tatica_formacao(dir: int = 1) -> String:
+	var pm: Node = get_node_or_null("/root/PartyManager")
+	var taticas: Array = ["LINHA_2X2", "LOSANGO", "VANGUARDA_3X1", "RETAGUARDA_1X3", "MEIA_LUA"]
+	if pm != null and "TATICAS_VALIDAS" in pm:
+		taticas = pm.get("TATICAS_VALIDAS")
+	var tatica_atual: String = obter_tatica_atual()
+	var idx: int = taticas.find(tatica_atual)
+	if idx < 0:
+		idx = 0
+	var novo_idx: int = posmod(idx + dir, taticas.size())
+	var nova_tatica: String = str(taticas[novo_idx])
+	if pm != null and pm.has_method("definir_tatica"):
+		pm.call("definir_tatica", nova_tatica)
+	var nome: String = obter_nome_amigavel_tatica(nova_tatica)
+	_exibir_notificacao_banner("Tática de Combate: %s" % nome)
+	_atualizar_texto_botao_formacao()
+	return nova_tatica
+
+
+func obter_tatica_atual() -> String:
+	var pm: Node = get_node_or_null("/root/PartyManager")
+	if pm != null and pm.has_method("obter_tatica"):
+		return str(pm.call("obter_tatica"))
+	elif pm != null and "tatica_formacao" in pm:
+		return str(pm.get("tatica_formacao"))
+	return "LINHA_2X2"
+
+
+static func obter_nome_amigavel_tatica(tatica: String) -> String:
+	match tatica:
+		"LINHA_2X2":
+			return "Linha 2x2"
+		"LOSANGO":
+			return "Losango"
+		"VANGUARDA_3X1":
+			return "Vanguarda 3x1"
+		"RETAGUARDA_1X3":
+			return "Retaguarda 1x3"
+		"MEIA_LUA":
+			return "Meia-Lua"
+		_:
+			return tatica
+
+
+func _atualizar_texto_botao_formacao() -> void:
+	if commands_container == null:
+		return
+	var btn: Button = commands_container.get_node_or_null("Btn5") as Button
+	if btn != null:
+		var nome: String = obter_nome_amigavel_tatica(obter_tatica_atual())
+		btn.text = "Formação (%s)" % nome
+
+
 func _navigate(dir: int) -> void:
 	if current_state == MenuState.COMMAND_SELECT:
 		selected_command_index = posmod(selected_command_index + dir, COMMAND_LABELS.size())
@@ -551,6 +631,7 @@ func hide_banner() -> void:
 func _refresh_all() -> void:
 	_refresh_party_slots()
 	_refresh_footer()
+	_atualizar_texto_botao_formacao()
 
 
 func _refresh_party_slots() -> void:

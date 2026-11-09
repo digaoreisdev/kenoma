@@ -28,7 +28,19 @@ func _verificar_estado_salvo() -> void:
 
 func _inicializar_grupo_padrao() -> void:
 	if inimigo_recurso != null and inimigo_recurso.has_method("to_dictionary"):
-		grupo_inimigo = [(inimigo_recurso as Object).call("to_dictionary")]
+		var base_dict: Dictionary = (inimigo_recurso as Object).call("to_dictionary")
+		grupo_inimigo = []
+		for i: int in range(8):
+			var d: Dictionary = base_dict.duplicate(true)
+			var eh_chefe: bool = (i == 0)
+			d["id"] = "general_cassian" if eh_chefe else ("cassian_squad_%d" % i)
+			d["name"] = str(base_dict.get("name", "General Cassian")) if eh_chefe else ("Oficial Cassian %d" % i)
+			d["is_boss"] = eh_chefe
+			d["max_hp"] = int(base_dict.get("max_hp", 240)) if eh_chefe else 90
+			d["current_hp"] = d["max_hp"]
+			d["estabilidade_max"] = int(base_dict.get("estabilidade_max", 120)) if eh_chefe else 60
+			d["estabilidade_atual"] = d["estabilidade_max"]
+			grupo_inimigo.append(d)
 	elif grupo_inimigo.is_empty():
 		grupo_inimigo = EnemyData.create_squad_cassian_8()
 

@@ -132,8 +132,12 @@ static func test_pause_menu_pt_br_commands(tree: SceneTree = null) -> bool:
 	if tree != null and tree.root != null:
 		tree.root.add_child(menu)
 	menu.call("open_menu")
+	var t1: String = str(menu.call("ciclar_tatica_formacao", 1))
+	assert(t1 == "LOSANGO", "Cycling forward from LINHA_2X2 must yield LOSANGO")
 	menu.call("_on_command_chosen", 5)
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.FORMATION_FIRST), "Formação prompts formation first")
+	var t2: String = str(menu.call("ciclar_tatica_formacao", 1))
+	assert(t2 == "VANGUARDA_3X1", "Cycling forward inside FORMATION_FIRST must yield VANGUARDA_3X1")
 	menu.call("_handle_cancel")
 	assert(int(menu.get("current_state")) == int(PauseMenuScript.MenuState.COMMAND_SELECT), "Cancel returns to command select")
 	if tree != null and tree.root != null:

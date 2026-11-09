@@ -101,14 +101,12 @@ func _conectar_labrador() -> void:
 func _auto_inicializar_se_necessario() -> void:
 	if battle_manager == null or not battle_manager.party_members.is_empty():
 		return
-	var tree: SceneTree = get_tree()
-	if tree != null and tree.current_scene == self:
-		var pm: Node = get_node_or_null("/root/PartyManager")
-		var allies: Array[CharacterData] = pm.call("get_active_party") if (pm != null and pm.has_method("get_active_party")) else []
-		if allies.is_empty():
-			allies = [CharacterData.create_default_lucas(), CharacterData.create_default_davi(), CharacterData.create_default_baltazar(), CharacterData.create_default_dai()]
-		var enemies: Array = EnemyData.create_squad_cassian_8()
-		battle_manager.initialize_battle(allies, enemies)
+	var pm: Node = get_node_or_null("/root/PartyManager")
+	var allies: Array[CharacterData] = pm.call("get_active_party") if (pm != null and pm.has_method("get_active_party")) else []
+	if allies.is_empty():
+		allies = [CharacterData.create_default_lucas(), CharacterData.create_default_davi(), CharacterData.create_default_baltazar(), CharacterData.create_default_dai()]
+	var enemies: Array = EnemyData.create_squad_cassian_8()
+	battle_manager.initialize_battle(allies, enemies)
 
 
 
@@ -440,13 +438,13 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	sprite.name = e_id
 	var frames: SpriteFrames = e.get("sprite_frames") as SpriteFrames
 	var is_boss: bool = str(e.get("name", "")).contains("Cassian") or e.get("is_boss", false)
-	if frames == null and is_boss:
-		const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
+	if frames == null:
 		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
-		if ResourceLoader.exists(CASSIAN_COMBAT_PATH):
-			frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
-		elif ResourceLoader.exists(CASSIAN_PATH):
+		const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
+		if ResourceLoader.exists(CASSIAN_PATH):
 			frames = load(CASSIAN_PATH) as SpriteFrames
+		elif ResourceLoader.exists(CASSIAN_COMBAT_PATH):
+			frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
 	var escala: Vector2 = ESCALA_CHEFE_BASE if is_boss else ESCALA_COMBATENTE_BASE
 	sprite.set_meta("escala_base", escala)

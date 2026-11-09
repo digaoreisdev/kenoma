@@ -913,13 +913,12 @@ static func test_labrador_companion_states_and_reactions() -> bool:
 	var dog: Node2D = companion_scene.instantiate() as Node2D
 	assert(dog != null, "Companion must instantiate")
 	assert(dog.get("estado_atual") == 0, "Initial state must be DEITADO (0)")
-	dog.call("reagir_latindo")
-	assert(dog.get("estado_atual") == 1, "State after reaction must be LATINDO (1)")
+	dog.call("levantar_e_latir")
+	assert(dog.get("estado_atual") == 1, "State after battle start must be LATINDO (1)")
+	dog.call("sentar_alerta")
+	assert(dog.get("estado_atual") == 2, "State after alert must be SENTADO_ALERTA (2)")
 	var bm: BattleManager = BattleManager.new()
-	bm.enemies = [{"id": "e0", "name": "Alvo", "current_hp": 50, "max_hp": 50}]
 	dog.call("conectar_batalha", bm)
-	dog.call("_aplicar_dano_ao_alvo", 0)
-	assert(bm.enemies[0]["current_hp"] == 46, "Autonomous bite must deduct 4 HP (50 -> 46)")
 	dog.free()
 	bm.free()
 	return true

@@ -57,7 +57,8 @@ y_sort_enabled = true
 position = Vector2(940, 510)
 
 [node name="LabradorCompanion" parent="CanvasLayer/UI/Arena" instance=ExtResource("7_labrador")]
-position = Vector2(1080, 580)
+position = Vector2(960, 465)
+scale = Vector2(0.3, 0.3)
 
 
 [node name="ArenaForeground" type="TextureRect" parent="CanvasLayer/UI"]
