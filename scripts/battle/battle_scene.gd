@@ -4,6 +4,7 @@ extends Node2D
 ## Cena de combate com arena visual de combatentes, HUD e comandos de ação.
 
 const LayoutScript = preload("res://scripts/battle/battle_scene_layout.gd")
+const LabradorScript = preload("res://scripts/battle/labrador_companion.gd")
 const ESCALA_COMBATENTE_BASE: Vector2 = Vector2(0.9, 0.9)
 const ESCALA_CHEFE_BASE: Vector2 = Vector2(1.05, 1.05)
 const MULTIPLICADOR_COMPENSACAO_ATAQUE: float = 1.25
@@ -34,6 +35,9 @@ const MULTIPLICADOR_COMPENSACAO_ATAQUE: float = 1.25
 @onready var ally2_mp_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/MPLabel")
 @onready var ally2_est_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/EstLabel")
 @onready var ally2_fase_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel2/Margin/HBox/VBox/FaseLabel")
+@onready var ally3_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel3")
+@onready var ally4_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/AllyPanel4")
+@onready var labrador_companion: Node2D = get_node_or_null("CanvasLayer/UI/Arena/LabradorCompanion") as Node2D
 @onready var enemy_panel: Control = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel")
 @onready var enemy_portrait_rect: TextureRect = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/PortraitRect")
 @onready var enemy_name_lbl: Label = get_node_or_null("CanvasLayer/UI/CombatantHUD/EnemyPanel/Margin/HBox/VBox/NameLabel")
@@ -83,6 +87,29 @@ func _ready() -> void:
 		if not battle_manager.party_members.is_empty():
 			_setup_arena_combatants(battle_manager.party_members, battle_manager.enemies)
 	_connect_buttons()
+	_conectar_labrador()
+	_auto_inicializar_se_necessario()
+
+
+func _conectar_labrador() -> void:
+	if labrador_companion == null:
+		labrador_companion = find_child("LabradorCompanion", true, false) as Node2D
+	if labrador_companion != null and battle_manager != null and labrador_companion.has_method("conectar_batalha"):
+		labrador_companion.call("conectar_batalha", battle_manager)
+
+
+func _auto_inicializar_se_necessario() -> void:
+	if battle_manager == null or not battle_manager.party_members.is_empty():
+		return
+	var tree: SceneTree = get_tree()
+	if tree != null and tree.current_scene == self:
+		var pm: Node = get_node_or_null("/root/PartyManager")
+		var allies: Array[CharacterData] = pm.call("get_active_party") if (pm != null and pm.has_method("get_active_party")) else []
+		if allies.is_empty():
+			allies = [CharacterData.create_default_lucas(), CharacterData.create_default_davi(), CharacterData.create_default_baltazar(), CharacterData.create_default_dai()]
+		var enemies: Array = EnemyData.create_squad_cassian_8()
+		battle_manager.initialize_battle(allies, enemies)
+
 
 
 func _inicializar_referencias_hud() -> void:
@@ -390,7 +417,7 @@ func _criar_sprite_aliado(ally: CharacterData, idx: int, _total_aliados: int = 2
 
 func _obter_fallback_frames_aliado(c_id: String) -> SpriteFrames:
 	var path: String = "res://assets/art/characters/player/player_frames.tres"
-	if c_id == "davi":
+	if c_id == "davi" or c_id == "dai":
 		path = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
 	if ResourceLoader.exists(path):
 		return load(path) as SpriteFrames
@@ -882,15 +909,31 @@ func _update_timeline_tracker() -> void:
 
 
 func _update_ally_hud() -> void:
-	if battle_manager.party_members.is_empty():
+	if battle_manager == null or battle_manager.party_members.is_empty():
 		return
-	if battle_manager.party_members.size() > 0:
-		_atualizar_painel_aliado(battle_manager.party_members[0], ally_panel, ally_portrait_rect, ally_name_lbl, ally_hp_lbl, ally_mp_lbl, ally_est_lbl, ally_fase_lbl, 0)
-	if battle_manager.party_members.size() > 1 and ally2_panel != null:
-		ally2_panel.visible = true
-		_atualizar_painel_aliado(battle_manager.party_members[1], ally2_panel, ally2_portrait_rect, ally2_name_lbl, ally2_hp_lbl, ally2_mp_lbl, ally2_est_lbl, ally2_fase_lbl, 1)
-	elif ally2_panel != null:
-		ally2_panel.visible = false
+	var paineis: Array[Control] = [ally_panel, ally2_panel, ally3_panel, ally4_panel]
+	for idx: int in range(paineis.size()):
+		var p: Control = paineis[idx]
+		if p == null:
+			continue
+		if idx < battle_manager.party_members.size() and battle_manager.party_members[idx] != null:
+			p.visible = true
+			_atualizar_painel_aliado_generico(battle_manager.party_members[idx], p, idx)
+		else:
+			p.visible = false
+
+
+func _atualizar_painel_aliado_generico(hero: CharacterData, panel: Control, idx: int) -> void:
+	if hero == null or panel == null:
+		return
+	var p_rect: TextureRect = panel.find_child("PortraitRect", true, false) as TextureRect
+	var n_lbl: Label = panel.find_child("NameLabel", true, false) as Label
+	var hp_lbl: Label = panel.find_child("HPLabel", true, false) as Label
+	var mp_lbl: Label = panel.find_child("MPLabel", true, false) as Label
+	var est_lbl: Label = panel.find_child("EstLabel", true, false) as Label
+	var f_lbl: Label = panel.find_child("FaseLabel", true, false) as Label
+	_atualizar_painel_aliado(hero, panel, p_rect, n_lbl, hp_lbl, mp_lbl, est_lbl, f_lbl, idx)
+
 
 
 func _atualizar_painel_aliado(hero: CharacterData, panel: Control, p_rect: TextureRect, n_lbl: Label, hp_lbl: Label, mp_lbl: Label, est_lbl: Label, f_lbl: Label, idx: int) -> void:
@@ -934,13 +977,13 @@ func _obter_textura_retrato(hero: CharacterData) -> Texture2D:
 		return null
 	var path: String = ""
 	if hero.character_id == "lucas":
-		path = "res://assets/art/portraits/lucas/lucas_confident.png"
-		if hero.current_hp < int(hero.max_hp * 0.3):
-			path = "res://assets/art/portraits/lucas/lucas_serious.png"
+		path = "res://assets/art/portraits/lucas/lucas_serious.png" if hero.current_hp < int(hero.max_hp * 0.3) else "res://assets/art/portraits/lucas/lucas_confident.png"
 	elif hero.character_id == "davi":
-		path = "res://assets/art/portraits/davi/davi_neutral.png"
-		if hero.current_hp < int(hero.max_hp * 0.3):
-			path = "res://assets/art/portraits/davi/davi_hurt.png"
+		path = "res://assets/art/portraits/davi/davi_hurt.png" if hero.current_hp < int(hero.max_hp * 0.3) else "res://assets/art/portraits/davi/davi_neutral.png"
+	elif hero.character_id == "baltazar":
+		path = "res://assets/art/portraits/baltazar/baltazar_hurt.png" if hero.current_hp < int(hero.max_hp * 0.3) else "res://assets/art/portraits/baltazar/baltazar_neutral.png"
+	elif hero.character_id == "dai":
+		path = "res://assets/art/portraits/dai/dai_hurt.png" if hero.current_hp < int(hero.max_hp * 0.3) else "res://assets/art/portraits/dai/dai_neutral.png"
 	if not path.is_empty() and ResourceLoader.exists(path):
 		return load(path) as Texture2D
 	return hero.portrait

@@ -188,3 +188,46 @@ static func create_default_davi() -> CharacterData:
 	davi.habilidades.append(lanca)
 	davi.skills.append(lanca)
 	return davi
+
+
+static func create_default_baltazar() -> CharacterData:
+	var port_p: String = "res://assets/art/portraits/baltazar/baltazar_neutral.png"
+	var port_tex: Texture2D = load(port_p) as Texture2D if ResourceLoader.exists(port_p) else null
+	var baltazar: CharacterData = CharacterData.new("baltazar", "Mestre Baltazar", 1, 150, 150, 30, 30, port_tex, null)
+	baltazar.strength = 18
+	baltazar.defense = 14
+	baltazar.agility = 9
+	baltazar.willpower = 10
+	var frm_p: String = "res://assets/art/characters/player/player_frames.tres"
+	if ResourceLoader.exists(frm_p):
+		baltazar.sprite_frames = load(frm_p) as SpriteFrames
+	baltazar.weapon_affinities = {
+		EquipmentData.WeaponType.HAMMER: 1.4,
+		EquipmentData.WeaponType.AXE: 1.2,
+		EquipmentData.WeaponType.SWORD: 0.8,
+	}
+	baltazar.habilidades.append(SkillData.create_golpe_sismico())
+	return baltazar
+
+
+static func create_default_dai() -> CharacterData:
+	var port_p: String = "res://assets/art/portraits/dai/dai_neutral.png"
+	var port_tex: Texture2D = load(port_p) as Texture2D if ResourceLoader.exists(port_p) else null
+	var dai: CharacterData = CharacterData.new("dai", "Sacerdotisa Dai", 1, 85, 85, 70, 70, port_tex, null)
+	dai.strength = 6
+	dai.defense = 8
+	dai.magic_power = 16
+	dai.magic_defense = 18
+	dai.agility = 13
+	dai.willpower = 16
+	var frm_p: String = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
+	if ResourceLoader.exists(frm_p):
+		dai.sprite_frames = load(frm_p) as SpriteFrames
+	dai.weapon_affinities = {
+		EquipmentData.WeaponType.CATALYST: 1.4,
+		EquipmentData.WeaponType.SHIELD: 1.1,
+		EquipmentData.WeaponType.HAMMER: 0.6,
+	}
+	dai.habilidades.append(SkillData.create_lanca_de_eter())
+	return dai
+

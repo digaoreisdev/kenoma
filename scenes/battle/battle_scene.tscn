@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/battle_fg_praca_moldura.png" id="4_fg_moldura"]
 [ext_resource type="Script" path="res://scripts/battle/distant_birds.gd" id="5_birds_script"]
 [ext_resource type="Script" path="res://scripts/battle/sky_clouds.gd" id="6_clouds_script"]
+[ext_resource type="PackedScene" path="res://scenes/battle/labrador_companion.tscn" id="7_labrador"]
+
 
 [node name="BattleScene" type="Node2D"]
 script = ExtResource("1_scene_script")
@@ -53,6 +55,10 @@ position = Vector2(420, 470)
 [node name="PartyContainer" type="Node2D" parent="CanvasLayer/UI/Arena"]
 y_sort_enabled = true
 position = Vector2(940, 510)
+
+[node name="LabradorCompanion" parent="CanvasLayer/UI/Arena" instance=ExtResource("7_labrador")]
+position = Vector2(1080, 580)
+
 
 [node name="ArenaForeground" type="TextureRect" parent="CanvasLayer/UI"]
 z_index = 10
@@ -385,6 +391,165 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
 theme_override_font_sizes/font_size = 11
 text = "Fase: Espera"
+
+[node name="AllyPanel3" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
+visible = false
+layout_mode = 0
+offset_left = 1520.0
+offset_top = 350.0
+offset_right = 1880.0
+offset_bottom = 475.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PortraitRect" type="TextureRect" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+text = "Mestre Baltazar"
+
+[node name="HPBar" type="ProgressBar" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+max_value = 150.0
+value = 150.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "PV: 150/150"
+
+[node name="MPBar" type="ProgressBar" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="MPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "PM: 30/30"
+
+[node name="EstBar" type="ProgressBar" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Estabilidade: 100/100"
+
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel3/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+text = "Fase: Espera"
+
+[node name="AllyPanel4" type="PanelContainer" parent="CanvasLayer/UI/CombatantHUD"]
+visible = false
+layout_mode = 0
+offset_left = 1520.0
+offset_top = 485.0
+offset_right = 1880.0
+offset_bottom = 610.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PortraitRect" type="TextureRect" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+text = "Sacerdotisa Dai"
+
+[node name="HPBar" type="ProgressBar" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+max_value = 85.0
+value = 85.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "PV: 85/85"
+
+[node name="MPBar" type="ProgressBar" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+max_value = 70.0
+value = 70.0
+show_percentage = false
+
+[node name="MPLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "PM: 70/70"
+
+[node name="EstBar" type="ProgressBar" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="EstLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Estabilidade: 100/100"
+
+[node name="FaseLabel" type="Label" parent="CanvasLayer/UI/CombatantHUD/AllyPanel4/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+text = "Fase: Espera"
+
 
 [node name="ActionCommandPanel" type="PanelContainer" parent="CanvasLayer/UI"]
 visible = false

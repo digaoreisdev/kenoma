@@ -30,21 +30,7 @@ func _inicializar_grupo_padrao() -> void:
 	if inimigo_recurso != null and inimigo_recurso.has_method("to_dictionary"):
 		grupo_inimigo = [(inimigo_recurso as Object).call("to_dictionary")]
 	elif grupo_inimigo.is_empty():
-		var cassian_res: Resource = load("res://resources/enemies/general_cassian.tres")
-		if cassian_res != null and cassian_res.has_method("to_dictionary"):
-			grupo_inimigo = [(cassian_res as Object).call("to_dictionary")]
-		else:
-			grupo_inimigo = [
-				{
-					"id": "general_cassian",
-					"name": "General Cassian",
-					"max_hp": 240,
-					"current_hp": 240,
-					"estabilidade_max": 120,
-					"estabilidade_atual": 120,
-					"velocidade": 12.0
-				}
-			]
+		grupo_inimigo = EnemyData.create_squad_cassian_8()
 
 
 func _on_body_entered(body: Node2D) -> void:

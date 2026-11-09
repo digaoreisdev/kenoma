@@ -76,3 +76,35 @@ static func create_general_cassian() -> Resource:
 	boss.set("exp_recompensa", 350)
 	boss.set("ouro_recompensa", 200)
 	return boss
+
+
+static func create_squad_cassian_8() -> Array[Dictionary]:
+	var squad: Array[Dictionary] = []
+	var frames: SpriteFrames = null
+	const P1: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
+	const P2: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
+	if ResourceLoader.exists(P1):
+		frames = load(P1) as SpriteFrames
+	elif ResourceLoader.exists(P2):
+		frames = load(P2) as SpriteFrames
+	for i: int in range(8):
+		var is_boss: bool = (i == 0)
+		squad.append({
+			"id": "general_cassian" if is_boss else ("cassian_squad_%d" % i),
+			"name": "General Cassian" if is_boss else ("Oficial Cassian %d" % i),
+			"max_hp": 240 if is_boss else 90,
+			"current_hp": 240 if is_boss else 90,
+			"estabilidade_max": 120 if is_boss else 60,
+			"estabilidade_atual": 120 if is_boss else 60,
+			"strength": 20 if is_boss else 14,
+			"defense": 14 if is_boss else 10,
+			"agility": 13 if is_boss else 11,
+			"velocidade": 13.0 if is_boss else 11.0,
+			"sprite_frames": frames,
+			"is_boss": is_boss,
+			"exp_recompensa": 350 if is_boss else 80,
+			"ouro_recompensa": 200 if is_boss else 50,
+			"stability": 120 if is_boss else 60
+		})
+	return squad
+

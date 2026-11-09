@@ -179,15 +179,7 @@ func _configurar_encontro_batalha(scene: Node) -> void:
 		elif e is Object and (e as Object).has_method("to_dictionary"):
 			inimigos.append((e as Object).call("to_dictionary"))
 	if inimigos.is_empty():
-		var cassian_res: Resource = load("res://resources/enemies/general_cassian.tres")
-		if cassian_res != null and cassian_res.has_method("to_dictionary"):
-			inimigos.append((cassian_res as Object).call("to_dictionary"))
-		else:
-			inimigos.append({
-				"id": "general_cassian", "name": "General Cassian",
-				"max_hp": 240, "current_hp": 240,
-				"estabilidade_max": 120, "estabilidade_atual": 120, "velocidade": 12.0
-			})
+		inimigos = EnemyData.create_squad_cassian_8()
 	bm.initialize_battle(allies, inimigos)
 
 

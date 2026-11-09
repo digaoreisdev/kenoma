@@ -57,6 +57,8 @@ static func _run_group_c() -> bool:
 	p = p and test_attack_aligns_to_target_line_before_advancing()
 	p = p and test_combatant_attack_scale_compensation_and_idle_restoration()
 	p = p and test_general_cassian_combat_frames_and_attack_selection()
+	p = p and test_full_squad_4_heroes_and_8_cassian_enemies()
+	p = p and test_labrador_companion_states_and_reactions()
 	return p
 
 
@@ -303,9 +305,11 @@ static func test_party_manager_starts_with_lucas_and_davi() -> bool:
 	var pm: Node = PartyManagerScript.new()
 	pm.call("reset_to_defaults")
 	var active_members: Array = pm.call("get_active_party") as Array
-	assert(active_members.size() == 2, "Active party must contain 2 members")
+	assert(active_members.size() == 4, "Active party must contain 4 members")
 	assert(active_members[0].name == "Lucas Reis", "First member must be Lucas Reis")
 	assert(active_members[1].name == "Davi Reis", "Second member must be Davi Reis")
+	assert(active_members[2].name == "Mestre Baltazar", "Third member must be Mestre Baltazar")
+	assert(active_members[3].name == "Sacerdotisa Dai", "Fourth member must be Sacerdotisa Dai")
 	assert(active_members[1].max_hp == 90, "Davi max HP must be 90")
 	assert(active_members[1].defense == 16, "Davi defense must be 16")
 	pm.free()
@@ -881,5 +885,44 @@ static func test_general_cassian_combat_frames_and_attack_selection() -> bool:
 	assert(atk_anim == "Attack Southeast_right" or atk_anim == "Attack Right_right", "Boss must select directional sword attack animation")
 	scene.free()
 	return true
+
+
+static func test_full_squad_4_heroes_and_8_cassian_enemies() -> bool:
+	var squad_enemies: Array[Dictionary] = EnemyData.create_squad_cassian_8()
+	assert(squad_enemies.size() == 8, "Must generate exactly 8 enemy slots")
+	assert(squad_enemies[0]["is_boss"] == true and squad_enemies[0]["max_hp"] == 240, "Slot 0 is boss Cassian")
+	assert(squad_enemies[7]["max_hp"] == 90, "Slot 7 is squad troop with 90 HP")
+	var baltazar: CharacterData = CharacterData.create_default_baltazar()
+	var dai: CharacterData = CharacterData.create_default_dai()
+	assert(baltazar != null and baltazar.name == "Mestre Baltazar", "Baltazar must instantiate")
+	assert(dai != null and dai.name == "Sacerdotisa Dai", "Dai must instantiate")
+	assert(baltazar.portrait != null, "Baltazar portrait must load")
+	assert(dai.portrait != null, "Dai portrait must load")
+	var bm: BattleManager = BattleManager.new()
+	var heroes: Array[CharacterData] = [CharacterData.create_default_lucas(), CharacterData.create_default_davi(), baltazar, dai]
+	bm.initialize_battle(heroes, squad_enemies)
+	assert(bm.party_members.size() == 4, "BattleManager must contain 4 hero members")
+	assert(bm.enemies.size() == 8, "BattleManager must contain 8 enemy combatants")
+	bm.free()
+	return true
+
+
+static func test_labrador_companion_states_and_reactions() -> bool:
+	var companion_scene: PackedScene = load("res://scenes/battle/labrador_companion.tscn")
+	assert(companion_scene != null, "Labrador companion scene must exist")
+	var dog: Node2D = companion_scene.instantiate() as Node2D
+	assert(dog != null, "Companion must instantiate")
+	assert(dog.get("estado_atual") == 0, "Initial state must be DEITADO (0)")
+	dog.call("reagir_latindo")
+	assert(dog.get("estado_atual") == 1, "State after reaction must be LATINDO (1)")
+	var bm: BattleManager = BattleManager.new()
+	bm.enemies = [{"id": "e0", "name": "Alvo", "current_hp": 50, "max_hp": 50}]
+	dog.call("conectar_batalha", bm)
+	dog.call("_aplicar_dano_ao_alvo", 0)
+	assert(bm.enemies[0]["current_hp"] == 46, "Autonomous bite must deduct 4 HP (50 -> 46)")
+	dog.free()
+	bm.free()
+	return true
+
 
 

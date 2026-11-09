@@ -36,8 +36,8 @@ func reset_to_defaults() -> void:
 	party_slots = [
 		CharacterData.create_default_lucas(),
 		CharacterData.create_default_davi(),
-		null,
-		null
+		CharacterData.create_default_baltazar(),
+		CharacterData.create_default_dai()
 	]
 	gold = 0
 	playtime_seconds = 0.0
@@ -182,4 +182,3 @@ func remove_unassigned_primordial(primordial: PrimordialData) -> bool:
 		unassigned_primordials.remove_at(idx)
 		return true
 	return false
-
