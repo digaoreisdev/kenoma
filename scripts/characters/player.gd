@@ -105,6 +105,9 @@ func _can_walk() -> bool:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_F7:
+		get_tree().change_scene_to_file("res://scenes/battle/battle_scene_3d.tscn")
+		return
 	if not _can_walk():
 		return
 	if event.is_action_pressed("action_interact"):

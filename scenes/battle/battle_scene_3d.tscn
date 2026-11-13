@@ -1,0 +1,10 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle/battle_scene_3d.gd" id="1_script3d"]
+[ext_resource type="Resource" path="res://resources/battle_layouts/arena_terrain_exemplo.tres" id="2_terrain"]
+[ext_resource type="Resource" path="res://resources/battle_layouts/layout_vila_forja.tres" id="3_layout"]
+
+[node name="BattleScene3D" type="Node3D"]
+script = ExtResource("1_script3d")
+terrain = ExtResource("2_terrain")
+layout_cenario = ExtResource("3_layout")

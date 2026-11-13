@@ -1174,6 +1174,9 @@ func _on_fugir_pressed() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_F7:
+		get_tree().change_scene_to_file("res://scenes/battle/battle_scene_3d.tscn")
+		return
 	if event.is_action_pressed("ui_cancel"):
 		if skills_panel != null and skills_panel.visible:
 			_on_voltar_skills_pressed()

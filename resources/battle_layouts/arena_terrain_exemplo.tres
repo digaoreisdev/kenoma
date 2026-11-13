@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ArenaTerrain" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle/arena_terrain.gd" id="1_terrain"]
+
+[resource]
+script = ExtResource("1_terrain")
+colunas = 12
+linhas = 8
+tamanho_celula = 1.6
+altura_degrau = 0.75
+celulas = Array[Dictionary]([
+{"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 1, "tipo": 2}, {"nivel_altura": 1, "tipo": 1}, {"nivel_altura": 1, "tipo": 1}, {"nivel_altura": 1, "tipo": 1}, {"nivel_altura": 1, "tipo": 1}, {"nivel_altura": 1, "tipo": 1}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0},
+{"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 1, "tipo": 2}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0},
+{"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 1, "tipo": 2}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0},
+{"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 1, "tipo": 2}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0},
+{"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 2, "tipo": 0}, {"nivel_altura": 1, "tipo": 2}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0},
+{"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 1, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0},
+{"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0},
+{"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}
+])

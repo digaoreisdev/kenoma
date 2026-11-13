@@ -1,0 +1,79 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# Fixed relative paths for Godot Engine 4.7 (PNG optimized)
+
+newmtl wood_pillar
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.000000 0.000000 0.000000
+	map_Kd textures/wood_pillar-d.png
+	map_Bump textures/wood_pillar-n.png
+
+newmtl walls_plaster
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.000000 0.000000 0.000000
+	map_Kd textures/walls_plaster-d.png
+	map_Bump textures/walls_plaster-n.png
+
+newmtl windows_glas
+	Ns 25.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.200000 0.200000 0.200000
+	map_Kd textures/windows_glas-d.png
+	map_Bump textures/windows_glas-n.png
+
+newmtl roof_wood
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.000000 0.000000 0.000000
+	map_Kd textures/roof_woodtile-d.png
+	map_Bump textures/roof_woodtile-n.png
+
+newmtl wood_planks
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.000000 0.000000 0.000000
+	map_Kd textures/wood_planks-d.png
+	map_Bump textures/wood_planks-n.png
+
+newmtl roof_hatch
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.000000 0.000000 0.000000
+	map_Kd textures/roof_hatch-d.png
+	map_Bump textures/roof_hatch-n.png
+
+newmtl wood_floor
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.000000 0.000000 0.000000
+	map_Kd textures/wood_floor-d.png
+	map_Bump textures/wood_floor-n.png

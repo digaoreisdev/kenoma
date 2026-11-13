@@ -60,6 +60,8 @@ static func _run_group_c() -> bool:
 	p = p and test_general_cassian_combat_frames_and_attack_selection()
 	p = p and test_full_squad_4_heroes_and_8_cassian_enemies()
 	p = p and test_labrador_companion_states_and_reactions()
+	p = p and test_arena_terrain_3d_altura_and_mundo_conversion()
+	p = p and test_battle_scene_3d_sprites_and_medieval_building()
 	return p
 
 
@@ -945,6 +947,46 @@ static func test_labrador_companion_states_and_reactions() -> bool:
 	dog.free()
 	bm.free()
 	return true
+
+
+static func test_arena_terrain_3d_altura_and_mundo_conversion() -> bool:
+	var terrain_res: ArenaTerrain = load("res://resources/battle_layouts/arena_terrain_exemplo.tres") as ArenaTerrain
+	assert(terrain_res != null, "arena_terrain_exemplo.tres deve carregar")
+	assert(terrain_res.colunas == 12 and terrain_res.linhas == 8, "Grade 12x8")
+	var alt_patamar_esq: float = terrain_res.get_altura(0.08, 0.20)
+	var alt_rampa: float = terrain_res.get_altura(0.28, 0.20)
+	var alt_chao: float = terrain_res.get_altura(0.50, 0.70)
+	var alt_patamar_dir: float = terrain_res.get_altura(0.85, 0.20)
+	assert(is_equal_approx(alt_patamar_esq, 1.50), "Patamar esquerdo nível 2 deve ter altura 1.50")
+	assert(is_equal_approx(alt_rampa, 0.75), "Rampa nível 1 deve ter altura 0.75")
+	assert(is_equal_approx(alt_chao, 0.0), "Chão nível 0 deve ter altura 0.0")
+	assert(is_equal_approx(alt_patamar_dir, 0.75), "Patamar direito nível 1 deve ter altura 0.75")
+	var pos_centro: Vector3 = terrain_res.normalizado_para_mundo(0.5, 0.5)
+	assert(is_equal_approx(pos_centro.x, 0.0) and is_equal_approx(pos_centro.z, 0.0), "Centro (0.5, 0.5) mapeia para X=0, Z=0")
+	var pos_alto: Vector3 = terrain_res.normalizado_para_mundo(0.08, 0.20)
+	assert(is_equal_approx(pos_alto.y, alt_patamar_esq), "normalizado_para_mundo deve aplicar get_altura em Y")
+	return true
+
+
+static func test_battle_scene_3d_sprites_and_medieval_building() -> bool:
+	var cena_res: PackedScene = load("res://scenes/battle/battle_scene_3d.tscn")
+	assert(cena_res != null, "battle_scene_3d.tscn deve existir")
+	var cena: BattleScene3D = cena_res.instantiate() as BattleScene3D
+	assert(cena != null, "BattleScene3D deve instanciar")
+	cena._ready()
+	assert(cena.herois_sprites.size() == 4, "Deve instanciar 4 heróis 2D em AnimatedSprite3D")
+	assert(cena.inimigos_sprites.size() == 8, "Deve instanciar 8 inimigos 2D em AnimatedSprite3D")
+	assert(cena.terrain_visual != null and cena.terrain_visual.get_child_count() >= 96, "Malha de blocos 3D empilhados deve ser gerada")
+	var tem_elevado: bool = false
+	for sp: AnimatedSprite3D in cena.inimigos_sprites:
+		if sp.position.y > 0.5:
+			tem_elevado = true
+	assert(tem_elevado, "Combatentes posicionados no patamar lateral devem ficar em Y elevado (> 0.5)")
+	var casa: Node = cena.get_node_or_null("CasaMedievalEsq")
+	assert(casa != null, "Construção medieval 3D (bld_13) deve estar instanciada no cenário")
+	cena.free()
+	return true
+
 
 
 
