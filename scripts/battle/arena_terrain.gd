@@ -92,3 +92,4 @@ static func _preencher_patamares_exemplo(t: ArenaTerrain) -> void:
 				t.definir_celula(col, lin, 1, TipoCelula.CHAO)
 			elif lin == 0 and col >= 4 and col <= 8:
 				t.definir_celula(col, lin, 1, TipoCelula.OBSTACULO)
+

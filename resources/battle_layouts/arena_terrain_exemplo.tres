@@ -18,3 +18,4 @@ celulas = Array[Dictionary]([
 {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0},
 {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}, {"nivel_altura": 0, "tipo": 0}
 ])
+

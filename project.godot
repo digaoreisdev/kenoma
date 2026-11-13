@@ -28,7 +28,6 @@ PauseMenu="*res://scenes/ui/pause_menu.tscn"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
 
 [editor_plugins]
 
