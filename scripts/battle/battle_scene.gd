@@ -470,12 +470,12 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	var frames: SpriteFrames = e.get("sprite_frames") as SpriteFrames
 	var is_boss: bool = str(e.get("name", "")).contains("Cassian") or e.get("is_boss", false)
 	if frames == null:
-		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
 		const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
-		if ResourceLoader.exists(CASSIAN_PATH):
-			frames = load(CASSIAN_PATH) as SpriteFrames
-		elif ResourceLoader.exists(CASSIAN_COMBAT_PATH):
+		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
+		if ResourceLoader.exists(CASSIAN_COMBAT_PATH):
 			frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
+		elif ResourceLoader.exists(CASSIAN_PATH):
+			frames = load(CASSIAN_PATH) as SpriteFrames
 	sprite.sprite_frames = frames
 	var escala: Vector2 = ESCALA_CHEFE_BASE if is_boss else ESCALA_COMBATENTE_BASE
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST

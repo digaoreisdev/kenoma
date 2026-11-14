@@ -1,18 +1,17 @@
 class_name ArenaTerrainVisual
 extends Node3D
 
-## Gera visualmente os blocos 3D empilhados a partir de um recurso ArenaTerrain.
+## Renderiza o pátio 3D único da Vila de Baltazar nivelado exatamente na base da arena (Y=0.0) preservando a altura real da escada e da fonte.
 
-const TEX_CHAO_DIFF: String = "res://assets/textures/piso_pedra/bricks_round-d.png"
-const TEX_CHAO_NORM: String = "res://assets/textures/piso_pedra/bricks_round-n.png"
-const TEX_ELEV_DIFF: String = "res://assets/textures/piso_pedra/bricks_edged-d.png"
-const TEX_ELEV_NORM: String = "res://assets/textures/piso_pedra/bricks_edged-n.png"
+const CAMINHO_PATIO_GLB: String = "res://assets/models/arena/patio_vila_baltazar.glb"
+const ANGULO_NIVELAMENTO_X_DEG: float = -3.63
+const OFFSET_SUPERFICIE_Y: float = 0.0535
+const ESCALA_ALTURA_RELEVO: float = 26.0
 
 @export var terrain: ArenaTerrain = null
 
-var _mat_chao: StandardMaterial3D = null
-var _mat_elevado: StandardMaterial3D = null
-var _mesh_bloco: BoxMesh = null
+var _cena_patio: PackedScene = null
+var patio_instancia: Node3D = null
 
 
 func _ready() -> void:
@@ -28,50 +27,68 @@ func construir_terreno(dados_terreno: ArenaTerrain) -> void:
 	terrain.garantir_grade()
 	_limpar_blocos()
 	_preparar_recursos_visuais()
-	for lin: int in range(terrain.linhas):
-		for col: int in range(terrain.colunas):
-			_criar_pilha_celula(col, lin)
+	_instanciar_patio_unico()
 
 
 func _limpar_blocos() -> void:
 	for filho: Node in get_children():
 		remove_child(filho)
 		filho.queue_free()
+	patio_instancia = null
 
 
 func _preparar_recursos_visuais() -> void:
-	_mesh_bloco = BoxMesh.new()
-	_mesh_bloco.size = Vector3(terrain.tamanho_celula, terrain.altura_degrau, terrain.tamanho_celula)
-	_mat_chao = _criar_material_pedra(TEX_CHAO_DIFF, TEX_CHAO_NORM, Color(0.58, 0.56, 0.52))
-	_mat_elevado = _criar_material_pedra(TEX_ELEV_DIFF, TEX_ELEV_NORM, Color(0.68, 0.64, 0.58))
+	if ResourceLoader.exists(CAMINHO_PATIO_GLB):
+		_cena_patio = load(CAMINHO_PATIO_GLB) as PackedScene
 
 
-func _criar_material_pedra(caminho_diff: String, caminho_norm: String, cor_base: Color) -> StandardMaterial3D:
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = cor_base
-	mat.roughness = 0.88
-	mat.uv1_triplanar = true
-	mat.uv1_scale = Vector3(0.45, 0.45, 0.45)
-	if ResourceLoader.exists(caminho_diff):
-		mat.albedo_texture = load(caminho_diff) as Texture2D
-		mat.albedo_color = Color(0.92, 0.88, 0.82)
-	if ResourceLoader.exists(caminho_norm):
-		mat.normal_enabled = true
-		mat.normal_texture = load(caminho_norm) as Texture2D
-	return mat
+func _instanciar_patio_unico() -> void:
+	var largura_arena: float = float(terrain.colunas) * terrain.tamanho_celula
+	var prof_arena: float = float(terrain.linhas) * terrain.tamanho_celula
+	if _cena_patio != null:
+		patio_instancia = _cena_patio.instantiate() as Node3D
+		patio_instancia.name = "PatioVilaBaltazar"
+		_nivelar_malha_patio(patio_instancia, largura_arena, prof_arena)
+		add_child(patio_instancia)
+	else:
+		var fallback: MeshInstance3D = MeshInstance3D.new()
+		fallback.name = "PatioVilaBaltazar"
+		var box: BoxMesh = BoxMesh.new()
+		box.size = Vector3(largura_arena, 0.2, prof_arena)
+		fallback.mesh = box
+		fallback.position = Vector3(0.0, -0.1, 0.0)
+		add_child(fallback)
+		patio_instancia = fallback
 
 
-func _criar_pilha_celula(col: int, lin: int) -> void:
-	var dados: Dictionary = terrain.obter_celula(col, lin)
-	var nivel: int = int(dados.get("nivel_altura", 0))
-	var u: float = (float(col) + 0.5) / float(terrain.colunas)
-	var v: float = (float(lin) + 0.5) / float(terrain.linhas)
-	var pos_topo: Vector3 = terrain.normalizado_para_mundo(u, v)
-	for camada: int in range(nivel + 1):
-		var instancia: MeshInstance3D = MeshInstance3D.new()
-		instancia.name = "Bloco_%d_%d_N%d" % [col, lin, camada]
-		instancia.mesh = _mesh_bloco
-		instancia.material_override = _mat_elevado if camada > 0 else _mat_chao
-		var y_centro: float = (float(camada) - 0.5) * terrain.altura_degrau
-		instancia.position = Vector3(pos_topo.x, y_centro, pos_topo.z)
-		add_child(instancia)
+func _nivelar_malha_patio(raiz_patio: Node3D, largura_arena: float, prof_arena: float) -> void:
+	for filho: Node in raiz_patio.get_children():
+		if filho is MeshInstance3D:
+			var mesh_inst: MeshInstance3D = filho as MeshInstance3D
+			var mat_ativo: Material = mesh_inst.get_active_material(0)
+			mesh_inst.mesh = _criar_malha_nivelada(mesh_inst.mesh, mat_ativo)
+			var aabb: AABB = mesh_inst.mesh.get_aabb()
+			var tam_x: float = maxf(aabb.size.x, 0.01)
+			var tam_z: float = maxf(aabb.size.z, 0.01)
+			mesh_inst.scale = Vector3(largura_arena / tam_x, ESCALA_ALTURA_RELEVO, prof_arena / tam_z)
+			mesh_inst.position = Vector3.ZERO
+
+
+func _criar_malha_nivelada(malha_orig: Mesh, mat_orig: Material) -> ArrayMesh:
+	var arrays: Array = malha_orig.surface_get_arrays(0)
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var norms: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+	var rot: Basis = Basis(Vector3.RIGHT, deg_to_rad(ANGULO_NIVELAMENTO_X_DEG))
+	for i: int in range(verts.size()):
+		var v: Vector3 = rot * verts[i]
+		v.y -= OFFSET_SUPERFICIE_Y
+		verts[i] = v
+	for i: int in range(norms.size()):
+		norms[i] = (rot * norms[i]).normalized()
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_NORMAL] = norms
+	var nova_malha: ArrayMesh = ArrayMesh.new()
+	nova_malha.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	if mat_orig != null:
+		nova_malha.surface_set_material(0, mat_orig)
+	return nova_malha

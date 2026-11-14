@@ -953,17 +953,19 @@ static func test_arena_terrain_3d_altura_and_mundo_conversion() -> bool:
 	var terrain_res: ArenaTerrain = load("res://resources/battle_layouts/arena_terrain_exemplo.tres") as ArenaTerrain
 	assert(terrain_res != null, "arena_terrain_exemplo.tres deve carregar")
 	assert(terrain_res.colunas == 12 and terrain_res.linhas == 8, "Grade 12x8")
-	var alt_patamar_esq: float = terrain_res.get_altura(0.08, 0.20)
-	var alt_rampa: float = terrain_res.get_altura(0.28, 0.20)
-	var alt_chao: float = terrain_res.get_altura(0.50, 0.70)
-	var alt_patamar_dir: float = terrain_res.get_altura(0.85, 0.20)
+	assert(is_equal_approx(terrain_res.get_altura(0.50, 0.50), 0.0), "Pátio da Vila do Baltazar deve ser plano em Y=0.0")
+	var terrain_patamar: ArenaTerrain = ArenaTerrain.criar_exemplo_patamar_lateral()
+	var alt_patamar_esq: float = terrain_patamar.get_altura(0.08, 0.20)
+	var alt_rampa: float = terrain_patamar.get_altura(0.28, 0.20)
+	var alt_chao: float = terrain_patamar.get_altura(0.50, 0.70)
+	var alt_patamar_dir: float = terrain_patamar.get_altura(0.85, 0.20)
 	assert(is_equal_approx(alt_patamar_esq, 1.50), "Patamar esquerdo nível 2 deve ter altura 1.50")
 	assert(is_equal_approx(alt_rampa, 0.75), "Rampa nível 1 deve ter altura 0.75")
 	assert(is_equal_approx(alt_chao, 0.0), "Chão nível 0 deve ter altura 0.0")
 	assert(is_equal_approx(alt_patamar_dir, 0.75), "Patamar direito nível 1 deve ter altura 0.75")
 	var pos_centro: Vector3 = terrain_res.normalizado_para_mundo(0.5, 0.5)
 	assert(is_equal_approx(pos_centro.x, 0.0) and is_equal_approx(pos_centro.z, 0.0), "Centro (0.5, 0.5) mapeia para X=0, Z=0")
-	var pos_alto: Vector3 = terrain_res.normalizado_para_mundo(0.08, 0.20)
+	var pos_alto: Vector3 = terrain_patamar.normalizado_para_mundo(0.08, 0.20)
 	assert(is_equal_approx(pos_alto.y, alt_patamar_esq), "normalizado_para_mundo deve aplicar get_altura em Y")
 	return true
 
@@ -974,16 +976,17 @@ static func test_battle_scene_3d_sprites_and_medieval_building() -> bool:
 	var cena: BattleScene3D = cena_res.instantiate() as BattleScene3D
 	assert(cena != null, "BattleScene3D deve instanciar")
 	cena._ready()
-	assert(cena.herois_sprites.size() == 4, "Deve instanciar 4 heróis 2D em AnimatedSprite3D")
-	assert(cena.inimigos_sprites.size() == 8, "Deve instanciar 8 inimigos 2D em AnimatedSprite3D")
-	assert(cena.terrain_visual != null and cena.terrain_visual.get_child_count() >= 96, "Malha de blocos 3D empilhados deve ser gerada")
-	var tem_elevado: bool = false
-	for sp: AnimatedSprite3D in cena.inimigos_sprites:
-		if sp.position.y > 0.5:
-			tem_elevado = true
-	assert(tem_elevado, "Combatentes posicionados no patamar lateral devem ficar em Y elevado (> 0.5)")
-	var casa: Node = cena.get_node_or_null("CasaMedievalEsq")
-	assert(casa != null, "Construção medieval 3D (bld_13) deve estar instanciada no cenário")
+	assert(cena.herois_sprites.size() == 2, "Deve instanciar apenas Lucas e Davi (2 heróis)")
+	assert(cena.inimigos_sprites.size() == 1, "Deve instanciar apenas General Cassian (1 chefe)")
+	assert(cena.terrain_visual != null and cena.terrain_visual.get_node_or_null("PatioVilaBaltazar") != null, "Pátio 3D único PatioVilaBaltazar deve ser instanciado")
+	var sp_lucas: AnimatedSprite3D = cena.herois_sprites[0]
+	var sp_davi: AnimatedSprite3D = cena.herois_sprites[1]
+	var sp_cassian: AnimatedSprite3D = cena.inimigos_sprites[0]
+	assert(sp_lucas.animation == "idle_down_left" or sp_lucas.animation == "idle_left", "Lucas deve usar sprite parado")
+	assert(sp_davi.animation == "Idle Southwest_right" or sp_davi.animation == "Idle Left_right", "Davi deve usar sprite parado (Idle Southwest_right)")
+	assert(sp_cassian.animation == "iso_idle_southeast_right" or sp_cassian.animation == "iso_idle_right_right", "General Cassian deve usar sprite parado recém-baixado")
+	var anim_espada: String = cena._escolher_anim_ataque(sp_cassian.sprite_frames, "general_cassian")
+	assert(anim_espada == "Attack Southeast_right" or anim_espada == "Attack Right_right", "General Cassian deve usar animação com a espada ao atacar")
 	cena.free()
 	return true
 
