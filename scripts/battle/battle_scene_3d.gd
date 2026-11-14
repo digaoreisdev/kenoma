@@ -4,7 +4,6 @@ extends Node3D
 ## Cena de batalha HD-2D 3D na praça medieval da Vila do Baltazar com pátio 3D completo (escadaria e fonte visíveis) e 3 combatentes (Lucas, Davi e General Cassian).
 
 const CAMINHO_CASSIAN_FRAMES: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
-const CAMINHO_BG_VILA: String = "res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.png"
 const TATICAS: Array[String] = ["LINHA_2X2", "LOSANGO", "VANGUARDA_3X1", "RETAGUARDA_1X3", "MEIA_LUA"]
 
 @export var terrain: ArenaTerrain = null
@@ -78,24 +77,6 @@ func _montar_terreno_e_construcoes() -> void:
 	terrain_visual.terrain = terrain
 	add_child(terrain_visual)
 	terrain_visual.construir_terreno(terrain)
-	_instanciar_fundo_vila_baltazar()
-
-
-func _instanciar_fundo_vila_baltazar() -> void:
-	if not ResourceLoader.exists(CAMINHO_BG_VILA):
-		return
-	var tex_vila: Texture2D = load(CAMINHO_BG_VILA) as Texture2D
-	if tex_vila == null:
-		return
-	var telao_vila: Sprite3D = Sprite3D.new()
-	telao_vila.name = "FundoVilaBaltazar"
-	telao_vila.texture = tex_vila
-	telao_vila.region_enabled = true
-	telao_vila.region_rect = Rect2(0.0, 0.0, 1920.0, 620.0)
-	telao_vila.pixel_size = 0.016
-	telao_vila.shaded = false
-	telao_vila.position = Vector3(0.0, 5.6, -6.7)
-	add_child(telao_vila)
 
 
 func _instanciar_equipe_3d() -> void:

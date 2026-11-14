@@ -979,6 +979,7 @@ static func test_battle_scene_3d_sprites_and_medieval_building() -> bool:
 	assert(cena.herois_sprites.size() == 2, "Deve instanciar apenas Lucas e Davi (2 heróis)")
 	assert(cena.inimigos_sprites.size() == 1, "Deve instanciar apenas General Cassian (1 chefe)")
 	assert(cena.terrain_visual != null and cena.terrain_visual.get_node_or_null("PatioVilaBaltazar") != null, "Pátio 3D único PatioVilaBaltazar deve ser instanciado")
+	assert(cena.get_node_or_null("FundoVilaBaltazar") == null, "Imagem de fundo 2D não deve estar na cena 3D")
 	var sp_lucas: AnimatedSprite3D = cena.herois_sprites[0]
 	var sp_davi: AnimatedSprite3D = cena.herois_sprites[1]
 	var sp_cassian: AnimatedSprite3D = cena.inimigos_sprites[0]
