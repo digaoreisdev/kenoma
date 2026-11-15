@@ -4,6 +4,9 @@ extends Node3D
 ## Cena de batalha HD-2D 3D na praça medieval da Vila do Baltazar com pátio 3D completo (escadaria e fonte visíveis) e 3 combatentes (Lucas, Davi e General Cassian).
 
 const CAMINHO_CASSIAN_FRAMES: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
+const CAMINHO_CASA_PRINCIPAL_GLB: String = "res://assets/models/arena/casa_principal_vila_baltazar.glb"
+const CAMINHO_CASA_LATERAL_GLB: String = "res://assets/models/arena/casa_lateral_vila_baltazar.glb"
+const CAMINHO_FORJA_GLB: String = "res://assets/models/arena/forja_vila_baltazar.glb"
 const TATICAS: Array[String] = ["LINHA_2X2", "LOSANGO", "VANGUARDA_3X1", "RETAGUARDA_1X3", "MEIA_LUA"]
 
 @export var terrain: ArenaTerrain = null
@@ -77,6 +80,45 @@ func _montar_terreno_e_construcoes() -> void:
 	terrain_visual.terrain = terrain
 	add_child(terrain_visual)
 	terrain_visual.construir_terreno(terrain)
+	_instanciar_estruturas_vila_3d()
+
+
+func _instanciar_estruturas_vila_3d() -> void:
+	_instanciar_modelo_3d(
+		CAMINHO_CASA_LATERAL_GLB,
+		"CasaLateralVila",
+		Vector3(-6.4, 1.18, -7.2),
+		Vector3(5.6, 5.6, 5.6),
+		Vector3(0.0, 14.0, 0.0)
+	)
+	_instanciar_modelo_3d(
+		CAMINHO_CASA_PRINCIPAL_GLB,
+		"CasaPrincipalVila",
+		Vector3(0.0, 1.18, -8.5),
+		Vector3(6.2, 6.2, 6.2),
+		Vector3.ZERO
+	)
+	_instanciar_modelo_3d(
+		CAMINHO_FORJA_GLB,
+		"ForjaVilaBaltazar",
+		Vector3(6.4, 1.18, -7.2),
+		Vector3(5.4, 5.4, 5.4),
+		Vector3(0.0, -16.0, 0.0)
+	)
+
+
+func _instanciar_modelo_3d(caminho: String, nome_no: String, pos: Vector3, escala: Vector3, rot_deg: Vector3) -> void:
+	if not ResourceLoader.exists(caminho):
+		return
+	var cena_res: PackedScene = load(caminho) as PackedScene
+	if cena_res == null:
+		return
+	var instancia: Node3D = cena_res.instantiate() as Node3D
+	instancia.name = nome_no
+	instancia.position = pos
+	instancia.scale = escala
+	instancia.rotation_degrees = rot_deg
+	add_child(instancia)
 
 
 func _instanciar_equipe_3d() -> void:
@@ -263,13 +305,13 @@ func alternar_formacao_3d(delta: int) -> void:
 
 func _aplicar_preset_camera(novo_indice: int, animar: bool) -> void:
 	var posicoes: Array[Vector3] = [
-		Vector3(0.0, 9.2, 16.5),
+		Vector3(0.0, 8.6, 15.8),
 		Vector3(2.5, 5.2, 11.5),
 		Vector3(0.0, 14.5, 12.2),
 		Vector3(-5.2, 6.4, 13.5)
 	]
 	var rotacoes: Array[Vector3] = [
-		Vector3(-27.5, 0.0, 0.0),
+		Vector3(-24.5, 0.0, 0.0),
 		Vector3(-19.0, 11.0, 0.0),
 		Vector3(-48.0, 0.0, 0.0),
 		Vector3(-22.0, -18.0, 0.0)
