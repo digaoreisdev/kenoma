@@ -979,10 +979,17 @@ static func test_battle_scene_3d_sprites_and_medieval_building() -> bool:
 	assert(cena.herois_sprites.size() == 2, "Deve instanciar apenas Lucas e Davi (2 heróis)")
 	assert(cena.inimigos_sprites.size() == 1, "Deve instanciar apenas General Cassian (1 chefe)")
 	assert(cena.terrain_visual != null and cena.terrain_visual.get_node_or_null("PatioVilaBaltazar") != null, "Pátio 3D único PatioVilaBaltazar deve ser instanciado")
-	assert(cena.get_node_or_null("CasaLateralVila") != null, "CasaLateralVila 3D deve estar instanciada no patamar esquerdo")
-	assert(cena.get_node_or_null("CasaPrincipalVila") != null, "CasaPrincipalVila 3D deve estar instanciada no patamar central")
-	assert(cena.get_node_or_null("ForjaVilaBaltazar") != null, "ForjaVilaBaltazar 3D deve estar instanciada no patamar direito")
-	assert(cena.get_node_or_null("FundoVilaBaltazar") == null, "Imagem de fundo 2D não deve estar na cena 3D")
+	assert(cena.terrain_visual.get_node_or_null("PatamarSuperiorVila") != null, "PatamarSuperiorVila elevado deve existir no fundo da praça para as casas e árvores")
+	var casa_lat: Node3D = cena.get_node_or_null("CasaLateralVila") as Node3D
+	var casa_prin: Node3D = cena.get_node_or_null("CasaPrincipalVila") as Node3D
+	var forja: Node3D = cena.get_node_or_null("ForjaVilaBaltazar") as Node3D
+	assert(casa_lat != null and casa_prin != null and forja != null, "As 3 construções 4K da vila devem estar instanciadas")
+	assert(casa_prin.position.z < casa_lat.position.z and casa_prin.position.y >= 0.85, "CasaPrincipalVila deve estar no patamar superior elevado ao fundo")
+	var veg: Node3D = cena.get_node_or_null("VegetacaoVilaHD2D") as Node3D
+	assert(veg != null and veg.get_child_count() >= 7, "Carvalhos HD-2D com sombra 3D real devem estar instanciados atrás das casas")
+	assert(cena.get_node_or_null("HorizonteMontanhasPoente") != null, "Horizonte 3D de montanhas e pôr do sol deve estar no fundo")
+	assert(cena.get_node_or_null("MolduraPrimeiroPlano3D") != null, "Moldura 3D de primeiro plano deve estar ativa")
+	assert(cena.get_node_or_null("LuzFornalhaBaltazar") != null, "Iluminação quente da forja deve estar ativa")
 	var sp_lucas: AnimatedSprite3D = cena.herois_sprites[0]
 	var sp_davi: AnimatedSprite3D = cena.herois_sprites[1]
 	var sp_cassian: AnimatedSprite3D = cena.inimigos_sprites[0]
