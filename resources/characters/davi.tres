@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://resources/skills/lanca_de_eter.tres" id="2_lanca"]
 [ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="2_xog6a"]
 [ext_resource type="Texture2D" path="res://assets/art/portraits/davi/davi_neutral.png" id="2_port"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/characters/davi/Davi_Reis_frames.tres" id="3_e42oc"]
+[ext_resource type="SpriteFrames" uid="uid://7bgkumyaot16" path="res://assets/art/characters/heroes/davi/Davi_Reis_frames.tres" id="3_e42oc"]
 
 [resource]
 script = ExtResource("1_vatih")

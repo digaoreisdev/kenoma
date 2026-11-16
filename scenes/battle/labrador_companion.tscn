@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c7k1y8v3m4q2p"]
 
 [ext_resource type="Script" path="res://scripts/battle/labrador_companion.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://assets/models/labrador/Labrador_AllAnimations.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://djj40mm0bxswn" path="res://assets/models/animals/labrador/Labrador_AllAnimations.glb" id="2_model"]
 
 [sub_resource type="Environment" id="Environment_light"]
 ambient_light_source = 2

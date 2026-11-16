@@ -2,8 +2,6 @@
 
 [ext_resource type="Script" path="res://scripts/battle/battle_scene.gd" id="1_scene_script"]
 [ext_resource type="Script" path="res://scripts/battle/battle_manager.gd" id="2_mgr_script"]
-[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/battle_bg_forge_village.png" id="3_bg_village"]
-[ext_resource type="Texture2D" path="res://assets/art/battle_backgrounds/baltazar_village/battle_fg_praca_moldura.png" id="4_fg_moldura"]
 [ext_resource type="Script" path="res://scripts/battle/distant_birds.gd" id="5_birds_script"]
 [ext_resource type="Script" path="res://scripts/battle/sky_clouds.gd" id="6_clouds_script"]
 [ext_resource type="PackedScene" path="res://scenes/battle/labrador_companion.tscn" id="7_labrador"]
@@ -33,7 +31,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_bg_village")
 expand_mode = 1
 stretch_mode = 0
 
@@ -70,7 +67,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("4_fg_moldura")
 expand_mode = 1
 stretch_mode = 0
 

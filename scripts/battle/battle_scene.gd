@@ -68,11 +68,22 @@ var layout_cenario: Resource = null
 var _cache_pes: Dictionary = {}
 var modo_encontro: String = "PADRAO"
 var modo_encontro_override: String = ""
+var indice_camera_2d: int = 0
+const NOMES_CAMERA_2D: Array[String] = [
+	"Visão Panorâmica da Praça",
+	"Foco no General Cassian",
+	"Foco nos Heróis (Lucas & Davi)",
+	"Visão de Confronto Próximo"
+]
+var _camera_tween: Tween = null
+var _camera_escala_atual: float = 1.0
+var _camera_offset_atual: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	_carregar_layout_cenario()
 	_inicializar_referencias_hud()
+	_inicializar_camera_2d()
 	_configurar_texturas_cenario()
 	_iniciar_pulsacao_cristal()
 	if battle_manager != null:
@@ -95,18 +106,20 @@ func _ready() -> void:
 func _conectar_labrador() -> void:
 	if labrador_companion == null:
 		labrador_companion = find_child("LabradorCompanion", true, false) as Node2D
-	if labrador_companion != null and battle_manager != null and labrador_companion.has_method("conectar_batalha"):
-		labrador_companion.call("conectar_batalha", battle_manager)
+	if labrador_companion != null:
+		labrador_companion.visible = false
 
 
 func _auto_inicializar_se_necessario() -> void:
 	if battle_manager == null or not battle_manager.party_members.is_empty():
 		return
-	var pm: Node = get_node_or_null("/root/PartyManager")
-	var allies: Array[CharacterData] = pm.call("get_active_party") if (pm != null and pm.has_method("get_active_party")) else []
-	if allies.is_empty():
-		allies = [CharacterData.create_default_lucas(), CharacterData.create_default_davi(), CharacterData.create_default_baltazar(), CharacterData.create_default_dai()]
-	var enemies: Array = EnemyData.create_squad_cassian_8()
+	var allies: Array[CharacterData] = [
+		CharacterData.create_default_lucas(),
+		CharacterData.create_default_davi()
+	]
+	var enemies: Array = [
+		EnemyData.create_general_cassian()
+	]
 	battle_manager.initialize_battle(allies, enemies)
 
 
@@ -436,18 +449,25 @@ func _medir_distancia_pes(sprite: AnimatedSprite2D) -> float:
 	if _cache_pes.has(chave):
 		return float(_cache_pes[chave])
 	var tex: Texture2D = frames.get_frame_texture(sprite.animation, 0)
-	var img: Image = tex.get_image() if tex != null else null
+	var img: Image = null
+	if tex != null and not (tex is AtlasTexture):
+		img = tex.get_image()
 	var dist: float = 0.0
 	if img != null and not img.is_empty():
-		dist = float(img.get_used_rect().end.y) - float(img.get_height()) * 0.5
+		if img.is_compressed():
+			img.decompress()
+		if not img.is_compressed():
+			dist = float(img.get_used_rect().end.y) - float(img.get_height()) * 0.5
+	elif tex != null:
+		dist = float(tex.get_height()) * 0.42
 	_cache_pes[chave] = dist
 	return dist
 
 
 func _obter_fallback_frames_aliado(c_id: String) -> SpriteFrames:
-	var path: String = "res://assets/art/characters/player/player_frames.tres"
+	var path: String = "res://assets/art/characters/heroes/lucas/player_frames.tres"
 	if c_id == "davi" or c_id == "dai":
-		path = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
+		path = "res://assets/art/characters/heroes/davi/Davi_Reis_frames.tres"
 	if ResourceLoader.exists(path):
 		return load(path) as SpriteFrames
 	return null
@@ -471,7 +491,7 @@ func _criar_sprite_inimigo(e: Dictionary, idx: int) -> void:
 	var is_boss: bool = str(e.get("name", "")).contains("Cassian") or e.get("is_boss", false)
 	if frames == null:
 		const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
-		const CASSIAN_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
+		const CASSIAN_PATH: String = "res://assets/art/characters/heroes/cassian/General_Cassian_frames.tres"
 		if ResourceLoader.exists(CASSIAN_COMBAT_PATH):
 			frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
 		elif ResourceLoader.exists(CASSIAN_PATH):
@@ -706,19 +726,89 @@ func _executar_passo_ataque_tween(actor_id: String, target_id: String) -> void:
 	_on_action_executed(actor_id, target_id, "ataque")
 
 
+func _inicializar_camera_2d() -> void:
+	if arena_background != null:
+		arena_background.pivot_offset = Vector2(960.0, 540.0)
+	if arena_foreground != null:
+		arena_foreground.pivot_offset = Vector2(960.0, 540.0)
+	aplicar_preset_camera_2d(0, false)
+
+
+func aplicar_preset_camera_2d(indice: int, animar: bool = true) -> void:
+	indice_camera_2d = posmod(indice, NOMES_CAMERA_2D.size())
+	var alvo_scale: float = 1.0
+	var alvo_offset: Vector2 = Vector2.ZERO
+	match indice_camera_2d:
+		0:
+			alvo_scale = 1.0
+			alvo_offset = Vector2.ZERO
+		1:
+			alvo_scale = 1.25
+			alvo_offset = Vector2(240.0, -20.0)
+		2:
+			alvo_scale = 1.25
+			alvo_offset = Vector2(-220.0, -20.0)
+		3:
+			alvo_scale = 1.15
+			alvo_offset = Vector2(0.0, -35.0)
+	_animar_camera_arena(alvo_scale, alvo_offset, 0.40 if animar else 0.0)
+	_mostrar_notificacao_camera()
+
+
+func _animar_camera_arena(alvo_scale: float, alvo_offset: Vector2, duracao: float) -> void:
+	_camera_escala_atual = alvo_scale
+	_camera_offset_atual = alvo_offset
+	if _camera_tween != null and _camera_tween.is_valid():
+		_camera_tween.kill()
+	var arena_node: Node2D = get_node_or_null("CanvasLayer/UI/Arena") as Node2D
+	var pos_arena: Vector2 = (Vector2.ONE - Vector2(alvo_scale, alvo_scale)) * Vector2(960.0, 540.0) + alvo_offset
+	if duracao <= 0.0 or not is_inside_tree():
+		_aplicar_estado_imediato_camera(arena_node, alvo_scale, alvo_offset, pos_arena)
+		return
+	_camera_tween = create_tween().set_parallel(true)
+	_camera_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if arena_background != null:
+		_camera_tween.tween_property(arena_background, "scale", Vector2(alvo_scale, alvo_scale), duracao)
+		_camera_tween.tween_property(arena_background, "position", alvo_offset, duracao)
+	if arena_foreground != null:
+		_camera_tween.tween_property(arena_foreground, "scale", Vector2(alvo_scale, alvo_scale), duracao)
+		_camera_tween.tween_property(arena_foreground, "position", alvo_offset, duracao)
+	if arena_node != null:
+		_camera_tween.tween_property(arena_node, "scale", Vector2(alvo_scale, alvo_scale), duracao)
+		_camera_tween.tween_property(arena_node, "position", pos_arena, duracao)
+
+
+func _aplicar_estado_imediato_camera(arena_node: Node2D, alvo_scale: float, alvo_offset: Vector2, pos_arena: Vector2) -> void:
+	if arena_background != null:
+		arena_background.scale = Vector2(alvo_scale, alvo_scale)
+		arena_background.position = alvo_offset
+	if arena_foreground != null:
+		arena_foreground.scale = Vector2(alvo_scale, alvo_scale)
+		arena_foreground.position = alvo_offset
+	if arena_node != null:
+		arena_node.scale = Vector2(alvo_scale, alvo_scale)
+		arena_node.position = pos_arena
+
+
+func _mostrar_notificacao_camera() -> void:
+	if state_label != null:
+		state_label.text = "Câmera 2D: %s [Setas ↑/↓]" % NOMES_CAMERA_2D[indice_camera_2d]
+
+
 func _aplicar_tremor_impacto() -> void:
 	var arena_node: Node2D = get_node_or_null("CanvasLayer/UI/Arena") as Node2D
 	if arena_node == null:
 		return
-	var orig_pos: Vector2 = Vector2.ZERO
+	var pos_base: Vector2 = arena_node.position
 	var tw: Tween = create_tween()
-	tw.tween_property(arena_node, "position", orig_pos + Vector2(6.0, -3.0), 0.05)
-	tw.tween_property(arena_node, "position", orig_pos + Vector2(-5.0, 4.0), 0.05)
-	tw.tween_property(arena_node, "position", orig_pos + Vector2(3.0, -2.0), 0.05)
-	tw.tween_property(arena_node, "position", orig_pos, 0.05)
+	tw.tween_property(arena_node, "position", pos_base + Vector2(10.0, -6.0), 0.05)
+	tw.tween_property(arena_node, "position", pos_base + Vector2(-8.0, 7.0), 0.05)
+	tw.tween_property(arena_node, "position", pos_base + Vector2(5.0, -3.0), 0.05)
+	tw.tween_property(arena_node, "position", pos_base, 0.05)
 
 
 func _finalizar_acao_cena() -> void:
+	aplicar_preset_camera_2d(indice_camera_2d, true)
 	if battle_manager != null:
 		battle_manager.concluir_acao()
 
@@ -1175,7 +1265,13 @@ func _on_fugir_pressed() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_F7:
-		get_tree().change_scene_to_file("res://scenes/battle/battle_scene_3d.tscn")
+		get_tree().change_scene_to_file("res://scenes/battle/BatalhaVila.tscn")
+		return
+	if event.is_action_pressed("ui_up"):
+		aplicar_preset_camera_2d(indice_camera_2d + 1, true)
+		return
+	elif event.is_action_pressed("ui_down"):
+		aplicar_preset_camera_2d(indice_camera_2d - 1, true)
 		return
 	if event.is_action_pressed("ui_cancel"):
 		if skills_panel != null and skills_panel.visible:

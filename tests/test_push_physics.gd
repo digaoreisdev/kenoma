@@ -47,7 +47,7 @@ static func test_hysteresis_buffer() -> bool:
 
 
 static func test_push_animation_cycle_integrity() -> bool:
-	var frames_res: Resource = load("res://assets/art/characters/player/player_frames.tres")
+	var frames_res: Resource = load("res://assets/art/characters/heroes/lucas/player_frames.tres")
 	assert(frames_res != null, "player_frames.tres must be loaded")
 	var sprite_frames: SpriteFrames = frames_res as SpriteFrames
 	assert(sprite_frames != null, "player_frames must be SpriteFrames")
@@ -93,7 +93,7 @@ static func test_pull_vector_opposition() -> bool:
 
 
 static func test_pull_animation_cycle_integrity() -> bool:
-	var frames_res: Resource = load("res://assets/art/characters/player/player_frames.tres")
+	var frames_res: Resource = load("res://assets/art/characters/heroes/lucas/player_frames.tres")
 	assert(frames_res != null, "player_frames.tres must be loaded")
 	var sprite_frames: SpriteFrames = frames_res as SpriteFrames
 	assert(sprite_frames != null, "player_frames must be SpriteFrames")

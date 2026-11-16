@@ -150,7 +150,7 @@ static func create_default_lucas() -> CharacterData:
 	var port_p: String = "res://assets/art/portraits/lucas/lucas_neutral.png"
 	var portrait_tex: Texture2D = load(port_p) as Texture2D if ResourceLoader.exists(port_p) else null
 	var lucas: CharacterData = CharacterData.new("lucas", "Lucas Reis", 1, 120, 120, 45, 45, portrait_tex, null)
-	var frm_p: String = "res://assets/art/characters/player/player_frames.tres"
+	var frm_p: String = "res://assets/art/characters/heroes/lucas/player_frames.tres"
 	if ResourceLoader.exists(frm_p):
 		lucas.sprite_frames = load(frm_p) as SpriteFrames
 	lucas.strength = 14
@@ -168,7 +168,7 @@ static func create_default_lucas() -> CharacterData:
 
 
 static func create_default_davi() -> CharacterData:
-	var frames: SpriteFrames = load("res://assets/sprites/characters/davi/Davi_Reis_frames.tres") if ResourceLoader.exists("res://assets/sprites/characters/davi/Davi_Reis_frames.tres") else null
+	var frames: SpriteFrames = load("res://assets/art/characters/heroes/davi/Davi_Reis_frames.tres") if ResourceLoader.exists("res://assets/art/characters/heroes/davi/Davi_Reis_frames.tres") else null
 	var portrait_tex: Texture2D = load("res://assets/art/portraits/davi/davi_neutral.png") if ResourceLoader.exists("res://assets/art/portraits/davi/davi_neutral.png") else null
 	var davi: CharacterData = CharacterData.new("davi", "Davi Reis", 1, 90, 90, 60, 60, portrait_tex, null)
 	davi.strength = 8
@@ -198,7 +198,7 @@ static func create_default_baltazar() -> CharacterData:
 	baltazar.defense = 14
 	baltazar.agility = 9
 	baltazar.willpower = 10
-	var frm_p: String = "res://assets/art/characters/player/player_frames.tres"
+	var frm_p: String = "res://assets/art/characters/heroes/lucas/player_frames.tres"
 	if ResourceLoader.exists(frm_p):
 		baltazar.sprite_frames = load(frm_p) as SpriteFrames
 	baltazar.weapon_affinities = {
@@ -220,7 +220,7 @@ static func create_default_dai() -> CharacterData:
 	dai.magic_defense = 18
 	dai.agility = 13
 	dai.willpower = 16
-	var frm_p: String = "res://assets/sprites/characters/davi/Davi_Reis_frames.tres"
+	var frm_p: String = "res://assets/art/characters/heroes/davi/Davi_Reis_frames.tres"
 	if ResourceLoader.exists(frm_p):
 		dai.sprite_frames = load(frm_p) as SpriteFrames
 	dai.weapon_affinities = {

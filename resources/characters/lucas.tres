@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/core/character_data.gd" id="3_t4tox"]
 [ext_resource type="Resource" path="res://resources/skills/golpe_sismico.tres" id="4_sismico"]
 [ext_resource type="Script" path="res://scripts/core/skill_data.gd" id="4_euep2"]
-[ext_resource type="SpriteFrames" path="res://assets/art/characters/player/player_frames.tres" id="5_i7upt"]
+[ext_resource type="SpriteFrames" path="res://assets/art/characters/heroes/lucas/player_frames.tres" id="5_i7upt"]
 
 [sub_resource type="Resource" id="Resource_1367e"]
 script = ExtResource("1_vop3q")

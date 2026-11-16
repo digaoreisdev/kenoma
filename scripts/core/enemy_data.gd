@@ -63,7 +63,7 @@ func to_dictionary() -> Dictionary:
 static func create_general_cassian() -> Resource:
 	var frames: SpriteFrames = null
 	const CASSIAN_COMBAT_PATH: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
-	const FRAMES_PATH: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
+	const FRAMES_PATH: String = "res://assets/art/characters/heroes/cassian/General_Cassian_frames.tres"
 	if ResourceLoader.exists(CASSIAN_COMBAT_PATH):
 		frames = load(CASSIAN_COMBAT_PATH) as SpriteFrames
 	elif ResourceLoader.exists(FRAMES_PATH):
@@ -82,7 +82,7 @@ static func create_squad_cassian_8() -> Array[Dictionary]:
 	var squad: Array[Dictionary] = []
 	var frames: SpriteFrames = null
 	const P1: String = "res://autosprite_imported/General_Cassian1/General_Cassian1_frames.tres"
-	const P2: String = "res://assets/sprites/characters/cassian/General_Cassian_frames.tres"
+	const P2: String = "res://assets/art/characters/heroes/cassian/General_Cassian_frames.tres"
 	if ResourceLoader.exists(P1):
 		frames = load(P1) as SpriteFrames
 	elif ResourceLoader.exists(P2):

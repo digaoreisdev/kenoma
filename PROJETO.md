@@ -119,6 +119,7 @@
 
 
 ## Backlog (Depois / Talvez)
+* Consulte o detalhamento completo de arte, canvas e reconstrução da arena em `res://BACKLOG.md`.
 * **Depois:**
   * Implementação da vertical slice (transição de mapa, combate por turnos).
   * Reavaliar `window/stretch/aspect` (keep vs expand) para telas de celular com proporções ultra-wide (ex: 19.5:9, 20:9) durante a Fase F1.
