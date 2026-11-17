@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1iytlty2dmar"
-path="res://.godot/imported/green_pine_01.jpg-54d69a37659a619571af3255c7bac4a2.ctex"
+uid="uid://bthe41kfoivi4"
+path="res://.godot/imported/bramble_bush_01.png-9ad747ba0f4fdf3d9ea83b9993b392ef.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/trees/green_pine_01.jpg"
-dest_files=["res://.godot/imported/green_pine_01.jpg-54d69a37659a619571af3255c7bac4a2.ctex"]
+source_file="res://assets/art/props/vegetation/bushes/bramble_bush_01.png"
+dest_files=["res://.godot/imported/bramble_bush_01.png-9ad747ba0f4fdf3d9ea83b9993b392ef.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfrudqojfgn5a"
-path="res://.godot/imported/flower_bush_01.jpg-065f9a72c6fb6003b210170355a4deee.ctex"
+uid="uid://fp2280xdytla"
+path="res://.godot/imported/yellow_flower_bush_01.png-8e5c9ceaa87cc8f04bf19a5be9c74af7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/bushes/flower_bush_01.jpg"
-dest_files=["res://.godot/imported/flower_bush_01.jpg-065f9a72c6fb6003b210170355a4deee.ctex"]
+source_file="res://assets/art/props/vegetation/bushes/yellow_flower_bush_01.png"
+dest_files=["res://.godot/imported/yellow_flower_bush_01.png-8e5c9ceaa87cc8f04bf19a5be9c74af7.ctex"]
 
 [params]
 

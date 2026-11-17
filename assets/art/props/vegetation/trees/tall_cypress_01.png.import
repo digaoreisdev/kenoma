@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0hjvaoflwbuk"
-path="res://.godot/imported/dead_tree_01.jpg-7d74e3ff2695bfe280fc7e162b0d0b58.ctex"
+uid="uid://c5t1esggb32sj"
+path="res://.godot/imported/tall_cypress_01.png-95d176cae23aa85322ddb5020a8ffc40.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/trees/dead_tree_01.jpg"
-dest_files=["res://.godot/imported/dead_tree_01.jpg-7d74e3ff2695bfe280fc7e162b0d0b58.ctex"]
+source_file="res://assets/art/props/vegetation/trees/tall_cypress_01.png"
+dest_files=["res://.godot/imported/tall_cypress_01.png-95d176cae23aa85322ddb5020a8ffc40.ctex"]
 
 [params]
 

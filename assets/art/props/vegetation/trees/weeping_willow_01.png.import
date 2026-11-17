@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3aknnig23fih"
-path="res://.godot/imported/tall_cypress_01.jpg-b16b93e8106b09c590d4d86fae06d8ab.ctex"
+uid="uid://ci38s5u52fmsa"
+path="res://.godot/imported/weeping_willow_01.png-62fe23261e35d78e3ecb8697f4bee789.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/trees/tall_cypress_01.jpg"
-dest_files=["res://.godot/imported/tall_cypress_01.jpg-b16b93e8106b09c590d4d86fae06d8ab.ctex"]
+source_file="res://assets/art/props/vegetation/trees/weeping_willow_01.png"
+dest_files=["res://.godot/imported/weeping_willow_01.png-62fe23261e35d78e3ecb8697f4bee789.ctex"]
 
 [params]
 

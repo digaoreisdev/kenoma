@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dja8aa1u7ekqy"
-path="res://.godot/imported/apple_tree_01.jpg-edd8b71085f603e294cdbda9d8e94786.ctex"
+uid="uid://gictud22iii4"
+path="res://.godot/imported/dry_bush_01.png-b498ecaa38bb8a0bde1407b95a11fa9e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/trees/apple_tree_01.jpg"
-dest_files=["res://.godot/imported/apple_tree_01.jpg-edd8b71085f603e294cdbda9d8e94786.ctex"]
+source_file="res://assets/art/props/vegetation/bushes/dry_bush_01.png"
+dest_files=["res://.godot/imported/dry_bush_01.png-b498ecaa38bb8a0bde1407b95a11fa9e.ctex"]
 
 [params]
 

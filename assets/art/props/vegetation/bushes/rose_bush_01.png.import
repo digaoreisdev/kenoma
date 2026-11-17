@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ex4e1xdynij0"
-path="res://.godot/imported/green_oak_01.jpg-9dde4746ea7e0e109441890debb5a53b.ctex"
+uid="uid://d24gf4834wqy7"
+path="res://.godot/imported/rose_bush_01.png-0821add8bd48a3b2c7dbcf608648e1dc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/trees/green_oak_01.jpg"
-dest_files=["res://.godot/imported/green_oak_01.jpg-9dde4746ea7e0e109441890debb5a53b.ctex"]
+source_file="res://assets/art/props/vegetation/bushes/rose_bush_01.png"
+dest_files=["res://.godot/imported/rose_bush_01.png-0821add8bd48a3b2c7dbcf608648e1dc.ctex"]
 
 [params]
 

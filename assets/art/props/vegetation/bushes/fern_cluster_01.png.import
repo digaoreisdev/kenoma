@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://21q8npwn4iws"
-path="res://.godot/imported/weeping_willow_01.jpg-13f9cd08a8dcdfe9cbcde6de51f60372.ctex"
+uid="uid://65kgpg44pr1l"
+path="res://.godot/imported/fern_cluster_01.png-8d5fb2f00026af23574cff2240c6e425.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/props/vegetation/trees/weeping_willow_01.jpg"
-dest_files=["res://.godot/imported/weeping_willow_01.jpg-13f9cd08a8dcdfe9cbcde6de51f60372.ctex"]
+source_file="res://assets/art/props/vegetation/bushes/fern_cluster_01.png"
+dest_files=["res://.godot/imported/fern_cluster_01.png-8d5fb2f00026af23574cff2240c6e425.ctex"]
 
 [params]
 
