@@ -1,0 +1,115 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/battle/village_battle_3d.gd" id="1_vil3d"]
+[ext_resource type="Script" path="res://scripts/battle/terreno_batalha.gd" id="2_terr"]
+[ext_resource type="Script" path="res://scripts/battle/campo_grama.gd" id="3_grama"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks/rocha_com_musgo1/rocha_com_musgo1.glb" id="4_rocha"]
+
+[sub_resource type="Environment" id="Environment_vild"]
+background_mode = 1
+background_color = Color(0.92, 0.74, 0.52, 1)
+tonemap_mode = 3
+ssao_enabled = true
+glow_enabled = true
+glow_intensity = 0.55
+glow_bloom = 0.2
+adjustment_enabled = true
+adjustment_saturation = 1.15
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.007
+volumetric_fog_albedo = Color(1, 0.88, 0.72, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pedra"]
+height = 1.8
+radius = 2.2
+
+[node name="VillageBattle3D" type="Node3D"]
+script = ExtResource("1_vil3d")
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("2_terr")
+largura = 70.0
+profundidade = 60.0
+celula = 0.25
+altura_subida = 5.2
+amp_ondulacao = 0.9
+largura_praca = 36.0
+largura_rua = 9.0
+
+[node name="Grass" type="MultiMeshInstance3D" parent="Terrain"]
+script = ExtResource("3_grama")
+quantidade = 12000
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, 0.40558, -0.40558, 0, 0.707107, 0.707107, 0.573576, -0.579228, 0.579228, 0, 15, 0)
+light_color = Color(1, 0.851, 0.627, 1)
+light_energy = 1.3
+shadow_enabled = true
+directional_shadow_mode = 2
+directional_shadow_max_distance = 65.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_vild")
+
+[node name="Backdrop" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 42, -95)
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="ElevatedRock" type="StaticBody3D" parent="."]
+transform = Transform3D(4, 0, 0, 0, 2.2, 0, 0, 0, 4, 8.5, 0, 6.5)
+
+[node name="RochaMesh" parent="ElevatedRock" instance=ExtResource("4_rocha")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ElevatedRock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CylinderShape3D_pedra")
+
+[node name="Vegetation" type="Node3D" parent="."]
+
+[node name="Slots" type="Node3D" parent="."]
+
+[node name="ally_1" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, 3)
+
+[node name="ally_2" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0.5)
+
+[node name="ally_3" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 2.5)
+
+[node name="ally_4" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -0.5)
+
+[node name="ally_5" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0, -1.5)
+
+[node name="ally_6" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 1.45, 6.5)
+
+[node name="enemy_1" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2)
+
+[node name="enemy_2" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0, 0)
+
+[node name="enemy_3" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -1.5)
+
+[node name="enemy_4" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, 2.5)
+
+[node name="enemy_5" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, -1)
+
+[node name="enemy_6" type="Marker3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 1)
+
+[node name="Combatants" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.913545, 0.406737, 0, -0.406737, 0.913545, 0, 9, 24)
+fov = 32.0
+current = true
