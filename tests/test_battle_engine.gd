@@ -63,7 +63,31 @@ static func _run_group_c() -> bool:
 	p = p and test_arena_terrain_3d_altura_and_mundo_conversion()
 	p = p and test_battle_scene_3d_sprites_and_medieval_building()
 	p = p and test_batalha_vila_procedural()
+	p = p and test_terreno_batalha_faces_voltadas_para_cima()
 	return p
+
+
+## REG-015: o chão do TerrenoBatalha deve ter a face frontal (horária) voltada para +Y, senão é descartado pelo culling.
+static func test_terreno_batalha_faces_voltadas_para_cima() -> bool:
+	var terreno: TerrenoBatalha = TerrenoBatalha.new()
+	terreno.largura = 4.0
+	terreno.profundidade = 4.0
+	terreno.celula = 1.0
+	terreno.gerar_colisao = false
+	terreno._inicializar_ruido()
+	var arrays: Array = terreno._construir_arrays_malha(4, 4)
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
+	var idx: PackedInt32Array = arrays[Mesh.ARRAY_INDEX] as PackedInt32Array
+	assert(idx.size() >= 3, "Malha do terreno deve ter triângulos")
+	var ok: bool = true
+	for t: int in range(0, idx.size(), 3):
+		var n: Vector3 = (verts[idx[t + 2]] - verts[idx[t]]).cross(verts[idx[t + 1]] - verts[idx[t]])
+		# Godot: face frontal = sentido horário; a normal frontal (v2-v0)x(v1-v0) deve apontar para cima (y > 0)
+		if n.y <= 0.0:
+			ok = false
+	terreno.free()
+	assert(ok, "REG-015: triângulos do terreno estão com winding invertido (chão invisível visto de cima)")
+	return ok
 
 
 static func test_battle_initialization_with_lucas() -> bool:

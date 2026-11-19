@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c30xebnay0o0w"
-path="res://.godot/imported/casa_forja_medieval_tripo_image_1598f22a-7ac2-4f1c-a32f-488ae1b0365e_0_0.jpg-ed72319b5be7e295d7d7ea2ae65b5d4b.ctex"
+path.s3tc="res://.godot/imported/casa_forja_medieval_tripo_image_1598f22a-7ac2-4f1c-a32f-488ae1b0365e_0_0.jpg-ed72319b5be7e295d7d7ea2ae65b5d4b.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "e8286eeaf3b0bb7c7772007c868564c6"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/houses/casa_forja_medieval/casa_forja_medieval_tripo_image_1598f22a-7ac2-4f1c-a32f-488ae1b0365e_0_0.jpg"
-dest_files=["res://.godot/imported/casa_forja_medieval_tripo_image_1598f22a-7ac2-4f1c-a32f-488ae1b0365e_0_0.jpg-ed72319b5be7e295d7d7ea2ae65b5d4b.ctex"]
+dest_files=["res://.godot/imported/casa_forja_medieval_tripo_image_1598f22a-7ac2-4f1c-a32f-488ae1b0365e_0_0.jpg-ed72319b5be7e295d7d7ea2ae65b5d4b.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

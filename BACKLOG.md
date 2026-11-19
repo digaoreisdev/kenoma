@@ -71,17 +71,18 @@
 * [x] Auditoria de modelos 3D (10 GLBs) e vegetação 2D (18 sprites RGBA8).
 * [x] Diagnóstico de scripts ausentes: `campo_grama.gd` e pasta `textures/terrain/`.
 
-#### Fase 1: Cenário Estático (CHECKPOINT A - CONCLUÍDO)
-* [x] Criar `res://scenes/battle/village_battle_3d.tscn` e `res://scripts/battle/village_battle_3d.gd`.
-* [x] Câmera de referência: FOV 32, posição `(0, 9, 24)`, rotação `(-24, 0, 0)`.
-* [x] Terreno via `TerrenoBatalha`: praça plana na frente, subida suave ao fundo, ondulação sutil (`celula = 0.25`, `altura_subida = 5.2`, `amp_ondulacao = 0.9`).
-* [x] Iluminação dourada (`#FFD9A0`) com sombras PSSM 4 splits e `WorldEnvironment` (Glow, Tonemap ACES, SSAO, névoa leve).
-* [x] Backdrop / Céu distante com `battle_bg_forge_village.png` (unshaded a 95m ao fundo).
-* [x] Posicionamento de casas e forja ao longo da rua com `posicionar_no_chao()` e verificação de inclinação (< 6°).
-* [x] Dispersão de props 3D (baú, rochas) e pedra plana elevada (`ElevatedRock`) com colisão cilíndrica uniforme Jolt.
+#### Fase 1: Cenário Estático (CHECKPOINT A - CONCLUÍDO E REFINADO)
+* [x] Criar `res://scenes/battle/village_battle_3d.tscn` e `res://scripts/battle/village_battle_3d.gd` 100% serializada para edição no Godot Editor.
+* [x] Arena compacta e intimista HD-2D (28x22m, praça de 14m, rua de 5m).
+* [x] Câmera de referência estilo HD-2D / Eiyuden: FOV 34°, posição `(0, 3.0, 10.5)`, pitch `(-11.5°, 0, 0)`.
+* [x] Terreno via `TerrenoBatalha` com texturas reais PBR (`cobblestone_01.png`, `grass_01.png`, `dirt_01.png`) e mesclagem orgânica por ruído procedural 2D.
+* [x] Iluminação dourada quente (`#FFDCB0`) com sombras direcionais e `WorldEnvironment` (Glow suave, Tonemap ACES, SSAO).
+* [x] Backdrop com o céu e montanhas ao pôr do sol emoldurando o horizonte a 32m.
+* [x] Casas e Forja do Baltazar aproximadas para emoldurar o combate imediatamente atrás da rua (Z = -9m a -12.5m).
+* [x] Dispersão de props 3D (baú aberto, formações rochosas) e pedra plana elevada (`ElevatedRock`).
 * [x] Vegetação 2D (árvores e arbustos em `Sprite3D` com `BILLBOARD_FIXED_Y`, `shaded = true`).
-* [x] Implementação de `campo_grama.gd` e `MultiMeshInstance3D` para tufos de grama fora da praça de combate.
-* [x] Validação visual e teste headless do Godot (0 erros).
+* [x] `CampoGrama` com `MultiMeshInstance3D` distribuindo tufos de grama orgânica fora da praça e rua.
+* [x] Validação visual e teste headless do Godot (ALL PASS 5/5).
 
 #### Fase 2: Combatentes e Câmera (CHECKPOINT B)
 * [ ] Criação dos slots de combate (`ally_1..6`, `enemy_1..6`) e slots na rocha elevada com ajuste de altura via Raycast.

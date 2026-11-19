@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c73c0t83bcat5"
-path="res://.godot/imported/casa_medieval2_tripo_image_03cd1664-b759-4938-a139-f47bab10c88c_0_0.jpg-1c341391e524314f1bbc6a9a0cbe384c.ctex"
+path.s3tc="res://.godot/imported/casa_medieval2_tripo_image_03cd1664-b759-4938-a139-f47bab10c88c_0_0.jpg-1c341391e524314f1bbc6a9a0cbe384c.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "93099787befea201b7be67df01b958ba"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/houses/casa_medieval2/casa_medieval2_tripo_image_03cd1664-b759-4938-a139-f47bab10c88c_0_0.jpg"
-dest_files=["res://.godot/imported/casa_medieval2_tripo_image_03cd1664-b759-4938-a139-f47bab10c88c_0_0.jpg-1c341391e524314f1bbc6a9a0cbe384c.ctex"]
+dest_files=["res://.godot/imported/casa_medieval2_tripo_image_03cd1664-b759-4938-a139-f47bab10c88c_0_0.jpg-1c341391e524314f1bbc6a9a0cbe384c.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

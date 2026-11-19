@@ -33,9 +33,10 @@ extends Node3D
 @export var rebaixo_rua: float = 0.08      # a rua fica levemente mais baixa
 
 @export_group("Material")
-@export var tex_estrada: Texture2D = null  # paralelepípedo / terra batida
-@export var tex_grama: Texture2D = null    # grama / terra das laterais
-@export var tiling: float = 0.25           # repetições por metro
+@export var tex_estrada: Texture2D = null  # paralelepípedo / cobblestone
+@export var tex_grama: Texture2D = null    # grama
+@export var tex_terra: Texture2D = null    # terra batida / dirt
+@export var tiling: float = 0.45           # repetições por metro
 @export var cor_estrada: Color = Color(0.58, 0.44, 0.28)
 @export var cor_grama: Color = Color(0.36, 0.44, 0.20)
 
@@ -48,6 +49,12 @@ var _corpo: StaticBody3D = null
 
 
 func _ready() -> void:
+	if tex_estrada == null and ResourceLoader.exists("res://assets/art/textures/terrain/cobblestone_01.png"):
+		tex_estrada = load("res://assets/art/textures/terrain/cobblestone_01.png") as Texture2D
+	if tex_grama == null and ResourceLoader.exists("res://assets/art/textures/terrain/grass_01.png"):
+		tex_grama = load("res://assets/art/textures/terrain/grass_01.png") as Texture2D
+	if tex_terra == null and ResourceLoader.exists("res://assets/art/textures/terrain/dirt_01.png"):
+		tex_terra = load("res://assets/art/textures/terrain/dirt_01.png") as Texture2D
 	gerar()
 
 
@@ -145,8 +152,8 @@ func _construir_arrays_malha(nx: int, nz: int) -> Array:
 			var b: int = a + 1
 			var c: int = a + (nx + 1)
 			var d: int = c + 1
-			# Triângulos com winding anti-horário visto de cima (OpenGL/Godot padrão): a, c, b e b, c, d
-			indices.append_array([a, c, b, b, c, d])
+			# Godot trata o sentido HORÁRIO como face frontal. Visto de cima (X→direita, Z→baixo): a, b, c e b, d, c
+			indices.append_array([a, b, c, b, d, c])
 
 	var arrays: Array = []
 	arrays.resize(Mesh.ARRAY_MAX)
@@ -176,19 +183,47 @@ func _criar_colisao(malha: ArrayMesh) -> void:
 
 
 func _criar_material() -> ShaderMaterial:
+	var t_est: Texture2D = tex_estrada
+	if t_est == null and ResourceLoader.exists("res://assets/art/textures/terrain/cobblestone_01.png"):
+		t_est = load("res://assets/art/textures/terrain/cobblestone_01.png") as Texture2D
+	var t_gra: Texture2D = tex_grama
+	if t_gra == null and ResourceLoader.exists("res://assets/art/textures/terrain/grass_01.png"):
+		t_gra = load("res://assets/art/textures/terrain/grass_01.png") as Texture2D
+	var t_ter: Texture2D = tex_terra
+	if t_ter == null and ResourceLoader.exists("res://assets/art/textures/terrain/dirt_01.png"):
+		t_ter = load("res://assets/art/textures/terrain/dirt_01.png") as Texture2D
+
 	var sh: Shader = Shader.new()
 	sh.code = """
 shader_type spatial;
 
 uniform sampler2D tex_estrada : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D tex_grama : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D tex_terra : source_color, filter_linear_mipmap, repeat_enable;
 uniform bool usar_texturas = false;
 uniform vec3 cor_estrada : source_color;
 uniform vec3 cor_grama : source_color;
-uniform float tiling = 0.25;
+uniform float tiling = 0.45;
 
 varying vec3 pos_mundo;
 varying float mascara;
+
+float hash21(vec2 p) {
+	p = fract(p * vec2(123.34, 456.21));
+	p += dot(p, p + 45.32);
+	return fract(p.x * p.y);
+}
+
+float ruido2d(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	float a = hash21(i);
+	float b = hash21(i + vec2(1.0, 0.0));
+	float c = hash21(i + vec2(0.0, 1.0));
+	float d = hash21(i + vec2(1.0, 1.0));
+	return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
 
 void vertex() {
 	pos_mundo = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -198,10 +233,19 @@ void vertex() {
 void fragment() {
 	vec2 uv = pos_mundo.xz * tiling;
 	vec3 estrada = usar_texturas ? texture(tex_estrada, uv).rgb : cor_estrada;
-	vec3 grama = usar_texturas ? texture(tex_grama, uv).rgb : cor_grama;
-	ALBEDO = mix(grama, estrada, smoothstep(0.35, 0.65, mascara));
-	ROUGHNESS = 1.0;
-	SPECULAR = 0.1;
+	vec3 grama = usar_texturas ? texture(tex_grama, uv * 1.3).rgb : cor_grama;
+	vec3 terra = usar_texturas ? texture(tex_terra, uv * 0.9).rgb : cor_estrada * 0.85;
+
+	float n = ruido2d(pos_mundo.xz * 1.8) * 0.28 - 0.14;
+	float m = clamp(mascara + n, 0.0, 1.0);
+
+	// Calçamento com terra e desgaste nas bordas
+	vec3 calcamento = mix(terra, estrada, 0.82);
+	vec3 verde = mix(grama, terra, 0.25);
+
+	ALBEDO = mix(verde, calcamento, smoothstep(0.28, 0.72, m));
+	ROUGHNESS = 0.88;
+	SPECULAR = 0.12;
 }
 """
 	var mat: ShaderMaterial = ShaderMaterial.new()
@@ -209,8 +253,9 @@ void fragment() {
 	mat.set_shader_parameter("tiling", tiling)
 	mat.set_shader_parameter("cor_estrada", Vector3(cor_estrada.r, cor_estrada.g, cor_estrada.b))
 	mat.set_shader_parameter("cor_grama", Vector3(cor_grama.r, cor_grama.g, cor_grama.b))
-	if tex_estrada != null and tex_grama != null:
+	if t_est != null and t_gra != null:
 		mat.set_shader_parameter("usar_texturas", true)
-		mat.set_shader_parameter("tex_estrada", tex_estrada)
-		mat.set_shader_parameter("tex_grama", tex_grama)
+		mat.set_shader_parameter("tex_estrada", t_est)
+		mat.set_shader_parameter("tex_grama", t_gra)
+		mat.set_shader_parameter("tex_terra", t_ter if t_ter != null else t_est)
 	return mat
